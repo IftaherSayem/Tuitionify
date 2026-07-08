@@ -5,13 +5,26 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { loginEmail, loginGoogle, refreshProfile } = useAuth();
+  const { loginEmail, loginGoogle, refreshProfile, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [busy, setBusy] = useState(false);
+
+  async function handleForgot() {
+    if (!form.email) return toast.error('Enter your email first, then click "Forgot password?"');
+    setBusy(true);
+    try {
+      await resetPassword(form.email);
+      toast.success('Password reset link sent. Check your inbox.');
+    } catch (err) {
+      toast.error(friendly(err));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function routeAfterLogin() {
     const profile = await refreshProfile();
@@ -63,7 +76,15 @@ export default function Login() {
             </div>
           </div>
           <div>
-            <label className="label">Password</label>
+            <div className="flex items-center justify-between">
+              <label className="label">Password</label>
+              <button
+                type="button" onClick={handleForgot} disabled={busy}
+                className="text-xs font-semibold text-brand-700 hover:underline disabled:opacity-50"
+              >
+                Forgot password?
+              </button>
+            </div>
             <div className="relative">
               <Lock size={17} className="absolute left-3 top-3 text-slate-400" />
               <input

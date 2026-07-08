@@ -6,6 +6,8 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  sendEmailVerification,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase/config';
 import api from '../api/client';
@@ -46,7 +48,21 @@ export function AuthProvider({ children }) {
   async function signupEmail(name, email, password) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     if (name) await updateProfile(cred.user, { displayName: name });
+    try {
+      await sendEmailVerification(cred.user);
+    } catch {
+      // non-fatal: account still created, user can resend later
+    }
     return cred.user;
+  }
+
+  function resetPassword(email) {
+    return sendPasswordResetEmail(auth, email);
+  }
+
+  function resendVerification() {
+    if (!auth.currentUser) throw new Error('Not logged in');
+    return sendEmailVerification(auth.currentUser);
   }
 
   function loginEmail(email, password) {
@@ -86,6 +102,8 @@ export function AuthProvider({ children }) {
     logout,
     registerProfile,
     refreshProfile,
+    resetPassword,
+    resendVerification,
     setProfile,
   };
 

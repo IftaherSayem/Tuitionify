@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail,
+  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
@@ -20,6 +20,7 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <VerifyEmailBanner />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
@@ -52,6 +53,40 @@ export default function Dashboard() {
           <SeekerDashboard />
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Email verification banner (hidden once verified) ──────────── */
+function VerifyEmailBanner() {
+  const { firebaseUser, resendVerification } = useAuth();
+  const [sending, setSending] = useState(false);
+
+  if (!firebaseUser || firebaseUser.emailVerified) return null;
+
+  async function handleResend() {
+    setSending(true);
+    try {
+      await resendVerification();
+      toast.success('Verification email sent. Check your inbox, then reload.');
+    } catch (err) {
+      toast.error(err?.code?.includes('too-many-requests')
+        ? 'Too many requests. Try again in a few minutes.'
+        : 'Could not send email. Try again later.');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+      <MailWarning size={20} className="text-amber-600" />
+      <p className="flex-1 text-sm text-amber-800">
+        Please verify your email ({firebaseUser.email}). Check your inbox for the link.
+      </p>
+      <button onClick={handleResend} disabled={sending} className="btn-outline px-3 py-1.5 text-xs">
+        {sending ? 'Sending…' : 'Resend email'}
+      </button>
     </div>
   );
 }

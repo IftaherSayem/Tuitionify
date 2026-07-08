@@ -17,7 +17,8 @@ const app = express();
 
 initFirebase();
 
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
+app.use(cors({ origin: clientUrl }));
 app.use(express.json());
 
 // Ensure the DB is connected before handling any request (serverless-safe).
