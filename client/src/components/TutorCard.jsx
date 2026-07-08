@@ -1,0 +1,50 @@
+import { Link } from 'react-router-dom';
+import { MapPin, Wallet, GraduationCap } from 'lucide-react';
+import { StarDisplay } from './StarRating';
+import VerifiedBadge from './VerifiedBadge';
+import { CURRENCY } from '../data/options';
+
+export default function TutorCard({ tutor }) {
+  return (
+    <Link to={`/tutors/${tutor._id}`} className="card group block p-5 transition hover:shadow-md hover:-translate-y-0.5">
+      <div className="flex items-center gap-4">
+        <img
+          src={tutor.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name)}&background=0f8f62&color=fff`}
+          alt={tutor.name}
+          className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-100"
+        />
+        <div className="min-w-0">
+          <h3 className="flex items-center gap-1 truncate font-semibold text-slate-900 group-hover:text-brand-700">
+            {tutor.name}
+            {tutor.isVerified && <VerifiedBadge size={15} />}
+          </h3>
+          <p className="flex items-center gap-1 truncate text-xs text-slate-500">
+            <GraduationCap size={13} /> {tutor.department || 'University Student'}
+          </p>
+          <div className="mt-1">
+            <StarDisplay value={tutor.ratingAvg} count={tutor.ratingCount} size={14} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {tutor.subjects?.slice(0, 4).map((s) => (
+          <span key={s} className="chip">{s}</span>
+        ))}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+        <span className="flex items-center gap-1.5">
+          <MapPin size={15} className="text-slate-400" />
+          {tutor.preferredAreas?.[0] || 'Flexible'}
+          {tutor.preferredAreas?.length > 1 && ` +${tutor.preferredAreas.length - 1}`}
+        </span>
+        {tutor.expectedSalary > 0 && (
+          <span className="flex items-center gap-1.5 font-medium text-slate-700">
+            <Wallet size={15} className="text-slate-400" /> {CURRENCY}{tutor.expectedSalary.toLocaleString()}/mo
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
