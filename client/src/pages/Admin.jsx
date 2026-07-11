@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, Users, Flag, BadgeCheck, X, Check, BarChart3, Download } from 'lucide-react';
+import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import api from '../api/client';
@@ -9,6 +9,7 @@ import VerifiedBadge from '../components/VerifiedBadge';
 
 const TABS = [
   { key: 'tutors', label: 'Tutors', icon: Users },
+  { key: 'guardians', label: 'Guardians', icon: UserCheck },
   { key: 'reports', label: 'Reports', icon: Flag },
   { key: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
@@ -46,6 +47,7 @@ export default function Admin() {
 
       <div className="mt-6">
         {tab === 'tutors' && <TutorsTab />}
+        {tab === 'guardians' && <GuardiansTab />}
         {tab === 'reports' && <ReportsTab />}
         {tab === 'analytics' && <AnalyticsTab />}
       </div>
@@ -197,6 +199,19 @@ function TutorsTab() {
     }
   }
 
+  async function toggleRestrict(t) {
+    setBusy(t._id + '-r');
+    try {
+      const { data } = await api.patch(`/admin/users/${t._id}/restrict`, { restricted: !t.restricted });
+      setTutors((list) => list.map((x) => (x._id === t._id ? { ...x, restricted: data.restricted } : x)));
+      toast.success(data.restricted ? 'Tutor restricted' : 'Restriction lifted');
+    } catch {
+      toast.error('Update failed');
+    } finally {
+      setBusy('');
+    }
+  }
+
   if (!tutors) return <Spinner />;
   if (!tutors.length)
     return <EmptyState title="No tutors yet" message="Tutors will appear here once they register." icon={Users} />;
@@ -209,14 +224,82 @@ function TutorsTab() {
             <div className="flex items-center gap-2">
               <span className="font-semibold text-slate-900 dark:text-white">{t.name}</span>
               {t.isVerified && <VerifiedBadge size={15} />}
+              {t.restricted && (
+                <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                  Restricted
+                </span>
+              )}
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">
               {[t.department, t.university].filter(Boolean).join(' · ') || 'No academic info'}
             </p>
           </div>
-          <button onClick={() => toggleVerify(t)} disabled={busy === t._id} className={t.isVerified ? 'btn-outline' : 'btn-primary'}>
-            {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
+          <div className="flex gap-2">
+            <button onClick={() => toggleVerify(t)} disabled={busy === t._id} className={t.isVerified ? 'btn-outline' : 'btn-primary'}>
+              {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
+            </button>
+            <button
+              onClick={() => toggleRestrict(t)}
+              disabled={busy === t._id + '-r'}
+              className={t.restricted ? 'btn-outline text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/30' : 'btn-outline text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/30'}
+            >
+              {t.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GuardiansTab() {
+  const [guardians, setGuardians] = useState(null);
+  const [busy, setBusy] = useState('');
+
+  useEffect(() => {
+    api.get('/admin/guardians').then(({ data }) => setGuardians(data)).catch(() => toast.error('Failed to load guardians'));
+  }, []);
+
+  async function toggleRestrict(g) {
+    setBusy(g._id);
+    try {
+      const { data } = await api.patch(`/admin/users/${g._id}/restrict`, { restricted: !g.restricted });
+      setGuardians((list) => list.map((x) => (x._id === g._id ? { ...x, restricted: data.restricted } : x)));
+      toast.success(data.restricted ? 'Guardian restricted' : 'Restriction lifted');
+    } catch {
+      toast.error('Update failed');
+    } finally {
+      setBusy('');
+    }
+  }
+
+  if (!guardians) return <Spinner />;
+  if (!guardians.length)
+    return <EmptyState title="No guardians yet" message="Guardians will appear here once they register." icon={UserCheck} />;
+
+  return (
+    <div className="space-y-3">
+      {guardians.map((g) => (
+        <div key={g._id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-900 dark:text-white">{g.name}</span>
+              {g.restricted && (
+                <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                  Restricted
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{g.email}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{g.phone || 'No phone'} · Joined {new Date(g.createdAt).toLocaleDateString()}</p>
+          </div>
+          <button
+            onClick={() => toggleRestrict(g)}
+            disabled={busy === g._id}
+            className={g.restricted ? 'btn-outline text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/30' : 'btn-outline text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/30'}
+          >
+            {g.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
           </button>
         </div>
       ))}

@@ -761,6 +761,18 @@ tuitionify/
   </ul>
 </div>
 
+<h3>4.22 Guardian Management &amp; User Restriction</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>Guardians tab</strong> &mdash; Admins can view all registered guardians (seekers) with their name, email, phone, and registration date in a new &ldquo;Guardians&rdquo; tab on the Admin panel.</li>
+    <li><strong>Restrict / Unrestrict</strong> &mdash; Admins can restrict any user (tutor or guardian) with a single click. Restricted users receive a <code>403</code> on all authenticated routes and see an &ldquo;account restricted&rdquo; message.</li>
+    <li><strong>Backend enforcement</strong> &mdash; The <code>loadUser</code> middleware checks the <code>restricted</code> field; restricted users are blocked before any route handler runs.</li>
+    <li><strong>Visual status</strong> &mdash; A red &ldquo;Restricted&rdquo; badge appears next to restricted users. The restrict button toggles between red (restrict) and green (unrestrict).</li>
+    <li><strong>API endpoints</strong> &mdash; <code>GET /api/admin/guardians</code> lists seekers; <code>PATCH /api/admin/users/:id/restrict</code> toggles restriction for any user.</li>
+  </ul>
+</div>
+
 <!-- ======================== 5. DATA MODELS ======================== -->
 <h2 id="data-models" class="page-break"><span class="num">5</span> Database Schema & Data Models</h2>
 
@@ -788,6 +800,7 @@ tuitionify/
   <tr><td><code>ratingCount</code></td><td>Number</td><td>No</td><td>Denormalized review count</td></tr>
   <tr><td><code>isVerified</code></td><td>Boolean</td><td>No</td><td>Admin-granted verification badge</td></tr>
   <tr><td><code>emailVerified</code></td><td>Boolean</td><td>No</td><td>Synced from Firebase token</td></tr>
+  <tr><td><code>restricted</code></td><td>Boolean</td><td>No</td><td>Admin-set flag; blocked from all authenticated routes when true</td></tr>
 </table>
 
 <h3>5.2 Tuition Model</h3>
@@ -1292,6 +1305,10 @@ cd server && npm run seed
   <div class="feature-item">
     <h4>Application Tracking Timeline</h4>
     <p><span class="badge badge-low">DONE</span> Visual timeline showing Applied &rarr; Viewed &rarr; Decision with timestamps for each application. See Section 4.21.</p>
+  </div>
+  <div class="feature-item">
+    <h4>Guardian Management &amp; User Restriction</h4>
+    <p><span class="badge badge-low">DONE</span> Admin can view all guardians and restrict/unrestrict both tutors and guardians. See Section 4.22.</p>
   </div>
 </div>
 

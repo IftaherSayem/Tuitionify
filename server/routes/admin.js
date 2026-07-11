@@ -10,13 +10,38 @@ const router = Router();
 // All routes here require an admin (email listed in ADMIN_EMAILS).
 router.use(verifyToken, loadUser, requireAdmin);
 
-// GET /api/admin/tutors — list tutors with verification status
+// GET /api/admin/tutors — list tutors with verification and restriction status
 router.get('/tutors', async (req, res, next) => {
   try {
     const tutors = await User.find({ role: 'tutor' })
-      .select('name email university department isVerified ratingAvg createdAt')
+      .select('name email university department isVerified restricted ratingAvg createdAt')
       .sort({ isVerified: 1, createdAt: -1 });
     res.json(tutors);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/guardians — list seekers (guardians)
+router.get('/guardians', async (req, res, next) => {
+  try {
+    const guardians = await User.find({ role: 'seeker' })
+      .select('name email phone restricted createdAt')
+      .sort({ createdAt: -1 });
+    res.json(guardians);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /api/admin/users/:id/restrict — restrict or unrestrict any user
+router.patch('/users/:id/restrict', async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.restricted = Boolean(req.body.restricted);
+    await user.save();
+    res.json({ _id: user._id, restricted: user.restricted });
   } catch (err) {
     next(err);
   }

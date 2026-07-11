@@ -15,6 +15,7 @@ IMPLEMENTED (for reference):
   9. Tuition Recommendations (overlap scoring on subjects/area/classLevel, tutor dashboard)
   10. Review Replies (single reply per review, tutor-only endpoint)
   11. Application Tracking Timeline (viewedAt, decidedAt, visual timeline)
+  12. Guardian Management & User Restriction (admin guardians tab, restrict/unrestrict toggle)
 ------------------------------------------------------------
 PROPOSED FEATURES (Not Yet Implemented)
 ------------------------------------------------------------

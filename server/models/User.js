@@ -32,6 +32,7 @@ const userSchema = new Schema(
     // student ID; emailVerified mirrors Firebase's email verification.
     isVerified: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: false },
+    restricted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
