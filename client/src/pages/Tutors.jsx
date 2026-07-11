@@ -1,8 +1,10 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import api from '../api/client';
 import FilterSidebar from '../components/FilterSidebar';
 import TutorCard from '../components/TutorCard';
+import Pagination from '../components/Pagination';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
 
@@ -14,8 +16,24 @@ export default function Tutors() {
   });
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [tutors, setTutors] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  const [searchText, setSearchText] = useState('');
+  const [query, setQuery] = useState('');
+  const debounceRef = useRef(null);
+
+  function handleSearch(value) {
+    setSearchText(value);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setQuery(value.trim());
+      setPage(1);
+    }, 400);
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -25,37 +43,59 @@ export default function Tutors() {
         Object.entries(filters).filter(([, v]) => (Array.isArray(v) ? v.length : v))
       );
       if (verifiedOnly) params.verified = 'true';
-      const { data } = await api.get('/users/tutors', { params });
-      setTutors(data);
+      if (query) params.q = query;
+      params.page = page;
+      params.limit = 12;
+      const { data: result } = await api.get('/users/tutors', { params });
+      setTutors(result.data);
+      setTotalPages(result.totalPages);
+      setTotal(result.total);
     } catch {
       setTutors([]);
       setError(true);
     } finally {
       setLoading(false);
     }
-  }, [filters, verifiedOnly]);
+  }, [filters, verifiedOnly, query, page]);
 
   useEffect(() => { load(); }, [load]);
 
-  const onChange = (key, value) => setFilters((f) => ({ ...f, [key]: value }));
+  const onChange = (key, value) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    setPage(1);
+  };
   const onReset = () => {
     setFilters({ subjects: [], classLevel: '', area: '', mode: '', gender: '', minSalary: '', maxSalary: '', minRating: '' });
     setVerifiedOnly(false);
+    setSearchText('');
+    setQuery('');
+    setPage(1);
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Find Tutors</h1>
-        <p className="mt-1 text-slate-500">Browse verified university-student tutors.</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Find Tutors</h1>
+        <p className="mt-1 text-slate-500 dark:text-slate-400">Browse verified university-student tutors.</p>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="relative mt-6">
+        <Search size={18} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
+        <input
+          type="text"
+          className="input pl-10"
+          placeholder="Search tutors by name, department, or subject…"
+          value={searchText}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr]">
         <div className="space-y-4">
-          <label className="card flex cursor-pointer items-center gap-2 p-4 text-sm font-medium text-slate-700">
+          <label className="card flex cursor-pointer items-center gap-2 p-4 text-sm font-medium text-slate-700 dark:text-slate-300">
             <input
               type="checkbox" className="h-4 w-4 accent-brand-600"
-              checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)}
+              checked={verifiedOnly} onChange={(e) => { setVerifiedOnly(e.target.checked); setPage(1); }}
             />
             Verified tutors only
           </label>
@@ -80,12 +120,13 @@ export default function Tutors() {
             />
           ) : (
             <>
-              <p className="mb-4 text-sm text-slate-500">{tutors.length} tutor(s) found</p>
+              <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">{total} tutor(s) found</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {tutors.map((t) => (
                   <TutorCard key={t._id} tutor={t} />
                 ))}
               </div>
+              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
             </>
           )}
         </div>

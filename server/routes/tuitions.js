@@ -25,9 +25,33 @@ router.get('/', async (req, res, next) => {
       if (maxSalary) filter.salary.$lte = Number(maxSalary);
     }
 
-    const tuitions = await Tuition.find(filter)
-      .populate('createdBy', 'name photo')
-      .sort({ createdAt: -1 });
+    if (req.query.q) {
+      const re = { $regex: req.query.q, $options: 'i' };
+      filter.$or = [{ title: re }, { description: re }, { subjects: re }];
+    }
+
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 12));
+    const skip = (page - 1) * limit;
+
+    const [tuitions, total] = await Promise.all([
+      Tuition.find(filter)
+        .populate('createdBy', 'name photo')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Tuition.countDocuments(filter),
+    ]);
+    res.json({ data: tuitions, page, totalPages: Math.ceil(total / limit), total });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/tuitions/mine/posted — seeker's own posts (must be before /:id)
+router.get('/mine/posted', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    const tuitions = await Tuition.find({ createdBy: req.dbUser._id }).sort({ createdAt: -1 });
     res.json(tuitions);
   } catch (err) {
     next(err);
@@ -50,16 +74,6 @@ router.post('/', verifyToken, loadUser, requireRole('seeker'), async (req, res, 
   try {
     const tuition = await Tuition.create({ ...req.body, createdBy: req.dbUser._id });
     res.status(201).json(tuition);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// GET /api/tuitions/mine/posted — seeker's own posts
-router.get('/mine/posted', verifyToken, loadUser, async (req, res, next) => {
-  try {
-    const tuitions = await Tuition.find({ createdBy: req.dbUser._id }).sort({ createdAt: -1 });
-    res.json(tuitions);
   } catch (err) {
     next(err);
   }

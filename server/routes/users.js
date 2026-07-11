@@ -111,14 +111,25 @@ router.get('/tutors', async (req, res, next) => {
       if (maxSalary) filter.expectedSalary.$lte = Number(maxSalary);
     }
     if (minRating) filter.ratingAvg = { $gte: Number(minRating) };
-    if (q) filter.name = { $regex: q, $options: 'i' };
+    if (q) {
+      const re = { $regex: q, $options: 'i' };
+      filter.$or = [{ name: re }, { university: re }, { department: re }, { subjects: re }];
+    }
     if (req.query.verified === 'true') filter.isVerified = true;
 
-    // Directory listing never exposes contact details.
-    const tutors = await User.find(filter)
-      .select(PRIVATE_FIELDS)
-      .sort({ isVerified: -1, ratingAvg: -1, createdAt: -1 });
-    res.json(tutors);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 12));
+    const skip = (page - 1) * limit;
+
+    const [tutors, total] = await Promise.all([
+      User.find(filter)
+        .select(PRIVATE_FIELDS)
+        .sort({ isVerified: -1, ratingAvg: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(filter),
+    ]);
+    res.json({ data: tutors, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }

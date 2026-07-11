@@ -21,20 +21,20 @@ export default function Admin() {
           <ShieldCheck size={22} />
         </span>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Admin panel</h1>
-          <p className="mt-1 text-sm text-slate-500">Verify tutors and review reports.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Admin panel</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Verify tutors and review reports.</p>
         </div>
       </div>
 
-      <div className="mt-8 flex gap-1 border-b border-slate-200">
+      <div className="mt-8 flex gap-1 border-b border-slate-200 dark:border-slate-700">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
               tab === t.key
-                ? 'border-brand-600 text-brand-700'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                ? 'border-brand-600 text-brand-700 dark:text-brand-400'
+                : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
             }`}
           >
             <t.icon size={16} /> {t.label}
@@ -54,21 +54,14 @@ function TutorsTab() {
   const [busy, setBusy] = useState('');
 
   useEffect(() => {
-    api
-      .get('/admin/tutors')
-      .then(({ data }) => setTutors(data))
-      .catch(() => toast.error('Failed to load tutors'));
+    api.get('/admin/tutors').then(({ data }) => setTutors(data)).catch(() => toast.error('Failed to load tutors'));
   }, []);
 
   async function toggleVerify(t) {
     setBusy(t._id);
     try {
-      const { data } = await api.patch(`/admin/tutors/${t._id}/verify`, {
-        isVerified: !t.isVerified,
-      });
-      setTutors((list) =>
-        list.map((x) => (x._id === t._id ? { ...x, isVerified: data.isVerified } : x))
-      );
+      const { data } = await api.patch(`/admin/tutors/${t._id}/verify`, { isVerified: !t.isVerified });
+      setTutors((list) => list.map((x) => (x._id === t._id ? { ...x, isVerified: data.isVerified } : x)));
       toast.success(data.isVerified ? 'Tutor verified' : 'Verification revoked');
     } catch {
       toast.error('Update failed');
@@ -87,24 +80,16 @@ function TutorsTab() {
         <div key={t._id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-900">{t.name}</span>
+              <span className="font-semibold text-slate-900 dark:text-white">{t.name}</span>
               {t.isVerified && <VerifiedBadge size={15} />}
             </div>
-            <p className="text-sm text-slate-500">{t.email}</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               {[t.department, t.university].filter(Boolean).join(' · ') || 'No academic info'}
             </p>
           </div>
-          <button
-            onClick={() => toggleVerify(t)}
-            disabled={busy === t._id}
-            className={t.isVerified ? 'btn-outline' : 'btn-primary'}
-          >
-            {t.isVerified ? (
-              <><X size={16} /> Revoke</>
-            ) : (
-              <><BadgeCheck size={16} /> Verify</>
-            )}
+          <button onClick={() => toggleVerify(t)} disabled={busy === t._id} className={t.isVerified ? 'btn-outline' : 'btn-primary'}>
+            {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
           </button>
         </div>
       ))}
@@ -117,10 +102,7 @@ function ReportsTab() {
   const [busy, setBusy] = useState('');
 
   useEffect(() => {
-    api
-      .get('/admin/reports')
-      .then(({ data }) => setReports(data))
-      .catch(() => toast.error('Failed to load reports'));
+    api.get('/admin/reports').then(({ data }) => setReports(data)).catch(() => toast.error('Failed to load reports'));
   }, []);
 
   async function setStatus(r, status) {
@@ -141,9 +123,9 @@ function ReportsTab() {
     return <EmptyState title="No reports" message="Reported profiles and posts will show up here." icon={Flag} />;
 
   const statusStyle = {
-    open: 'bg-amber-50 text-amber-700',
-    reviewed: 'bg-brand-50 text-brand-700',
-    dismissed: 'bg-slate-100 text-slate-500',
+    open: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    reviewed: 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400',
+    dismissed: 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400',
   };
 
   return (
@@ -154,30 +136,22 @@ function ReportsTab() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="chip capitalize">{r.targetType}</span>
-                <span className="font-semibold text-slate-900">{r.reason}</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{r.reason}</span>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusStyle[r.status]}`}>
                   {r.status}
                 </span>
               </div>
-              {r.details && <p className="mt-1.5 text-sm text-slate-600">{r.details}</p>}
-              <p className="mt-1 text-xs text-slate-400">
+              {r.details && <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{r.details}</p>}
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                 Reported by {r.reporter?.name || 'Unknown'} ({r.reporter?.email || '—'})
               </p>
             </div>
             {r.status === 'open' && (
               <div className="flex gap-2">
-                <button
-                  onClick={() => setStatus(r, 'reviewed')}
-                  disabled={busy === r._id}
-                  className="btn-primary"
-                >
+                <button onClick={() => setStatus(r, 'reviewed')} disabled={busy === r._id} className="btn-primary">
                   <Check size={16} /> Reviewed
                 </button>
-                <button
-                  onClick={() => setStatus(r, 'dismissed')}
-                  disabled={busy === r._id}
-                  className="btn-outline"
-                >
+                <button onClick={() => setStatus(r, 'dismissed')} disabled={busy === r._id} className="btn-outline">
                   <X size={16} /> Dismiss
                 </button>
               </div>

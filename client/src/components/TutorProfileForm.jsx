@@ -4,6 +4,7 @@ import { Save } from 'lucide-react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { SUBJECTS, CLASS_LEVELS, AREAS } from '../data/options';
+import PhotoUpload from './PhotoUpload';
 
 const Chips = ({ label, options, value, onToggle }) => (
   <div>
@@ -15,7 +16,9 @@ const Chips = ({ label, options, value, onToggle }) => (
           <button
             key={o} type="button" onClick={() => onToggle(o)}
             className={`rounded-full border px-3 py-1.5 text-sm transition ${
-              active ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+              active
+                ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
+                : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-600 dark:text-slate-400 dark:hover:border-slate-500'
             }`}
           >
             {o}
@@ -27,7 +30,7 @@ const Chips = ({ label, options, value, onToggle }) => (
 );
 
 export default function TutorProfileForm({ onDone }) {
-  const { profile, setProfile } = useAuth();
+  const { profile, setProfile, firebaseUser } = useAuth();
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     name: profile.name || '',
@@ -70,7 +73,13 @@ export default function TutorProfileForm({ onDone }) {
 
   return (
     <form onSubmit={save} className="card space-y-5 p-6 sm:p-8">
-      <h2 className="text-lg font-bold text-slate-900">Edit Tutor Profile</h2>
+      <h2 className="text-lg font-bold text-slate-900 dark:text-white">Edit Tutor Profile</h2>
+
+      <PhotoUpload
+        value={form.photo}
+        onChange={(url) => set('photo', url)}
+        uid={firebaseUser?.uid}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
@@ -100,10 +109,6 @@ export default function TutorProfileForm({ onDone }) {
         <div>
           <label className="label">Expected salary (৳/month)</label>
           <input type="number" min="0" className="input" value={form.expectedSalary} onChange={(e) => set('expectedSalary', e.target.value)} />
-        </div>
-        <div>
-          <label className="label">Photo URL (optional)</label>
-          <input className="input" placeholder="https://…" value={form.photo} onChange={(e) => set('photo', e.target.value)} />
         </div>
         <div>
           <label className="label">Preferred mode</label>

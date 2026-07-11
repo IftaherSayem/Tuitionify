@@ -5,8 +5,6 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
 
-// Shown when a Firebase user exists but has no Mongo profile yet
-// (e.g. logged in with Google before choosing a role).
 export default function CompleteProfile() {
   const { firebaseUser, profile, loading, registerProfile } = useAuth();
   const navigate = useNavigate();
@@ -34,29 +32,33 @@ export default function CompleteProfile() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-14">
       <div className="card p-8">
-        <h1 className="text-2xl font-bold text-slate-900">One last step</h1>
-        <p className="mt-1 text-sm text-slate-500">Tell us how you'll use Tuitionify.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">One last step</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Tell us how you'll use Tuitionify.</p>
 
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
             type="button" onClick={() => setRole('seeker')}
             className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-              role === 'seeker' ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200' : 'border-slate-200'
+              role === 'seeker'
+                ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200 dark:bg-brand-900/30 dark:ring-brand-700'
+                : 'border-slate-200 dark:border-slate-600'
             }`}
           >
-            <Users size={22} className={role === 'seeker' ? 'text-brand-600' : 'text-slate-500'} />
-            <span className="text-sm font-semibold">Guardian / Student</span>
-            <span className="text-xs text-slate-500">Find a tutor</span>
+            <Users size={22} className={role === 'seeker' ? 'text-brand-600' : 'text-slate-500 dark:text-slate-400'} />
+            <span className="text-sm font-semibold dark:text-white">Guardian / Student</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Find a tutor</span>
           </button>
           <button
             type="button" onClick={() => setRole('tutor')}
             className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-              role === 'tutor' ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200' : 'border-slate-200'
+              role === 'tutor'
+                ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200 dark:bg-brand-900/30 dark:ring-brand-700'
+                : 'border-slate-200 dark:border-slate-600'
             }`}
           >
-            <GraduationCap size={22} className={role === 'tutor' ? 'text-brand-600' : 'text-slate-500'} />
-            <span className="text-sm font-semibold">Tutor</span>
-            <span className="text-xs text-slate-500">Give tuition</span>
+            <GraduationCap size={22} className={role === 'tutor' ? 'text-brand-600' : 'text-slate-500 dark:text-slate-400'} />
+            <span className="text-sm font-semibold dark:text-white">Tutor</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Give tuition</span>
           </button>
         </div>
 

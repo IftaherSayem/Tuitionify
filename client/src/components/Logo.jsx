@@ -24,7 +24,7 @@ export default function Logo({ size = 36, withWordmark = true, className = '' })
         </defs>
       </svg>
       {withWordmark && (
-        <span className="text-lg font-extrabold tracking-tight text-slate-900">
+        <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
           Tuition<span className="text-brand-600">ify</span>
         </span>
       )}

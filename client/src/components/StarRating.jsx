@@ -9,12 +9,12 @@ export function StarDisplay({ value = 0, count, size = 16 }) {
           <Star
             key={i}
             size={size}
-            className={i <= Math.round(value) ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+            className={i <= Math.round(value) ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'}
           />
         ))}
       </span>
       {typeof count === 'number' && (
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
           {value ? value.toFixed(1) : 'New'}{count ? ` (${count})` : ''}
         </span>
       )}
@@ -36,7 +36,7 @@ export function StarInput({ value, onChange, size = 28 }) {
         >
           <Star
             size={size}
-            className={i <= value ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+            className={i <= value ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'}
           />
         </button>
       ))}

@@ -11,14 +11,14 @@ export default function TutorCard({ tutor }) {
         <img
           src={tutor.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name)}&background=0f8f62&color=fff`}
           alt={tutor.name}
-          className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-100"
+          className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-800"
         />
         <div className="min-w-0">
-          <h3 className="flex items-center gap-1 truncate font-semibold text-slate-900 group-hover:text-brand-700">
+          <h3 className="flex items-center gap-1 truncate font-semibold text-slate-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-400">
             {tutor.name}
             {tutor.isVerified && <VerifiedBadge size={15} />}
           </h3>
-          <p className="flex items-center gap-1 truncate text-xs text-slate-500">
+          <p className="flex items-center gap-1 truncate text-xs text-slate-500 dark:text-slate-400">
             <GraduationCap size={13} /> {tutor.department || 'University Student'}
           </p>
           <div className="mt-1">
@@ -33,15 +33,15 @@ export default function TutorCard({ tutor }) {
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+      <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
-          <MapPin size={15} className="text-slate-400" />
+          <MapPin size={15} className="text-slate-400 dark:text-slate-500" />
           {tutor.preferredAreas?.[0] || 'Flexible'}
           {tutor.preferredAreas?.length > 1 && ` +${tutor.preferredAreas.length - 1}`}
         </span>
         {tutor.expectedSalary > 0 && (
-          <span className="flex items-center gap-1.5 font-medium text-slate-700">
-            <Wallet size={15} className="text-slate-400" /> {CURRENCY}{tutor.expectedSalary.toLocaleString()}/mo
+          <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
+            <Wallet size={15} className="text-slate-400 dark:text-slate-500" /> {CURRENCY}{tutor.expectedSalary.toLocaleString()}/mo
           </span>
         )}
       </div>

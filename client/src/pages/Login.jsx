@@ -61,14 +61,14 @@ export default function Login() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-14">
       <div className="card p-8">
-        <h1 className="text-2xl font-bold text-slate-900">Log in</h1>
-        <p className="mt-1 text-sm text-slate-500">Welcome back to Tuitionify.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Log in</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Welcome back to Tuitionify.</p>
 
         <form onSubmit={handleEmail} className="mt-6 space-y-4">
           <div>
             <label className="label">Email</label>
             <div className="relative">
-              <Mail size={17} className="absolute left-3 top-3 text-slate-400" />
+              <Mail size={17} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
               <input
                 type="email" required className="input pl-10" placeholder="you@example.com"
                 value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -80,13 +80,13 @@ export default function Login() {
               <label className="label">Password</label>
               <button
                 type="button" onClick={handleForgot} disabled={busy}
-                className="text-xs font-semibold text-brand-700 hover:underline disabled:opacity-50"
+                className="text-xs font-semibold text-brand-700 hover:underline disabled:opacity-50 dark:text-brand-400"
               >
                 Forgot password?
               </button>
             </div>
             <div className="relative">
-              <Lock size={17} className="absolute left-3 top-3 text-slate-400" />
+              <Lock size={17} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
               <input
                 type="password" required className="input pl-10" placeholder="••••••••"
                 value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -98,17 +98,17 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
-          <span className="h-px flex-1 bg-slate-200" /> OR <span className="h-px flex-1 bg-slate-200" />
+        <div className="my-5 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+          <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" /> OR <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
         </div>
 
         <button onClick={handleGoogle} disabled={busy} className="btn-outline w-full">
           <GoogleIcon /> Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="font-semibold text-brand-700 hover:underline">Sign up</Link>
+          <Link to="/register" className="font-semibold text-brand-700 hover:underline dark:text-brand-400">Sign up</Link>
         </p>
       </div>
     </div>

@@ -15,7 +15,9 @@ const MultiChips = ({ label, options, value, onToggle }) => (
           <button
             key={o} type="button" onClick={() => onToggle(o)}
             className={`rounded-full border px-3 py-1.5 text-sm transition ${
-              active ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+              active
+                ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
+                : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-600 dark:text-slate-400 dark:hover:border-slate-500'
             }`}
           >
             {o}
@@ -62,8 +64,8 @@ export default function PostTuition() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">Post a Tuition</h1>
-      <p className="mt-1 text-slate-500">Describe what you're looking for and let tutors apply.</p>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Post a Tuition</h1>
+      <p className="mt-1 text-slate-500 dark:text-slate-400">Describe what you're looking for and let tutors apply.</p>
 
       <form onSubmit={submit} className="card mt-8 space-y-5 p-6 sm:p-8">
         <div>

@@ -7,8 +7,6 @@ const RATINGS = [
   { value: '2', label: '2★ & up' },
 ];
 
-// Controlled filter panel. `filters` is an object; `onChange(key, value)`.
-// `filters.subjects` is an array (multi-select). `showRating` adds a rating filter.
 export default function FilterSidebar({ filters, onChange, onReset, genderLabel = 'Gender', showRating = false }) {
   const field = (label, key, options, withEmpty = 'All') => (
     <div>
@@ -35,10 +33,10 @@ export default function FilterSidebar({ filters, onChange, onReset, genderLabel 
   return (
     <aside className="card sticky top-20 h-fit p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 font-semibold text-slate-900">
+        <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
           <SlidersHorizontal size={18} /> Filters
         </h3>
-        <button onClick={onReset} className="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-700">
+        <button onClick={onReset} className="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400">
           <X size={13} /> Reset
         </button>
       </div>
@@ -53,7 +51,9 @@ export default function FilterSidebar({ filters, onChange, onReset, genderLabel 
                 <button
                   key={s} type="button" onClick={() => toggleSubject(s)}
                   className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                    active ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    active
+                      ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
+                      : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-600 dark:text-slate-400 dark:hover:border-slate-500'
                   }`}
                 >
                   {s}
@@ -76,7 +76,7 @@ export default function FilterSidebar({ filters, onChange, onReset, genderLabel 
               type="number" min="0" placeholder="Min" className="input"
               value={filters.minSalary || ''} onChange={(e) => onChange('minSalary', e.target.value)}
             />
-            <span className="text-slate-400">–</span>
+            <span className="text-slate-400 dark:text-slate-500">–</span>
             <input
               type="number" min="0" placeholder="Max" className="input"
               value={filters.maxSalary || ''} onChange={(e) => onChange('maxSalary', e.target.value)}

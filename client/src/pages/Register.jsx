@@ -4,7 +4,6 @@ import { Mail, Lock, User, GraduationCap, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
-// Step 1: pick a role. Step 2: fill credentials → create Firebase user → create profile.
 export default function Register() {
   const { signupEmail, loginGoogle, registerProfile } = useAuth();
   const navigate = useNavigate();
@@ -47,10 +46,9 @@ export default function Register() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-14">
       <div className="card p-8">
-        <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-        <p className="mt-1 text-sm text-slate-500">Join Tuitionify in a minute.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Create your account</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Join Tuitionify in a minute.</p>
 
-        {/* Role picker */}
         <div className="mt-6">
           <label className="label">I am a…</label>
           <div className="grid grid-cols-2 gap-3">
@@ -69,7 +67,7 @@ export default function Register() {
           <div>
             <label className="label">Full name</label>
             <div className="relative">
-              <User size={17} className="absolute left-3 top-3 text-slate-400" />
+              <User size={17} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
               <input
                 required className="input pl-10" placeholder="Your name"
                 value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -79,7 +77,7 @@ export default function Register() {
           <div>
             <label className="label">Email</label>
             <div className="relative">
-              <Mail size={17} className="absolute left-3 top-3 text-slate-400" />
+              <Mail size={17} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
               <input
                 type="email" required className="input pl-10" placeholder="you@example.com"
                 value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -89,7 +87,7 @@ export default function Register() {
           <div>
             <label className="label">Password</label>
             <div className="relative">
-              <Lock size={17} className="absolute left-3 top-3 text-slate-400" />
+              <Lock size={17} className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
               <input
                 type="password" required minLength={6} className="input pl-10" placeholder="At least 6 characters"
                 value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -101,17 +99,17 @@ export default function Register() {
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
-          <span className="h-px flex-1 bg-slate-200" /> OR <span className="h-px flex-1 bg-slate-200" />
+        <div className="my-5 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+          <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" /> OR <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
         </div>
 
         <button onClick={handleGoogle} disabled={busy} className="btn-outline w-full">
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-brand-700 hover:underline">Log in</Link>
+          <Link to="/login" className="font-semibold text-brand-700 hover:underline dark:text-brand-400">Log in</Link>
         </p>
       </div>
     </div>
@@ -123,12 +121,14 @@ function RoleCard({ active, onClick, icon: Icon, title, desc }) {
     <button
       type="button" onClick={onClick}
       className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-        active ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200' : 'border-slate-200 hover:border-slate-300'
+        active
+          ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200 dark:bg-brand-900/30 dark:ring-brand-700'
+          : 'border-slate-200 hover:border-slate-300 dark:border-slate-600 dark:hover:border-slate-500'
       }`}
     >
-      <Icon size={22} className={active ? 'text-brand-600' : 'text-slate-500'} />
-      <span className="text-sm font-semibold text-slate-900">{title}</span>
-      <span className="text-xs text-slate-500">{desc}</span>
+      <Icon size={22} className={active ? 'text-brand-600' : 'text-slate-500 dark:text-slate-400'} />
+      <span className="text-sm font-semibold text-slate-900 dark:text-white">{title}</span>
+      <span className="text-xs text-slate-500 dark:text-slate-400">{desc}</span>
     </button>
   );
 }

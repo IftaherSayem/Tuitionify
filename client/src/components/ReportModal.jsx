@@ -38,10 +38,10 @@ export default function ReportModal({ open, onClose, targetType, targetId }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
             <Flag size={18} className="text-red-500" /> Report
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"><X size={20} /></button>
         </div>
 
         <div className="mt-4 space-y-3">
