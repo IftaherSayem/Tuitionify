@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
@@ -137,17 +137,26 @@ function StatCard({ label, value, sub }) {
 }
 
 function ChartCard({ title, data, dataKey, nameKey, color }) {
+  const gradientId = `spark-${title.replace(/\s/g, '')}`;
+  const latest = data.length ? data[data.length - 1][dataKey] : 0;
   return (
     <div className="card p-5">
-      <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey={nameKey} tick={{ fontSize: 11 }} />
-          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-          <Tooltip />
-          <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
-        </BarChart>
+      <div className="flex items-baseline justify-between">
+        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
+        <span className="text-2xl font-bold text-slate-900 dark:text-white">{latest}</span>
+      </div>
+      <ResponsiveContainer width="100%" height={80}>
+        <AreaChart data={data} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+              <stop offset="100%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey={nameKey} hide />
+          <Tooltip labelFormatter={(v) => `Week: ${v}`} formatter={(v) => [v, '']} />
+          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#${gradientId})`} dot={false} />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
