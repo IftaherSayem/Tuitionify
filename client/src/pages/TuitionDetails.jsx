@@ -188,7 +188,8 @@ export default function TuitionDetails() {
           ) : (
             <div className="space-y-3">
               {applications.map((a) => (
-                <div key={a._id} className="card flex flex-wrap items-center gap-4 p-4">
+                <div key={a._id} className="card p-4">
+                  <div className="flex flex-wrap items-center gap-4">
                   <img
                     src={a.tutor?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.tutor?.name || 'T')}&background=0f8f62&color=fff`}
                     alt="" className="h-12 w-12 rounded-full"
@@ -215,6 +216,8 @@ export default function TuitionDetails() {
                       {cap(a.status)}
                     </span>
                   )}
+                  </div>
+                  <AppTimeline app={a} />
                 </div>
               ))}
             </div>
@@ -250,3 +253,31 @@ function Info({ icon: Icon, label, value }) {
 }
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
+
+function AppTimeline({ app }) {
+  const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : null;
+  const steps = [
+    { label: 'Applied', time: fmt(app.createdAt), done: true },
+    { label: 'Viewed', time: fmt(app.viewedAt), done: !!app.viewedAt },
+    { label: app.status === 'accepted' ? 'Accepted' : app.status === 'rejected' ? 'Rejected' : 'Decision', time: fmt(app.decidedAt), done: !!app.decidedAt },
+  ];
+
+  return (
+    <div className="mt-3 flex items-center gap-1 border-t border-slate-100 pt-3 dark:border-slate-700">
+      {steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-1">
+          <div className="flex flex-col items-center">
+            <div className={`h-2.5 w-2.5 rounded-full ${s.done ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-600'}`} />
+            <span className={`mt-1 text-[10px] ${s.done ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>
+              {s.label}
+            </span>
+            {s.time && <span className="text-[9px] text-slate-400 dark:text-slate-500">{s.time}</span>}
+          </div>
+          {i < steps.length - 1 && (
+            <div className={`h-0.5 w-6 ${s.done ? 'bg-brand-300 dark:bg-brand-700' : 'bg-slate-200 dark:bg-slate-600'}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}

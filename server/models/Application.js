@@ -9,6 +9,8 @@ const applicationSchema = new Schema(
     tutor: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     message: { type: String, default: '' },
     status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
+    viewedAt: { type: Date, default: null },
+    decidedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -13,6 +13,7 @@ import contactRoutes from './routes/contact.js';
 import reportRoutes from './routes/reports.js';
 import adminRoutes from './routes/admin.js';
 import bookmarkRoutes from './routes/bookmarks.js';
+import tutorBookmarkRoutes from './routes/tutorBookmarks.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/contact-requests', contactRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/tutor-bookmarks', tutorBookmarkRoutes);
 
 // Central error handler
 app.use((err, req, res, next) => {

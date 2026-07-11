@@ -10,6 +10,11 @@ IMPLEMENTED (for reference):
   4. Bookmark/Save Tuitions (toggle, batch check, dashboard section)
   5. Profile Photo Upload (Firebase Storage)
   6. Edit/Delete Tuitions (edit details, hard delete, confirmation modal, cascade)
+  7. Analytics Dashboard (admin stats, charts with Recharts, CSV export)
+  8. Favorites/Saved Tutors (TutorBookmark model, heart toggle, dashboard section)
+  9. Tuition Recommendations (overlap scoring on subjects/area/classLevel, tutor dashboard)
+  10. Review Replies (single reply per review, tutor-only endpoint)
+  11. Application Tracking Timeline (viewedAt, decidedAt, visual timeline)
 ------------------------------------------------------------
 PROPOSED FEATURES (Not Yet Implemented)
 ------------------------------------------------------------
@@ -52,7 +57,7 @@ PROPOSED FEATURES (Not Yet Implemented)
     - Comparison table view with highlights on differences
     - "Add to compare" button on tutor cards
 
-12. ANALYTICS DASHBOARD (ADMIN)
+12. ANALYTICS DASHBOARD (ADMIN) [DONE]
     - Total users, tuitions, applications over time
     - Charts: signups per week, tuitions posted per week
     - Top subjects, most active areas
@@ -70,23 +75,23 @@ PROPOSED FEATURES (Not Yet Implemented)
     - All UI text translated to Bangla
     - Store language preference in localStorage
 
-15. FAVORITES / SAVED TUTORS
+15. FAVORITES / SAVED TUTORS [DONE]
     - Bookmark tutors (similar to tuition bookmarks)
     - "Saved Tutors" section in dashboard
     - Quick-access list for frequently viewed tutors
 
-16. TUITION RECOMMENDATIONS
+16. TUITION RECOMMENDATIONS [DONE]
     - Suggest tuitions to tutors based on their subjects,
       preferred areas, and class levels
     - "Recommended for you" section on tutor dashboard
     - Simple matching algorithm (overlap score on subjects + area)
 
-17. REVIEW REPLIES
+17. REVIEW REPLIES [DONE]
     - Allow tutors to reply to reviews left on their profile
     - Single reply per review (no threads)
     - Reply shown below the review on tutor profile page
 
-18. APPLICATION TRACKING TIMELINE
+18. APPLICATION TRACKING TIMELINE [DONE]
     - Visual timeline showing application status changes
     - Timestamps for: applied, viewed, accepted/rejected
     - "Viewed" status when tuition owner opens the application
@@ -121,7 +126,7 @@ PROPOSED FEATURES (Not Yet Implemented)
   NICE TO HAVE:
     #9  Availability Calendar
     #11 Tutor Comparison
-    #12 Analytics Dashboard
-    #16 Tuition Recommendations
+    #12 Analytics Dashboard [DONE]
+    #16 Tuition Recommendations [DONE]
 
 ============================================================

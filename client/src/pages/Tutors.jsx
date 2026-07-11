@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import FilterSidebar from '../components/FilterSidebar';
 import TutorCard from '../components/TutorCard';
 import Pagination from '../components/Pagination';
@@ -9,6 +11,7 @@ import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
 
 export default function Tutors() {
+  const { firebaseUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     subjects: searchParams.get('subject') ? [searchParams.get('subject')] : [],
@@ -16,6 +19,7 @@ export default function Tutors() {
   });
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [tutors, setTutors] = useState([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -50,15 +54,32 @@ export default function Tutors() {
       setTutors(result.data);
       setTotalPages(result.totalPages);
       setTotal(result.total);
+
+      if (firebaseUser && result.data.length) {
+        const ids = result.data.map((t) => t._id);
+        api.get('/tutor-bookmarks/check', { params: { tutorIds: ids } })
+          .then(({ data }) => setBookmarkedIds(data))
+          .catch(() => {});
+      }
     } catch {
       setTutors([]);
       setError(true);
     } finally {
       setLoading(false);
     }
-  }, [filters, verifiedOnly, query, page]);
+  }, [filters, verifiedOnly, query, page, firebaseUser]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function toggleTutorBookmark(tutorId) {
+    if (!firebaseUser) return toast.error('Log in to save tutors');
+    try {
+      const { data } = await api.post(`/tutor-bookmarks/${tutorId}`);
+      setBookmarkedIds((ids) => data.bookmarked ? [...ids, tutorId] : ids.filter((id) => id !== tutorId));
+    } catch {
+      toast.error('Could not update bookmark');
+    }
+  }
 
   const onChange = (key, value) => {
     setFilters((f) => ({ ...f, [key]: value }));
@@ -123,7 +144,12 @@ export default function Tutors() {
               <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">{total} tutor(s) found</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {tutors.map((t) => (
-                  <TutorCard key={t._id} tutor={t} />
+                  <TutorCard
+                    key={t._id}
+                    tutor={t}
+                    isBookmarked={bookmarkedIds.includes(t._id)}
+                    onToggleBookmark={toggleTutorBookmark}
+                  />
                 ))}
               </div>
               <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />

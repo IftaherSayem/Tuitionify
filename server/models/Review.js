@@ -10,6 +10,8 @@ const reviewSchema = new Schema(
     authorName: { type: String, required: true }, // snapshot for display
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, default: '' },
+    reply: { type: String, default: '' },
+    replyAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   MapPin, Wallet, GraduationCap, BookOpen, Phone, Mail, ArrowLeft, Monitor, Home,
-  MessageSquarePlus, Lock, Send, Clock, CheckCircle2, XCircle, Flag,
+  MessageSquarePlus, Lock, Send, Clock, CheckCircle2, XCircle, Flag, Reply,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
@@ -171,13 +171,7 @@ export default function TutorProfile() {
         ) : (
           <div className="space-y-3">
             {reviews.map((r) => (
-              <div key={r._id} className="card p-4">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-slate-800 dark:text-slate-200">{r.authorName}</p>
-                  <StarDisplay value={r.rating} size={14} />
-                </div>
-                {r.comment && <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{r.comment}</p>}
-              </div>
+              <ReviewCard key={r._id} review={r} isOwnProfile={isOwnProfile} onReplyPosted={load} />
             ))}
           </div>
         )}
@@ -264,6 +258,68 @@ function LockedCard({ children, note }) {
         {note || "To protect our tutors, phone & email are shared only after the tutor approves your request."}
       </p>
       {children}
+    </div>
+  );
+}
+
+function ReviewCard({ review, isOwnProfile, onReplyPosted }) {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  async function submitReply() {
+    if (!replyText.trim()) return toast.error('Reply cannot be empty');
+    setSubmitting(true);
+    try {
+      await api.patch(`/reviews/${review._id}/reply`, { reply: replyText });
+      toast.success('Reply posted');
+      setShowReplyForm(false);
+      setReplyText('');
+      onReplyPosted();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Could not post reply');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="card p-4">
+      <div className="flex items-center justify-between">
+        <p className="font-medium text-slate-800 dark:text-slate-200">{review.authorName}</p>
+        <StarDisplay value={review.rating} size={14} />
+      </div>
+      {review.comment && <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{review.comment}</p>}
+
+      {review.reply && (
+        <div className="mt-3 rounded-lg border-l-2 border-brand-300 bg-brand-50/50 py-2 pl-3 pr-2 dark:border-brand-700 dark:bg-brand-900/20">
+          <p className="flex items-center gap-1 text-xs font-semibold text-brand-700 dark:text-brand-400">
+            <Reply size={12} /> Tutor's reply
+          </p>
+          <p className="mt-0.5 text-sm text-slate-700 dark:text-slate-300">{review.reply}</p>
+        </div>
+      )}
+
+      {isOwnProfile && !review.reply && !showReplyForm && (
+        <button onClick={() => setShowReplyForm(true)} className="mt-2 inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400">
+          <Reply size={13} /> Reply
+        </button>
+      )}
+
+      {showReplyForm && (
+        <div className="mt-3">
+          <textarea
+            rows={2} className="input text-sm" placeholder="Write your reply…"
+            value={replyText} onChange={(e) => setReplyText(e.target.value)}
+          />
+          <div className="mt-2 flex gap-2">
+            <button onClick={submitReply} disabled={submitting} className="btn-primary px-3 py-1.5 text-xs">
+              {submitting ? 'Posting…' : 'Post Reply'}
+            </button>
+            <button onClick={() => setShowReplyForm(false)} className="btn-outline px-3 py-1.5 text-xs">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

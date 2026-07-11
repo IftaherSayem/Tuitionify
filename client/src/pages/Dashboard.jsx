@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark, Trash2,
+  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark, Trash2, Heart, Sparkles,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
@@ -12,6 +12,7 @@ import { StarDisplay } from '../components/StarRating';
 import VerifiedBadge from '../components/VerifiedBadge';
 import TutorProfileForm from '../components/TutorProfileForm';
 import TuitionCard from '../components/TuitionCard';
+import TutorCard from '../components/TutorCard';
 import ConfirmModal from '../components/ConfirmModal';
 import { CURRENCY } from '../data/options';
 
@@ -57,6 +58,7 @@ export default function Dashboard() {
       </div>
 
       <SavedTuitions />
+      <SavedTutors />
     </div>
   );
 }
@@ -98,12 +100,14 @@ function TutorDashboard() {
   const { profile } = useAuth();
   const [apps, setApps] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/applications/mine').then(({ data }) => setApps(data)).catch(() => setApps([])),
       api.get('/contact-requests/incoming').then(({ data }) => setRequests(data)).catch(() => setRequests([])),
+      api.get('/tuitions/recommended').then(({ data }) => setRecommended(data)).catch(() => setRecommended([])),
     ]).finally(() => setLoading(false));
   }, []);
 
@@ -150,6 +154,19 @@ function TutorDashboard() {
           </p>
         )}
       </div>
+
+      {recommended.length > 0 && (
+        <section>
+          <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+            <Sparkles size={18} /> Recommended for You
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {recommended.map((t) => (
+              <TuitionCard key={t._id} tuition={t} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
@@ -213,22 +230,25 @@ function TutorDashboard() {
         ) : (
           <div className="space-y-3">
             {apps.map((a) => (
-              <div key={a._id} className="card flex flex-wrap items-center gap-3 p-4">
-                <div className="min-w-0 flex-1">
-                  {a.tuition ? (
-                    <Link to={`/tuitions/${a.tuition._id}`} className="font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-400">
-                      {a.tuition.title}
-                    </Link>
-                  ) : (
-                    <span className="text-slate-400 dark:text-slate-500">Tuition removed</span>
-                  )}
-                  {a.tuition && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {a.tuition.area} · {CURRENCY}{a.tuition.salary?.toLocaleString()}/mo
-                    </p>
-                  )}
+              <div key={a._id} className="card p-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    {a.tuition ? (
+                      <Link to={`/tuitions/${a.tuition._id}`} className="font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-400">
+                        {a.tuition.title}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-400 dark:text-slate-500">Tuition removed</span>
+                    )}
+                    {a.tuition && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {a.tuition.area} · {CURRENCY}{a.tuition.salary?.toLocaleString()}/mo
+                      </p>
+                    )}
+                  </div>
+                  <StatusBadge status={a.status} />
                 </div>
-                <StatusBadge status={a.status} />
+                <ApplicationTimeline app={a} />
               </div>
             ))}
           </div>
@@ -402,4 +422,89 @@ function StatusBadge({ status }) {
     rejected: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
   };
   return <span className={`badge ${map[status] || ''}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
+}
+
+function ApplicationTimeline({ app }) {
+  const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : null;
+
+  const steps = [
+    { label: 'Applied', time: fmt(app.createdAt), done: true },
+    { label: 'Viewed', time: fmt(app.viewedAt), done: !!app.viewedAt },
+    { label: app.status === 'accepted' ? 'Accepted' : app.status === 'rejected' ? 'Rejected' : 'Decision', time: fmt(app.decidedAt), done: !!app.decidedAt },
+  ];
+
+  return (
+    <div className="mt-3 flex items-center gap-1">
+      {steps.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-1">
+          <div className="flex flex-col items-center">
+            <div className={`h-2.5 w-2.5 rounded-full ${s.done ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-600'}`} />
+            <span className={`mt-1 text-[10px] ${s.done ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>
+              {s.label}
+            </span>
+            {s.time && <span className="text-[9px] text-slate-400 dark:text-slate-500">{s.time}</span>}
+          </div>
+          {i < steps.length - 1 && (
+            <div className={`h-0.5 w-6 ${s.done ? 'bg-brand-300 dark:bg-brand-700' : 'bg-slate-200 dark:bg-slate-600'}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SavedTutors() {
+  const { firebaseUser } = useAuth();
+  const [bookmarks, setBookmarks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!firebaseUser) { setLoading(false); return; }
+    api.get('/tutor-bookmarks')
+      .then(({ data }) => setBookmarks(data))
+      .catch(() => setBookmarks([]))
+      .finally(() => setLoading(false));
+  }, [firebaseUser]);
+
+  async function handleRemove(tutorId) {
+    try {
+      await api.post(`/tutor-bookmarks/${tutorId}`);
+      setBookmarks((b) => b.filter((bm) => bm.tutor?._id !== tutorId));
+      toast.success('Tutor removed from saved');
+    } catch {
+      toast.error('Could not remove');
+    }
+  }
+
+  if (!firebaseUser) return null;
+
+  return (
+    <section className="mt-8">
+      <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+        <Heart size={18} /> Saved Tutors
+      </h3>
+      {loading ? (
+        <Spinner />
+      ) : bookmarks.length === 0 ? (
+        <EmptyState
+          title="No saved tutors" icon={Heart}
+          message="Save tutors you're interested in and they'll appear here."
+          action={<Link to="/tutors" className="btn-primary mt-2">Browse Tutors</Link>}
+        />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {bookmarks.map((bm) =>
+            bm.tutor ? (
+              <TutorCard
+                key={bm._id}
+                tutor={bm.tutor}
+                isBookmarked
+                onToggleBookmark={() => handleRemove(bm.tutor._id)}
+              />
+            ) : null
+          )}
+        </div>
+      )}
+    </section>
+  );
 }

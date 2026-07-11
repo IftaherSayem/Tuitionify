@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, Users, Flag, BadgeCheck, X, Check } from 'lucide-react';
+import { ShieldCheck, Users, Flag, BadgeCheck, X, Check, BarChart3, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
@@ -9,6 +10,7 @@ import VerifiedBadge from '../components/VerifiedBadge';
 const TABS = [
   { key: 'tutors', label: 'Tutors', icon: Users },
   { key: 'reports', label: 'Reports', icon: Flag },
+  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
 export default function Admin() {
@@ -22,7 +24,7 @@ export default function Admin() {
         </span>
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Admin panel</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Verify tutors and review reports.</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Verify tutors, review reports, and view analytics.</p>
         </div>
       </div>
 
@@ -43,7 +45,132 @@ export default function Admin() {
       </div>
 
       <div className="mt-6">
-        {tab === 'tutors' ? <TutorsTab /> : <ReportsTab />}
+        {tab === 'tutors' && <TutorsTab />}
+        {tab === 'reports' && <ReportsTab />}
+        {tab === 'analytics' && <AnalyticsTab />}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsTab() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api.get('/admin/analytics').then(({ data }) => setData(data)).catch(() => toast.error('Failed to load analytics'));
+  }, []);
+
+  if (!data) return <Spinner />;
+
+  const { counts, signupsPerWeek, tuitionsPerWeek, topSubjects, topAreas } = data;
+
+  function exportCSV() {
+    let csv = 'Metric,Value\n';
+    csv += `Total Users,${counts.users.total}\n`;
+    csv += `Tutors,${counts.users.tutors}\n`;
+    csv += `Seekers,${counts.users.seekers}\n`;
+    csv += `Total Tuitions,${counts.tuitions.total}\n`;
+    csv += `Open Tuitions,${counts.tuitions.open}\n`;
+    csv += `Closed Tuitions,${counts.tuitions.closed}\n`;
+    csv += `Total Applications,${counts.applications.total}\n`;
+    csv += `Pending Applications,${counts.applications.pending}\n`;
+    csv += `Accepted Applications,${counts.applications.accepted}\n`;
+    csv += `Rejected Applications,${counts.applications.rejected}\n`;
+    csv += '\nWeek,Signups,Tuitions Posted\n';
+    const weeks = new Set([...signupsPerWeek.map((w) => w.week), ...tuitionsPerWeek.map((w) => w.week)]);
+    [...weeks].sort().forEach((w) => {
+      const s = signupsPerWeek.find((x) => x.week === w)?.count || 0;
+      const t = tuitionsPerWeek.find((x) => x.week === w)?.count || 0;
+      csv += `${w},${s},${t}\n`;
+    });
+    csv += '\nTop Subjects,Count\n';
+    topSubjects.forEach((s) => { csv += `${s.name},${s.count}\n`; });
+    csv += '\nTop Areas,Count\n';
+    topAreas.forEach((a) => { csv += `${a.name},${a.count}\n`; });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tuitionify-analytics.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-end">
+        <button onClick={exportCSV} className="btn-outline text-sm">
+          <Download size={15} /> Export CSV
+        </button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Total Users" value={counts.users.total} sub={`${counts.users.tutors} tutors · ${counts.users.seekers} seekers`} />
+        <StatCard label="Tuitions" value={counts.tuitions.total} sub={`${counts.tuitions.open} open · ${counts.tuitions.closed} closed`} />
+        <StatCard label="Applications" value={counts.applications.total} sub={`${counts.applications.pending} pending · ${counts.applications.accepted} accepted`} />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ChartCard title="Signups per Week" data={signupsPerWeek} dataKey="count" nameKey="week" color="#0f8f62" />
+        <ChartCard title="Tuitions Posted per Week" data={tuitionsPerWeek} dataKey="count" nameKey="week" color="#3b82f6" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RankList title="Top Subjects" items={topSubjects} />
+        <RankList title="Top Areas" items={topAreas} />
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub }) {
+  return (
+    <div className="card p-5">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">{value.toLocaleString()}</p>
+      {sub && <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{sub}</p>}
+    </div>
+  );
+}
+
+function ChartCard({ title, data, dataKey, nameKey, color }) {
+  return (
+    <div className="card p-5">
+      <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <XAxis dataKey={nameKey} tick={{ fontSize: 11 }} />
+          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+          <Tooltip />
+          <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function RankList({ title, items }) {
+  const max = items[0]?.count || 1;
+  return (
+    <div className="card p-5">
+      <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
+      <div className="space-y-2">
+        {items.map((item, i) => (
+          <div key={item.name} className="flex items-center gap-3">
+            <span className="w-5 text-xs font-medium text-slate-400">{i + 1}.</span>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-700 dark:text-slate-300">{item.name}</span>
+                <span className="text-xs font-medium text-slate-500">{item.count}</span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full bg-slate-100 dark:bg-slate-700">
+                <div className="h-full rounded-full bg-brand-500" style={{ width: `${(item.count / max) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

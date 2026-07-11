@@ -1,12 +1,21 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Wallet, GraduationCap } from 'lucide-react';
+import { MapPin, Wallet, GraduationCap, Heart } from 'lucide-react';
 import { StarDisplay } from './StarRating';
 import VerifiedBadge from './VerifiedBadge';
 import { CURRENCY } from '../data/options';
 
-export default function TutorCard({ tutor }) {
+export default function TutorCard({ tutor, isBookmarked, onToggleBookmark }) {
   return (
-    <Link to={`/tutors/${tutor._id}`} className="card group block p-5 transition hover:shadow-md hover:-translate-y-0.5">
+    <Link to={`/tutors/${tutor._id}`} className="card group relative block p-5 transition hover:shadow-md hover:-translate-y-0.5">
+      {onToggleBookmark && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleBookmark(tutor._id); }}
+          className="absolute right-3 top-3 rounded-full p-1.5 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"
+        >
+          <Heart size={18} className={isBookmarked ? 'fill-red-500 text-red-500' : ''} />
+        </button>
+      )}
+
       <div className="flex items-center gap-4">
         <img
           src={tutor.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name)}&background=0f8f62&color=fff`}

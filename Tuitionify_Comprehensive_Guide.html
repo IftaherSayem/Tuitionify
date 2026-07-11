@@ -706,10 +706,65 @@ tuitionify/
   </ul>
 </div>
 
+<h3>4.17 Analytics Dashboard (Admin)</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>Admin-only tab</strong> &mdash; A third "Analytics" tab in the admin panel displays key metrics, charts, and rankings.</li>
+    <li><strong>Aggregated statistics</strong> &mdash; The server endpoint <code>GET /api/admin/analytics</code> returns total counts (users, tuitions, applications), weekly signup/posting trends, and top subjects/areas.</li>
+    <li><strong>Charts with Recharts</strong> &mdash; Bar charts visualize signups and tuitions posted per week over the last 8 weeks.</li>
+    <li><strong>Top rankings</strong> &mdash; The most popular subjects and areas are displayed as ranked lists with progress bars.</li>
+    <li><strong>CSV Export</strong> &mdash; An "Export CSV" button generates a downloadable CSV file of all analytics data client-side.</li>
+  </ul>
+</div>
+
+<h3>4.18 Favorites / Saved Tutors</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>TutorBookmark model</strong> &mdash; A new <code>TutorBookmark</code> collection with <code>{ user, tutor }</code> fields and a unique compound index, mirroring the tuition bookmark pattern.</li>
+    <li><strong>Toggle API</strong> &mdash; <code>POST /api/tutor-bookmarks/:tutorId</code> toggles the bookmark on/off. <code>GET /check</code> supports batch checking.</li>
+    <li><strong>Heart icon on TutorCard</strong> &mdash; Each tutor card shows a heart icon that fills red when bookmarked. Uses <code>e.stopPropagation()</code> to prevent card navigation.</li>
+    <li><strong>Dashboard section</strong> &mdash; A "Saved Tutors" section on the dashboard lists bookmarked tutors with the ability to remove them.</li>
+  </ul>
+</div>
+
+<h3>4.19 Tuition Recommendations</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>Matching algorithm</strong> &mdash; <code>GET /api/tuitions/recommended</code> finds open tuitions matching the tutor's subjects, preferred areas, or class levels.</li>
+    <li><strong>Overlap scoring</strong> &mdash; Results are scored by how many fields match (subjects worth 2 points, area and class level worth 1 each), sorted by score descending.</li>
+    <li><strong>"Recommended for You" section</strong> &mdash; Appears at the top of the tutor dashboard when recommendations are available, displaying up to 6 matching tuitions.</li>
+  </ul>
+</div>
+
+<h3>4.20 Review Replies</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>Reply fields on Review</strong> &mdash; The Review schema has <code>reply</code> (String) and <code>replyAt</code> (Date) fields added.</li>
+    <li><strong>Tutor-only endpoint</strong> &mdash; <code>PATCH /api/reviews/:id/reply</code> allows only the reviewed tutor to post a single reply.</li>
+    <li><strong>Display on profile</strong> &mdash; Replies appear below reviews with a styled left-border callout and "Tutor's reply" label.</li>
+    <li><strong>Reply button</strong> &mdash; When viewing their own profile, tutors see a "Reply" button on unreplied reviews that reveals an inline textarea.</li>
+  </ul>
+</div>
+
+<h3>4.21 Application Tracking Timeline</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>New timestamp fields</strong> &mdash; The Application model has <code>viewedAt</code> and <code>decidedAt</code> fields that record when the seeker first views and decides on the application.</li>
+    <li><strong>Auto-view marking</strong> &mdash; When a seeker fetches applicants for their tuition, all unviewed applications are automatically marked as viewed.</li>
+    <li><strong>Visual timeline</strong> &mdash; A 3-step dot timeline (Applied &rarr; Viewed &rarr; Decision) shows below each application, with timestamps and color-coded progress.</li>
+    <li><strong>Both perspectives</strong> &mdash; The timeline is visible to both seekers (on the tuition detail page) and tutors (on their dashboard's "My Applications" section).</li>
+  </ul>
+</div>
+
 <!-- ======================== 5. DATA MODELS ======================== -->
 <h2 id="data-models" class="page-break"><span class="num">5</span> Database Schema & Data Models</h2>
 
-<p>Tuitionify uses <strong>7 MongoDB collections</strong> managed through Mongoose schemas:</p>
+<p>Tuitionify uses <strong>8 MongoDB collections</strong> managed through Mongoose schemas:</p>
 
 <h3>5.1 User Model</h3>
 <table>
@@ -1212,7 +1267,7 @@ cd server && npm run seed
   </div>
   <div class="feature-item">
     <h4>Search history & saved tutors</h4>
-    <p><span class="badge badge-low">PARTIALLY DONE</span> Bookmark/save tuitions implemented (Section 4.14). Saved tutor bookmarks and search filter presets are future work.</p>
+    <p><span class="badge badge-low">DONE</span> Bookmark/save tuitions (Section 4.14) and saved tutors (Section 4.18) both implemented. Search filter presets are future work.</p>
   </div>
   <div class="feature-item">
     <h4>Tutor availability calendar</h4>
@@ -1221,6 +1276,22 @@ cd server && npm run seed
   <div class="feature-item">
     <h4>Multi-city support</h4>
     <p>Add a city selector to expand beyond Chittagong to Dhaka, Sylhet, etc.</p>
+  </div>
+  <div class="feature-item">
+    <h4>Analytics Dashboard</h4>
+    <p><span class="badge badge-low">DONE</span> Admin analytics tab with charts, stat cards, top subjects/areas, and CSV export. See Section 4.17.</p>
+  </div>
+  <div class="feature-item">
+    <h4>Tuition Recommendations</h4>
+    <p><span class="badge badge-low">DONE</span> Matching algorithm suggests open tuitions to tutors based on subjects, areas, and class levels. See Section 4.19.</p>
+  </div>
+  <div class="feature-item">
+    <h4>Review Replies</h4>
+    <p><span class="badge badge-low">DONE</span> Tutors can reply to reviews on their profile with a single response per review. See Section 4.20.</p>
+  </div>
+  <div class="feature-item">
+    <h4>Application Tracking Timeline</h4>
+    <p><span class="badge badge-low">DONE</span> Visual timeline showing Applied &rarr; Viewed &rarr; Decision with timestamps for each application. See Section 4.21.</p>
   </div>
 </div>
 
