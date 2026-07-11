@@ -57,6 +57,7 @@ router.patch('/:id', verifyToken, loadUser, async (req, res, next) => {
       return res.status(400).json({ message: 'status must be accepted or rejected' });
     }
     app.status = status;
+    app.decidedAt = new Date();
     await app.save();
 
     // Accepting an applicant closes the tuition.

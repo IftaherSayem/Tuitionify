@@ -52,4 +52,21 @@ router.get('/tutor/:id', async (req, res, next) => {
   }
 });
 
+// PATCH /api/reviews/:id/reply — tutor replies to a review
+router.patch('/:id/reply', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+    if (String(review.tutor) !== String(req.dbUser._id)) {
+      return res.status(403).json({ message: 'Only the reviewed tutor can reply' });
+    }
+    review.reply = req.body.reply || '';
+    review.replyAt = new Date();
+    await review.save();
+    res.json(review);
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

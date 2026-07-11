@@ -60,6 +60,37 @@ router.get('/mine/posted', verifyToken, loadUser, async (req, res, next) => {
   }
 });
 
+// GET /api/tuitions/recommended — tuition recommendations for a tutor
+router.get('/recommended', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    if (req.dbUser.role !== 'tutor') return res.json([]);
+    const { subjects = [], preferredAreas = [], classLevels = [] } = req.dbUser;
+    if (!subjects.length && !preferredAreas.length && !classLevels.length) return res.json([]);
+
+    const filter = { status: 'open', $or: [] };
+    if (subjects.length) filter.$or.push({ subjects: { $in: subjects } });
+    if (preferredAreas.length) filter.$or.push({ area: { $in: preferredAreas } });
+    if (classLevels.length) filter.$or.push({ classLevel: { $in: classLevels } });
+
+    const tuitions = await Tuition.find(filter)
+      .populate('createdBy', 'name photo')
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    const scored = tuitions.map((t) => {
+      let score = 0;
+      if (subjects.some((s) => t.subjects.includes(s))) score += 2;
+      if (preferredAreas.includes(t.area)) score += 1;
+      if (classLevels.includes(t.classLevel)) score += 1;
+      return { tuition: t, score };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    res.json(scored.slice(0, 6).map((s) => s.tuition));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/tuitions/:id — single tuition
 router.get('/:id', async (req, res, next) => {
   try {
@@ -108,6 +139,18 @@ router.get('/:id/applications', verifyToken, loadUser, async (req, res, next) =>
     const applications = await Application.find({ tuition: tuition._id })
       .populate('tutor', 'name photo university department subjects ratingAvg ratingCount expectedSalary phone')
       .sort({ createdAt: -1 });
+
+    // Auto-mark unviewed applications as viewed
+    const unviewed = applications.filter((a) => !a.viewedAt);
+    if (unviewed.length) {
+      const now = new Date();
+      await Application.updateMany(
+        { _id: { $in: unviewed.map((a) => a._id) } },
+        { $set: { viewedAt: now } },
+      );
+      unviewed.forEach((a) => { a.viewedAt = now; });
+    }
+
     // Contact (phone) is only shared once the applicant is accepted.
     const sanitized = applications.map((a) => {
       const obj = a.toObject();
