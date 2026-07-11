@@ -1,0 +1,127 @@
+============================================================
+  TUITIONIFY - FEATURE PROPOSALS
+  (Beyond the 5 already implemented)
+============================================================
+
+IMPLEMENTED (for reference):
+  1. Dark Mode (Tailwind class-based, localStorage, Sun/Moon toggle)
+  2. Pagination (server-side, reusable component)
+  3. Search Bar (debounced, multi-field regex)
+  4. Bookmark/Save Tuitions (toggle, batch check, dashboard section)
+  5. Profile Photo Upload (Firebase Storage)
+  6. Edit/Delete Tuitions (edit details, hard delete, confirmation modal, cascade)
+------------------------------------------------------------
+PROPOSED FEATURES (Not Yet Implemented)
+------------------------------------------------------------
+
+6. IN-APP MESSAGING / CHAT
+   - Real-time chat between seekers and tutors
+   - Use Firebase Realtime Database or WebSocket (Socket.io)
+   - Chat history stored per conversation pair
+   - Unread message count badge on navbar
+   - Triggered after a contact request is approved
+
+7. PUSH / EMAIL NOTIFICATIONS
+   - Email notifications for: new application received, application
+     accepted/rejected, contact request received/approved
+   - Browser push notifications using Firebase Cloud Messaging (FCM)
+   - Notification preferences page (opt-in/out per event type)
+   - In-app notification bell with dropdown list
+
+8. EDIT / DELETE TUITIONS [DONE]
+   - Allow seekers to edit tuition details after posting
+   - Soft-delete or hard-delete tuition posts
+   - Confirmation modal before deletion
+   - Cascade: delete related applications when tuition is removed
+
+9. TUTOR AVAILABILITY CALENDAR
+   - Weekly schedule grid (Mon-Sun, morning/afternoon/evening)
+   - Tutors mark available time slots on their profile
+   - Seekers can filter tutors by availability overlap
+   - Visual calendar component with toggle slots
+
+10. MULTI-CITY SUPPORT
+    - City selector (Chittagong, Dhaka, Sylhet, Rajshahi, etc.)
+    - Each city has its own set of areas/thanas
+    - Filter tuitions and tutors by city
+    - Dynamic area dropdown based on selected city
+
+11. TUTOR COMPARISON
+    - Select 2-3 tutors and compare side-by-side
+    - Compare: subjects, rating, salary, areas, mode, verified status
+    - Comparison table view with highlights on differences
+    - "Add to compare" button on tutor cards
+
+12. ANALYTICS DASHBOARD (ADMIN)
+    - Total users, tuitions, applications over time
+    - Charts: signups per week, tuitions posted per week
+    - Top subjects, most active areas
+    - Use Chart.js or Recharts for visualization
+    - Export data as CSV
+
+13. SOCIAL SHARING
+    - Share tuition posts or tutor profiles via WhatsApp, Facebook, link copy
+    - Open Graph meta tags for rich link previews
+    - Share button on tuition detail and tutor profile pages
+
+14. MULTILINGUAL SUPPORT (BANGLA / ENGLISH)
+    - i18n with react-i18next
+    - Language toggle (EN / BN) in navbar
+    - All UI text translated to Bangla
+    - Store language preference in localStorage
+
+15. FAVORITES / SAVED TUTORS
+    - Bookmark tutors (similar to tuition bookmarks)
+    - "Saved Tutors" section in dashboard
+    - Quick-access list for frequently viewed tutors
+
+16. TUITION RECOMMENDATIONS
+    - Suggest tuitions to tutors based on their subjects,
+      preferred areas, and class levels
+    - "Recommended for you" section on tutor dashboard
+    - Simple matching algorithm (overlap score on subjects + area)
+
+17. REVIEW REPLIES
+    - Allow tutors to reply to reviews left on their profile
+    - Single reply per review (no threads)
+    - Reply shown below the review on tutor profile page
+
+18. APPLICATION TRACKING TIMELINE
+    - Visual timeline showing application status changes
+    - Timestamps for: applied, viewed, accepted/rejected
+    - "Viewed" status when tuition owner opens the application
+
+19. SALARY INSIGHTS
+    - Show average salary for a given subject + area combination
+    - "Market rate" indicator on tuition posting form
+    - Based on aggregated data from existing tuitions
+    - Helps seekers set competitive salaries
+
+20. PWA (PROGRESSIVE WEB APP)
+    - Service worker for offline support
+    - Installable on mobile home screen
+    - Offline fallback page
+    - Cache static assets for faster loads
+    - manifest.json with app icons and theme color
+
+============================================================
+  PRIORITY RECOMMENDATION
+============================================================
+
+  HIGH PRIORITY:
+    #6  In-App Messaging (core marketplace feature)
+    #7  Notifications (user engagement)
+    #8  Edit/Delete Tuitions (basic CRUD completion) [DONE]
+
+  MEDIUM PRIORITY:
+    #10 Multi-City Support (scale beyond Chittagong)
+    #14 Multilingual Support (accessibility for BD users)
+    #20 PWA (mobile experience)
+
+  NICE TO HAVE:
+    #9  Availability Calendar
+    #11 Tutor Comparison
+    #12 Analytics Dashboard
+    #16 Tuition Recommendations
+
+============================================================

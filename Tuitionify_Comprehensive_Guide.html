@@ -693,6 +693,19 @@ tuitionify/
   </ul>
 </div>
 
+<h3>4.16 Edit / Delete Tuitions</h3>
+<div class="card">
+  <h4>How it works:</h4>
+  <ul>
+    <li><strong>Edit tuition</strong> &mdash; Seekers can edit any of their posted tuitions via the <code>/edit-tuition/:id</code> page. The form pre-populates with the existing data and submits a <code>PUT /api/tuitions/:id</code> request.</li>
+    <li><strong>Delete tuition</strong> &mdash; A delete button (with a confirmation modal) allows seekers to permanently remove a tuition post. Uses <code>DELETE /api/tuitions/:id</code>.</li>
+    <li><strong>Cascade cleanup</strong> &mdash; Deleting a tuition also removes all related applications, bookmarks, and reports from the database.</li>
+    <li><strong>Ownership verification</strong> &mdash; Both edit and delete endpoints verify that the logged-in user is the tuition's creator before allowing the operation.</li>
+    <li><strong>Access points</strong> &mdash; Edit and Delete buttons appear in the Seeker Dashboard (My Posted Tuitions) and on the tuition detail page when the owner is viewing it.</li>
+    <li><strong>Confirmation modal</strong> &mdash; A reusable <code>ConfirmModal</code> component prevents accidental deletions with a clear warning message.</li>
+  </ul>
+</div>
+
 <!-- ======================== 5. DATA MODELS ======================== -->
 <h2 id="data-models" class="page-break"><span class="num">5</span> Database Schema & Data Models</h2>
 
@@ -1195,7 +1208,7 @@ cd server && npm run seed
   </div>
   <div class="feature-item">
     <h4>Edit/Delete tuitions</h4>
-    <p>Allow seekers to edit tuition details and delete posts they no longer need.</p>
+    <p><span class="badge badge-low">DONE</span> Seekers can edit tuition details and delete posts with cascade cleanup. See Section 4.16.</p>
   </div>
   <div class="feature-item">
     <h4>Search history & saved tutors</h4>

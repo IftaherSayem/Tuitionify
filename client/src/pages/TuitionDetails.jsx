@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  MapPin, Wallet, CalendarDays, BookOpen, Monitor, Home, User, Phone, Send, ArrowLeft, Flag,
+  MapPin, Wallet, CalendarDays, BookOpen, Monitor, Home, User, Phone, Send, ArrowLeft, Flag, Pencil, Trash2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import ReportModal from '../components/ReportModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import { CURRENCY } from '../data/options';
 
 export default function TuitionDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { profile, isTutor, isSeeker } = useAuth();
   const [tuition, setTuition] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,8 @@ export default function TuitionDetails() {
   const [applying, setApplying] = useState(false);
   const [applications, setApplications] = useState([]);
   const [reportOpen, setReportOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const isOwner = profile && tuition && String(tuition.createdBy?._id) === String(profile._id);
 
@@ -70,6 +74,20 @@ export default function TuitionDetails() {
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await api.delete(`/tuitions/${id}`);
+      toast.success('Tuition deleted');
+      navigate('/dashboard');
+    } catch {
+      toast.error('Could not delete tuition');
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
+    }
+  }
+
   if (loading) return <Spinner full />;
   if (!tuition) return null;
 
@@ -79,11 +97,23 @@ export default function TuitionDetails() {
         <Link to="/tuitions" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400">
           <ArrowLeft size={16} /> Back to tuitions
         </Link>
-        {profile && !isOwner && (
-          <button onClick={() => setReportOpen(true)} className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-red-500 dark:text-slate-500">
-            <Flag size={13} /> Report
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isOwner && (
+            <>
+              <Link to={`/edit-tuition/${id}`} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400">
+                <Pencil size={13} /> Edit
+              </Link>
+              <button onClick={() => setDeleteOpen(true)} className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-600 dark:text-red-500">
+                <Trash2 size={13} /> Delete
+              </button>
+            </>
+          )}
+          {profile && !isOwner && (
+            <button onClick={() => setReportOpen(true)} className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-red-500 dark:text-slate-500">
+              <Flag size={13} /> Report
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="card p-6 sm:p-8">
@@ -193,6 +223,14 @@ export default function TuitionDetails() {
       )}
 
       <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} targetType="tuition" targetId={id} />
+      <ConfirmModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Tuition"
+        message="Are you sure you want to delete this tuition? All applications and bookmarks will be removed. This cannot be undone."
+        busy={deleting}
+      />
     </div>
   );
 }

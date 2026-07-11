@@ -14,6 +14,7 @@ const TuitionDetails = lazy(() => import('./pages/TuitionDetails'));
 const Tutors = lazy(() => import('./pages/Tutors'));
 const TutorProfile = lazy(() => import('./pages/TutorProfile'));
 const PostTuition = lazy(() => import('./pages/PostTuition'));
+const EditTuition = lazy(() => import('./pages/EditTuition'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Admin = lazy(() => import('./pages/Admin'));
 const AuthAction = lazy(() => import('./pages/AuthAction'));
@@ -42,6 +43,14 @@ export default function App() {
             element={
               <ProtectedRoute role="seeker">
                 <PostTuition />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-tuition/:id"
+            element={
+              <ProtectedRoute role="seeker">
+                <EditTuition />
               </ProtectedRoute>
             }
           />

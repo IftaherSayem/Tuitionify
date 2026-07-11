@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark,
+  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark, Trash2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
@@ -12,6 +12,7 @@ import { StarDisplay } from '../components/StarRating';
 import VerifiedBadge from '../components/VerifiedBadge';
 import TutorProfileForm from '../components/TutorProfileForm';
 import TuitionCard from '../components/TuitionCard';
+import ConfirmModal from '../components/ConfirmModal';
 import { CURRENCY } from '../data/options';
 
 export default function Dashboard() {
@@ -240,6 +241,8 @@ function TutorDashboard() {
 function SeekerDashboard() {
   const [tuitions, setTuitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -262,6 +265,21 @@ function SeekerDashboard() {
       toast.success(next === 'open' ? 'Tuition reopened' : 'Tuition closed');
     } catch {
       toast.error('Could not update');
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/tuitions/${deleteTarget._id}`);
+      setTuitions((list) => list.filter((x) => x._id !== deleteTarget._id));
+      toast.success('Tuition deleted');
+    } catch {
+      toast.error('Could not delete');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   }
 
@@ -297,11 +315,26 @@ function SeekerDashboard() {
                 {t.status === 'open' ? <ToggleRight size={16} className="text-brand-600" /> : <ToggleLeft size={16} />}
                 {t.status === 'open' ? 'Close' : 'Reopen'}
               </button>
+              <Link to={`/edit-tuition/${t._id}`} className="btn-ghost text-xs">
+                <Pencil size={14} /> Edit
+              </Link>
+              <button onClick={() => setDeleteTarget(t)} className="btn-ghost text-xs text-red-500 hover:text-red-700 dark:text-red-400">
+                <Trash2 size={14} /> Delete
+              </button>
               <Link to={`/tuitions/${t._id}`} className="btn-outline text-xs">View applicants</Link>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete Tuition"
+        message={`Are you sure you want to delete "${deleteTarget?.title}"? This will also remove all applications and bookmarks for this tuition. This action cannot be undone.`}
+        busy={deleting}
+      />
     </section>
   );
 }

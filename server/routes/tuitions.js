@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import Tuition from '../models/Tuition.js';
 import Application from '../models/Application.js';
+import Bookmark from '../models/Bookmark.js';
+import Report from '../models/Report.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -113,6 +115,47 @@ router.get('/:id/applications', verifyToken, loadUser, async (req, res, next) =>
       return obj;
     });
     res.json(sanitized);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /api/tuitions/:id — edit own tuition
+router.put('/:id', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    const tuition = await Tuition.findById(req.params.id);
+    if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
+    if (String(tuition.createdBy) !== String(req.dbUser._id)) {
+      return res.status(403).json({ message: 'Not your tuition' });
+    }
+
+    const allowed = ['title', 'classLevel', 'subjects', 'area', 'salary', 'daysPerWeek', 'mode', 'genderPreference', 'description'];
+    allowed.forEach((key) => {
+      if (req.body[key] !== undefined) tuition[key] = req.body[key];
+    });
+    await tuition.save();
+    res.json(tuition);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/tuitions/:id — delete own tuition with cascade
+router.delete('/:id', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    const tuition = await Tuition.findById(req.params.id);
+    if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
+    if (String(tuition.createdBy) !== String(req.dbUser._id)) {
+      return res.status(403).json({ message: 'Not your tuition' });
+    }
+
+    await Promise.all([
+      Application.deleteMany({ tuition: tuition._id }),
+      Bookmark.deleteMany({ tuition: tuition._id }),
+      Report.deleteMany({ targetType: 'tuition', targetId: tuition._id }),
+    ]);
+    await tuition.deleteOne();
+    res.json({ message: 'Tuition deleted' });
   } catch (err) {
     next(err);
   }
