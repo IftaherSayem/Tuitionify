@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Camera, Loader2 } from 'lucide-react';
-import { storage } from '../firebase/config';
+import toast from 'react-hot-toast';
 
 const MAX_SIZE = 5 * 1024 * 1024;
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
-export default function PhotoUpload({ value, onChange, uid }) {
+export default function PhotoUpload({ value, onChange }) {
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef(null);
 
@@ -17,12 +17,18 @@ export default function PhotoUpload({ value, onChange, uid }) {
 
     setUploading(true);
     try {
-      const storageRef = ref(storage, `profile-photos/${uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      onChange(url);
-    } catch {
-      // silently fail — toast is handled upstream if needed
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'Upload failed');
+      onChange(data.data.display_url);
+    } catch (err) {
+      toast.error('Photo upload failed');
+      console.error(err);
     } finally {
       setUploading(false);
       e.target.value = '';
