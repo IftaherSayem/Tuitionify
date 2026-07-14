@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import FilterSidebar from '../components/FilterSidebar';
 import TutorCard from '../components/TutorCard';
 import Pagination from '../components/Pagination';
-import Spinner from '../components/Spinner';
+import CardSkeleton from '../components/CardSkeleton';
 import EmptyState from '../components/EmptyState';
 
 export default function Tutors() {
@@ -128,16 +128,18 @@ export default function Tutors() {
 
         <div>
           {loading ? (
-            <Spinner />
+            <CardSkeleton />
           ) : error ? (
             <EmptyState
               title="Couldn't load tutors"
               message="Something went wrong while fetching tutors. Please check your connection and try again."
+              action={<button className="btn-primary" onClick={load}>Try again</button>}
             />
           ) : tutors.length === 0 ? (
             <EmptyState
               title="No tutors found"
               message="Try adjusting your filters to see more tutors."
+              action={<button className="btn-outline" onClick={onReset}>Clear filters</button>}
             />
           ) : (
             <>
