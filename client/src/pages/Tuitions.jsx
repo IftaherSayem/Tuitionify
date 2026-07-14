@@ -6,7 +6,7 @@ import api from '../api/client';
 import FilterSidebar from '../components/FilterSidebar';
 import TuitionCard from '../components/TuitionCard';
 import Pagination from '../components/Pagination';
-import Spinner from '../components/Spinner';
+import CardSkeleton from '../components/CardSkeleton';
 import EmptyState from '../components/EmptyState';
 import { useAuth } from '../context/AuthContext';
 
@@ -126,16 +126,18 @@ export default function Tuitions() {
 
         <div>
           {loading ? (
-            <Spinner />
+            <CardSkeleton />
           ) : error ? (
             <EmptyState
               title="Couldn't load tuitions"
               message="Something went wrong while fetching posts. Please check your connection and try again."
+              action={<button className="btn-primary" onClick={load}>Try again</button>}
             />
           ) : tuitions.length === 0 ? (
             <EmptyState
               title="No tuitions found"
               message="Try adjusting your filters, or check back later for new posts."
+              action={<button className="btn-outline" onClick={onReset}>Clear filters</button>}
             />
           ) : (
             <>

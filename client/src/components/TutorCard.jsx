@@ -6,11 +6,12 @@ import { CURRENCY } from '../data/options';
 
 export default function TutorCard({ tutor, isBookmarked, onToggleBookmark }) {
   return (
-    <Link to={`/tutors/${tutor._id}`} className="card group relative block p-5 transition hover:shadow-md hover:-translate-y-0.5">
+    <Link to={`/tutors/${tutor._id}`} className="card-hover group relative block overflow-hidden p-5 focus:outline-none focus:ring-2 focus:ring-brand-500">
       {onToggleBookmark && (
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleBookmark(tutor._id); }}
-          className="absolute right-3 top-3 rounded-full p-1.5 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"
+          className="icon-button absolute right-3 top-3 hover:text-red-500 dark:hover:text-red-400"
+          aria-label={isBookmarked ? 'Remove saved tutor' : 'Save tutor'}
         >
           <Heart size={18} className={isBookmarked ? 'fill-red-500 text-red-500' : ''} />
         </button>
@@ -42,15 +43,15 @@ export default function TutorCard({ tutor, isBookmarked, onToggleBookmark }) {
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
           <MapPin size={15} className="text-slate-400 dark:text-slate-500" />
           {tutor.preferredAreas?.[0] || 'Flexible'}
           {tutor.preferredAreas?.length > 1 && ` +${tutor.preferredAreas.length - 1}`}
         </span>
         {tutor.expectedSalary > 0 && (
-          <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-            <Wallet size={15} className="text-slate-400 dark:text-slate-500" /> {CURRENCY}{tutor.expectedSalary.toLocaleString()}/mo
+          <span className="flex shrink-0 items-center gap-1.5 font-semibold text-brand-700 dark:text-brand-300">
+            <Wallet size={15} /> {CURRENCY}{tutor.expectedSalary.toLocaleString()}/mo
           </span>
         )}
       </div>
