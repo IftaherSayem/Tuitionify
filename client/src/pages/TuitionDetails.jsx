@@ -150,7 +150,7 @@ export default function TuitionDetails() {
         <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5 dark:border-slate-700">
           <img
             src={tuition.createdBy?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(tuition.createdBy?.name || 'U')}&background=0f8f62&color=fff`}
-            alt="" className="h-10 w-10 rounded-full"
+            alt="" className="h-10 w-10 rounded-full object-cover"
           />
           <div className="text-sm">
             <p className="font-medium text-slate-800 dark:text-slate-200">Posted by {tuition.createdBy?.name}</p>
@@ -192,7 +192,7 @@ export default function TuitionDetails() {
                   <div className="flex flex-wrap items-center gap-4">
                   <img
                     src={a.tutor?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.tutor?.name || 'T')}&background=0f8f62&color=fff`}
-                    alt="" className="h-12 w-12 rounded-full"
+                    alt="" className="h-12 w-12 rounded-full object-cover"
                   />
                   <div className="min-w-0 flex-1">
                     <Link to={`/tutors/${a.tutor?._id}`} className="font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-400">

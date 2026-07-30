@@ -63,7 +63,7 @@ export default function Home() {
           <div className="relative">
             <div className="card space-y-4 p-6 shadow-lg">
               <div className="flex items-center gap-3">
-                <img src="https://i.pravatar.cc/150?img=12" alt="" className="h-12 w-12 rounded-full ring-2 ring-brand-100 dark:ring-brand-800" />
+                <img src="https://i.pravatar.cc/150?img=12" alt="" className="h-12 w-12 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-800" />
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white">Tanvir Ahmed</p>
                   <p className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">

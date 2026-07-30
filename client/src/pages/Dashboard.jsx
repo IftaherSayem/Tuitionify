@@ -129,7 +129,7 @@ function TutorDashboard() {
         <div className="flex items-center gap-4">
           <img
             src={profile.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=0f8f62&color=fff`}
-            alt="" className="h-16 w-16 rounded-full ring-2 ring-brand-100 dark:ring-brand-800"
+            alt="" className="h-16 w-16 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-800"
           />
           <div className="flex-1">
             <h2 className="flex items-center gap-1.5 text-lg font-bold text-slate-900 dark:text-white">
@@ -189,7 +189,7 @@ function TutorDashboard() {
               <div key={r._id} className="card flex flex-wrap items-center gap-3 p-4">
                 <img
                   src={r.seeker?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.seeker?.name || 'S')}&background=0f8f62&color=fff`}
-                  alt="" className="h-11 w-11 rounded-full"
+                  alt="" className="h-11 w-11 rounded-full object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-slate-900 dark:text-white">{r.seeker?.name || 'A guardian'}</p>
