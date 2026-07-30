@@ -3,7 +3,9 @@ import { Camera, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
 
-const MAX_SIZE = 5 * 1024 * 1024;
+// Vercel caps a serverless function's request body at 4.5 MB, and base64
+// inflates a file by ~4/3 — so keep the accepted file well under that.
+const MAX_SIZE = 3 * 1024 * 1024;
 
 // Reads a File into the bare base64 payload imgbb expects (no data: prefix).
 function toBase64(file) {
@@ -28,7 +30,7 @@ export default function PhotoUpload({ value, onChange }) {
       return;
     }
     if (file.size > MAX_SIZE) {
-      toast.error('Image must be 5 MB or smaller');
+      toast.error('Image must be 3 MB or smaller');
       e.target.value = '';
       return;
     }
@@ -67,7 +69,7 @@ export default function PhotoUpload({ value, onChange }) {
       </div>
       <div className="text-sm text-slate-500 dark:text-slate-400">
         <p className="font-medium text-slate-700 dark:text-slate-300">Profile photo</p>
-        <p>Click the camera icon to upload (max 5 MB)</p>
+        <p>Click the camera icon to upload (max 3 MB)</p>
       </div>
       <input
         ref={inputRef}

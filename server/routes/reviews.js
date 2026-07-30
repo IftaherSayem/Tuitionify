@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Review from '../models/Review.js';
 import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
@@ -19,17 +20,24 @@ async function recomputeRating(tutorId) {
 }
 
 // POST /api/reviews — seeker reviews a tutor
-router.post('/', verifyToken, loadUser, requireRole('seeker'), async (req, res, next) => {
+router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }), async (req, res, next) => {
   try {
     const { tutorId, rating, comment } = req.body;
     const tutor = await User.findOne({ _id: tutorId, role: 'tutor' });
     if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
 
+    // Guard the rating range here as well as in the schema, so a bad value
+    // produces a 400 rather than a 500 from the model validator.
+    const score = Number(rating);
+    if (!Number.isFinite(score) || score < 1 || score > 5) {
+      return res.status(400).json({ message: 'rating must be a number between 1 and 5' });
+    }
+
     const review = await Review.create({
       tutor: tutor._id,
       author: req.dbUser._id,
       authorName: req.dbUser.name,
-      rating: Number(rating),
+      rating: score,
       comment: comment || '',
     });
     await recomputeRating(tutor._id);

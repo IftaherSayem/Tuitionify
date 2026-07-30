@@ -4,6 +4,8 @@ import Application from '../models/Application.js';
 import Bookmark from '../models/Bookmark.js';
 import Report from '../models/Report.js';
 import { verifyToken, loadUser, requireRole, optionalAuth } from '../middleware/auth.js';
+import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
@@ -12,24 +14,34 @@ router.get('/', async (req, res, next) => {
   try {
     const { subject, subjects, classLevel, area, gender, mode, minSalary, maxSalary, status } = req.query;
     const filter = {};
-    filter.status = status || 'open';
+    // Every value below is forced to a scalar: Express turns `?area[$ne]=x`
+    // into an object, which would otherwise inject a Mongo operator.
+    filter.status = asEnum(status, ['open', 'closed']) || 'open';
 
     // Accept multi-select (subjects[]=a&subjects[]=b) or legacy single `subject`.
-    const subjectList = [].concat(subjects || subject || []).filter(Boolean);
+    const subjectList = []
+      .concat(subjects || subject || [])
+      .map(asString)
+      .filter(Boolean);
     if (subjectList.length) filter.subjects = { $in: subjectList };
-    if (classLevel) filter.classLevel = classLevel;
-    if (area) filter.area = area;
-    if (gender) filter.genderPreference = { $in: [gender, 'any'] };
-    if (mode) filter.mode = mode;
-    if (minSalary || maxSalary) {
+    if (asString(classLevel)) filter.classLevel = asString(classLevel);
+    if (asString(area)) filter.area = asString(area);
+    if (asEnum(gender, ['male', 'female'])) {
+      filter.genderPreference = { $in: [asEnum(gender, ['male', 'female']), 'any'] };
+    }
+    if (asEnum(mode, ['home', 'online'])) filter.mode = asEnum(mode, ['home', 'online']);
+
+    const min = asNumber(minSalary);
+    const max = asNumber(maxSalary);
+    if (min !== null || max !== null) {
       filter.salary = {};
-      if (minSalary) filter.salary.$gte = Number(minSalary);
-      if (maxSalary) filter.salary.$lte = Number(maxSalary);
+      if (min !== null) filter.salary.$gte = min;
+      if (max !== null) filter.salary.$lte = max;
     }
 
-    if (req.query.q) {
-      const re = { $regex: req.query.q, $options: 'i' };
-      filter.$or = [{ title: re }, { description: re }, { subjects: re }];
+    const search = safeSearchRegex(req.query.q);
+    if (search) {
+      filter.$or = [{ title: search }, { description: search }, { subjects: search }];
     }
 
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -110,9 +122,20 @@ router.get('/:id', optionalAuth, async (req, res, next) => {
 });
 
 // POST /api/tuitions — seeker posts a tuition
-router.post('/', verifyToken, loadUser, requireRole('seeker'), async (req, res, next) => {
+router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windowMs: 60_000, max: 10, name: 'post-tuition' }), async (req, res, next) => {
   try {
-    const tuition = await Tuition.create({ ...req.body, createdBy: req.dbUser._id });
+    // Whitelist, so a caller cannot set server-controlled fields
+    // (status, createdBy, timestamps) by spreading extra keys.
+    const CREATABLE = [
+      'title', 'classLevel', 'subjects', 'area', 'salary',
+      'daysPerWeek', 'mode', 'genderPreference', 'description',
+    ];
+    const payload = {};
+    for (const key of CREATABLE) {
+      if (req.body[key] !== undefined) payload[key] = req.body[key];
+    }
+
+    const tuition = await Tuition.create({ ...payload, createdBy: req.dbUser._id });
     res.status(201).json(tuition);
   } catch (err) {
     next(err);

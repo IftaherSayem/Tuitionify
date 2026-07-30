@@ -2,11 +2,12 @@ import { Router } from 'express';
 import ContactRequest from '../models/ContactRequest.js';
 import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
 // POST /api/contact-requests — seeker asks a tutor to share contact
-router.post('/', verifyToken, loadUser, requireRole('seeker'), async (req, res, next) => {
+router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windowMs: 3_600_000, max: 20, name: 'contact-req' }), async (req, res, next) => {
   try {
     const { tutorId, message } = req.body;
     const tutor = await User.findOne({ _id: tutorId, role: 'tutor' });

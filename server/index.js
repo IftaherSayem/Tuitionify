@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin.js';
 import bookmarkRoutes from './routes/bookmarks.js';
 import tutorBookmarkRoutes from './routes/tutorBookmarks.js';
 import uploadRoutes from './routes/uploads.js';
+import { rateLimit } from './middleware/rateLimit.js';
 
 const app = express();
 
@@ -22,9 +23,15 @@ initFirebase();
 
 const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
 app.use(cors({ origin: clientUrl }));
-// Base64 image uploads are proxied through /api/uploads, so allow a payload
-// large enough for a 5 MB photo after base64 inflation.
-app.use(express.json({ limit: '8mb' }));
+
+// Base64 photo uploads need a large body, but only on that one route —
+// every other endpoint keeps a small limit so a single request cannot
+// tie up memory.
+app.use('/api/uploads', express.json({ limit: '4.5mb' }));
+app.use(express.json({ limit: '100kb' }));
+
+// Blanket limit as a backstop; individual write routes set tighter ones.
+app.use('/api', rateLimit({ windowMs: 60_000, max: 200, name: 'global' }));
 
 // Ensure the DB is connected before handling any request (serverless-safe).
 app.use(async (req, res, next) => {
@@ -53,7 +60,26 @@ app.use('/api/uploads', uploadRoutes);
 // Central error handler
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(err.status || 500).json({ message: err.message || 'Server error' });
+
+  // A malformed :id reaches Mongoose as a CastError — that's a bad request,
+  // not a server fault, and the raw message leaks schema internals.
+  if (err.name === 'CastError') {
+    return res.status(400).json({ message: 'Invalid id' });
+  }
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ message: 'Invalid request data' });
+  }
+  // Body larger than the configured limit.
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Request body too large' });
+  }
+
+  const status = err.status || 500;
+  // Don't echo internal error text to clients in production.
+  const message = status >= 500 && process.env.NODE_ENV === 'production'
+    ? 'Server error'
+    : err.message || 'Server error';
+  res.status(status).json({ message });
 });
 
 // Run a real listener only outside Vercel (local dev). On Vercel the app

@@ -2,11 +2,12 @@ import { Router } from 'express';
 import Application from '../models/Application.js';
 import Tuition from '../models/Tuition.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
 // POST /api/applications — tutor applies to a tuition
-router.post('/', verifyToken, loadUser, requireRole('tutor'), async (req, res, next) => {
+router.post('/', verifyToken, loadUser, requireRole('tutor'), rateLimit({ windowMs: 3_600_000, max: 30, name: 'apply' }), async (req, res, next) => {
   try {
     const { tuitionId, message } = req.body;
     const tuition = await Tuition.findById(tuitionId);

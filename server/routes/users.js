@@ -3,6 +3,8 @@ import User from '../models/User.js';
 import Review from '../models/Review.js';
 import ContactRequest from '../models/ContactRequest.js';
 import { verifyToken, loadUser, optionalAuth } from '../middleware/auth.js';
+import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
@@ -116,24 +118,37 @@ router.get('/tutors', async (req, res, next) => {
     const { subject, subjects, classLevel, area, gender, mode, minSalary, maxSalary, minRating, q } = req.query;
     const filter = { role: 'tutor' };
 
+    // All values forced to scalars — `?area[$ne]=x` would otherwise inject
+    // a Mongo operator into the filter.
     // Accept multi-select (subjects[]=a&subjects[]=b) or legacy single `subject`.
-    const subjectList = [].concat(subjects || subject || []).filter(Boolean);
+    const subjectList = []
+      .concat(subjects || subject || [])
+      .map(asString)
+      .filter(Boolean);
     if (subjectList.length) filter.subjects = { $in: subjectList };
-    if (classLevel) filter.classLevels = classLevel;
-    if (area) filter.preferredAreas = area;
-    if (gender) filter.gender = gender;
-    if (mode) filter.mode = { $in: [mode, 'both'] };
-    if (minSalary || maxSalary) {
+    if (asString(classLevel)) filter.classLevels = asString(classLevel);
+    if (asString(area)) filter.preferredAreas = asString(area);
+    if (asEnum(gender, ['male', 'female'])) filter.gender = asEnum(gender, ['male', 'female']);
+    if (asEnum(mode, ['home', 'online'])) {
+      filter.mode = { $in: [asEnum(mode, ['home', 'online']), 'both'] };
+    }
+
+    const min = asNumber(minSalary);
+    const max = asNumber(maxSalary);
+    if (min !== null || max !== null) {
       filter.expectedSalary = {};
-      if (minSalary) filter.expectedSalary.$gte = Number(minSalary);
-      if (maxSalary) filter.expectedSalary.$lte = Number(maxSalary);
+      if (min !== null) filter.expectedSalary.$gte = min;
+      if (max !== null) filter.expectedSalary.$lte = max;
     }
-    if (minRating) filter.ratingAvg = { $gte: Number(minRating) };
-    if (q) {
-      const re = { $regex: q, $options: 'i' };
-      filter.$or = [{ name: re }, { university: re }, { department: re }, { subjects: re }];
+
+    const rating = asNumber(minRating);
+    if (rating !== null) filter.ratingAvg = { $gte: rating };
+
+    const search = safeSearchRegex(q);
+    if (search) {
+      filter.$or = [{ name: search }, { university: search }, { department: search }, { subjects: search }];
     }
-    if (req.query.verified === 'true') filter.isVerified = true;
+    if (asString(req.query.verified) === 'true') filter.isVerified = true;
 
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 12));
