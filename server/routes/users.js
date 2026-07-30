@@ -32,21 +32,39 @@ router.post('/register', verifyToken, async (req, res, next) => {
 
     if (user) return res.json(user); // already registered
 
-    const { name, role, phone, photo, gender, ...tutorFields } = req.body;
+    const { name, role, phone, photo, gender } = req.body;
     if (!role || !['tutor', 'seeker'].includes(role)) {
       return res.status(400).json({ message: 'A valid role (tutor or seeker) is required' });
     }
 
+    // Only these tutor fields may be set by the client. Never spread req.body:
+    // trust fields (email, isVerified, emailVerified, restricted, ratingAvg)
+    // are derived from the verified token or granted by an admin.
+    const TUTOR_FIELDS = [
+      'university', 'department', 'subjects', 'classLevels',
+      'preferredAreas', 'expectedSalary', 'mode', 'bio',
+    ];
+    const tutorFields = {};
+    if (role === 'tutor') {
+      for (const key of TUTOR_FIELDS) {
+        if (req.body[key] !== undefined) tutorFields[key] = req.body[key];
+      }
+    }
+
+    if (!email) {
+      return res.status(400).json({ message: 'Your account has no email address' });
+    }
+
     user = await User.create({
       firebaseUid: uid,
-      email: email || req.body.email,
+      email, // always from the verified Firebase token — admin access keys off this
       name: name || tokenName || 'User',
       role,
       phone: phone || '',
       photo: photo || '',
       gender: gender || '',
       emailVerified: Boolean(email_verified),
-      ...(role === 'tutor' ? tutorFields : {}),
+      ...tutorFields,
     });
 
     res.status(201).json(user);

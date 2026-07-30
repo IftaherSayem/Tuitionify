@@ -3,7 +3,7 @@ import Tuition from '../models/Tuition.js';
 import Application from '../models/Application.js';
 import Bookmark from '../models/Bookmark.js';
 import Report from '../models/Report.js';
-import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { verifyToken, loadUser, requireRole, optionalAuth } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -92,11 +92,18 @@ router.get('/recommended', verifyToken, loadUser, async (req, res, next) => {
 });
 
 // GET /api/tuitions/:id — single tuition
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', optionalAuth, async (req, res, next) => {
   try {
     const tuition = await Tuition.findById(req.params.id).populate('createdBy', 'name photo phone');
     if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
-    res.json(tuition);
+
+    // The poster's phone is private — only the owner may see it. The client
+    // also hides it, but that check is cosmetic; this is the real guard.
+    const obj = tuition.toObject();
+    const isOwner = req.dbUser && String(tuition.createdBy?._id) === String(req.dbUser._id);
+    if (!isOwner && obj.createdBy) delete obj.createdBy.phone;
+
+    res.json(obj);
   } catch (err) {
     next(err);
   }

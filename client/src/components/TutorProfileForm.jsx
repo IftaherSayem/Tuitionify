@@ -78,7 +78,6 @@ export default function TutorProfileForm({ onDone }) {
       <PhotoUpload
         value={form.photo}
         onChange={(url) => set('photo', url)}
-        uid={firebaseUser?.uid}
       />
 
       <div className="grid gap-5 sm:grid-cols-2">

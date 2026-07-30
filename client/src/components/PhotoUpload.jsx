@@ -1,28 +1,47 @@
 import { useState, useRef } from 'react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Camera, Loader2 } from 'lucide-react';
-import { storage } from '../firebase/config';
+import toast from 'react-hot-toast';
+import api from '../api/client';
 
 const MAX_SIZE = 5 * 1024 * 1024;
 
-export default function PhotoUpload({ value, onChange, uid }) {
+// Reads a File into the bare base64 payload imgbb expects (no data: prefix).
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+export default function PhotoUpload({ value, onChange }) {
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef(null);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) return;
-    if (file.size > MAX_SIZE) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      toast.error('Image must be 5 MB or smaller');
+      e.target.value = '';
+      return;
+    }
 
     setUploading(true);
     try {
-      const storageRef = ref(storage, `profile-photos/${uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      onChange(url);
-    } catch {
-      // silently fail — toast is handled upstream if needed
+      // Uploads go through our API so the imgbb key stays server-side.
+      const image = await toBase64(file);
+      const { data } = await api.post('/uploads/photo', { image });
+      onChange(data.url);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Photo upload failed');
+      console.error(err);
     } finally {
       setUploading(false);
       e.target.value = '';

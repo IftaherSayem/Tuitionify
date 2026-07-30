@@ -14,6 +14,7 @@ import reportRoutes from './routes/reports.js';
 import adminRoutes from './routes/admin.js';
 import bookmarkRoutes from './routes/bookmarks.js';
 import tutorBookmarkRoutes from './routes/tutorBookmarks.js';
+import uploadRoutes from './routes/uploads.js';
 
 const app = express();
 
@@ -21,7 +22,9 @@ initFirebase();
 
 const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
 app.use(cors({ origin: clientUrl }));
-app.use(express.json());
+// Base64 image uploads are proxied through /api/uploads, so allow a payload
+// large enough for a 5 MB photo after base64 inflation.
+app.use(express.json({ limit: '8mb' }));
 
 // Ensure the DB is connected before handling any request (serverless-safe).
 app.use(async (req, res, next) => {
@@ -45,6 +48,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/tutor-bookmarks', tutorBookmarkRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Central error handler
 app.use((err, req, res, next) => {
