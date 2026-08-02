@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tuitionify — Project Report</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm 20mm 25mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt; line-height: 1.65; color: #000;
+    margin: 0; padding: 0; text-align: justify;
+  }
+  h1, h2, h3, h4 { font-family: "Times New Roman", Times, serif; text-align: left; }
+  h1.chapter {
+    font-size: 17pt; font-weight: bold; margin: 0 0 18pt 0;
+    padding-bottom: 6pt; border-bottom: 1.5pt solid #000;
+  }
+  h2 { font-size: 13.5pt; margin: 18pt 0 7pt 0; }
+  h3 { font-size: 12pt; margin: 14pt 0 5pt 0; }
+  p { margin: 0 0 9pt 0; }
+  ul, ol { margin: 0 0 9pt 0; padding-left: 20pt; }
+  li { margin-bottom: 4pt; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 10pt; background: #f2f2f2; padding: 1px 3px;
+    border-radius: 2px;
+  }
+  pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9pt; line-height: 1.45; background: #f7f7f7;
+    border: 0.5pt solid #bbb; border-left: 2.5pt solid #555;
+    padding: 8pt 10pt; margin: 9pt 0; white-space: pre-wrap;
+    text-align: left; page-break-inside: avoid;
+  }
+  pre code { background: none; padding: 0; font-size: 9pt; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 10pt 0;
+    font-size: 10.5pt; page-break-inside: avoid;
+  }
+  th, td { border: 0.5pt solid #666; padding: 5pt 7pt; text-align: left; vertical-align: top; }
+  th { background: #e8e8e8; font-weight: bold; }
+  .caption {
+    font-size: 10pt; font-style: italic; text-align: center;
+    margin: 0 0 12pt 0; color: #333;
+  }
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+  .center { text-align: center; }
+
+  /* ---------- Title page ---------- */
+  .title-page { height: 246mm; text-align: center; page-break-after: always; padding-top: 6mm; }
+  .uni { font-size: 15pt; font-weight: bold; letter-spacing: 0.4pt; margin-bottom: 2pt; }
+  .dept { font-size: 12.5pt; margin-bottom: 20mm; }
+  .logo-mark {
+    width: 74px; height: 74px; margin: 0 auto 14mm auto;
+    border: 2pt solid #000; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30pt; font-weight: bold; font-family: Georgia, serif;
+  }
+  .rpt-label { font-size: 11pt; letter-spacing: 2.5pt; text-transform: uppercase; margin-bottom: 8mm; }
+  .rpt-title { font-size: 27pt; font-weight: bold; margin: 0 0 4mm 0; letter-spacing: 0.5pt; }
+  .rpt-sub { font-size: 13pt; font-style: italic; margin-bottom: 18mm; }
+  .fill { display: inline-block; min-width: 62mm; border-bottom: 0.8pt solid #000; }
+  .meta-table { width: 118mm; margin: 0 auto 16mm auto; font-size: 11.5pt; }
+  .meta-table td { border: none; padding: 5pt 4pt; }
+  .meta-table td.k { text-align: right; width: 44mm; font-weight: bold; }
+  .meta-table td.v { text-align: left; }
+  .submitted { font-size: 11.5pt; line-height: 2.1; }
+
+  /* ---------- Front matter ---------- */
+  .fm-title { font-size: 15pt; font-weight: bold; text-align: center; margin: 0 0 16pt 0; }
+  .sig-line { margin-top: 26mm; }
+  .sig-line .fill { min-width: 68mm; }
+  .toc-list { font-size: 11.5pt; }
+  .toc-list div { margin-bottom: 5pt; }
+  .toc-ch { font-weight: bold; margin-top: 10pt !important; }
+  .toc-sub { padding-left: 16pt; }
+  .abstract-body { text-align: justify; }
+  .kw { margin-top: 12pt; }
+</style>
+</head>
+<body>
+
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="title-page">
+  <div class="uni">INTERNATIONAL ISLAMIC UNIVERSITY CHITTAGONG</div>
+  <div class="dept">Department of Computer Science and Engineering</div>
+
+  <div class="logo-mark">T</div>
+
+  <div class="rpt-label">Project Report</div>
+  <div class="rpt-title">TUITIONIFY</div>
+  <div class="rpt-sub">A Privacy-Aware Tuition Marketplace<br>for the Bangladeshi Education Context</div>
+
+  <table class="meta-table">
+    <tr><td class="k">Course Title:</td><td class="v"><span class="fill"></span></td></tr>
+    <tr><td class="k">Course Code:</td><td class="v"><span class="fill"></span></td></tr>
+    <tr><td class="k">Semester:</td><td class="v"><span class="fill"></span></td></tr>
+  </table>
+
+  <div class="submitted">
+    <strong>Submitted by</strong><br>
+    Iftaher Sayem<br>
+    Student ID: <span class="fill" style="min-width:44mm"></span><br>
+    <br>
+    <strong>Submitted to</strong><br>
+    <span class="fill" style="min-width:56mm"></span><br>
+    <span class="fill" style="min-width:56mm"></span><br>
+    Department of CSE, IIUC
+  </div>
+
+  <div style="margin-top:14mm; font-size:11.5pt">
+    Date of Submission: <span class="fill" style="min-width:42mm"></span>
+  </div>
+</div>
+
+<!-- ==================== DECLARATION ==================== -->
+<div class="fm-title">DECLARATION</div>
+
+<p>I hereby declare that this project report titled <strong>&ldquo;Tuitionify &mdash; A Privacy-Aware Tuition Marketplace for the Bangladeshi Education Context&rdquo;</strong> is the result of my own work carried out in the Department of Computer Science and Engineering, International Islamic University Chittagong.</p>
+
+<p>The design, implementation, testing and security analysis presented in this report were performed by me. Any external libraries, services and sources that were used are acknowledged in the text and listed in the References. This work has not been submitted elsewhere for the award of any other degree or diploma.</p>
+
+<p>I further declare that the security findings reported in Chapter 7 were identified during a review of my own codebase, that the fixes described there were implemented and verified by me, and that the limitations which remain unresolved have been stated openly rather than omitted.</p>
+
+<div class="sig-line">
+  <p><span class="fill"></span><br>
+  <strong>Iftaher Sayem</strong><br>
+  Student ID: <span class="fill" style="min-width:40mm"></span><br>
+  Department of CSE, IIUC</p>
+</div>
+
+<div style="margin-top:22mm">
+  <p><strong>Approved by</strong></p>
+  <p style="margin-top:20mm"><span class="fill"></span><br>
+  Supervisor<br>
+  Department of CSE, IIUC</p>
+</div>
+
+<!-- ==================== ACKNOWLEDGEMENTS ==================== -->
+<div class="page-break"></div>
+<div class="fm-title">ACKNOWLEDGEMENTS</div>
+
+<p>All praise is due to Allah, by whose mercy this work was brought to completion.</p>
+
+<p>I am grateful to my supervisor for the guidance and patience that shaped this project, and for the questions that repeatedly sent me back to the code with a clearer idea of what I was actually building.</p>
+
+<p>I thank the faculty of the Department of Computer Science and Engineering at IIUC, whose teaching in database systems, software engineering and web technologies provided the foundation this project rests on.</p>
+
+<p>I am indebted to the classmates who tested early builds and reported what confused them. Several decisions in the final system &mdash; the review-eligibility notice, the dashboard prompts for a missing phone number, the visible reason a contact detail is hidden &mdash; exist because a real user was puzzled first.</p>
+
+<p>Finally, I thank my family for their support and encouragement throughout.</p>
+
+<p style="margin-top:16pt"><strong>Iftaher Sayem</strong><br>August 2026</p>
+
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="page-break"></div>
+<div class="fm-title">TABLE OF CONTENTS</div>
+
+<div class="toc-list">
+  <div class="toc-ch">CHAPTER 1 &mdash; INTRODUCTION</div>
+  <div class="toc-sub">1.1 Project Overview</div>
+  <div class="toc-sub">1.2 Problem Statement</div>
+  <div class="toc-sub">1.3 Objectives</div>
+  <div class="toc-sub">1.4 Scope</div>
+  <div class="toc-sub">1.5 Report Organisation</div>
+
+  <div class="toc-ch">CHAPTER 2 &mdash; BACKGROUND AND LITERATURE REVIEW</div>
+  <div class="toc-sub">2.1 The Private Tuition Market in Bangladesh</div>
+  <div class="toc-sub">2.2 Existing Solutions and Their Gaps</div>
+  <div class="toc-sub">2.3 Key Concepts Applied</div>
+
+  <div class="toc-ch">CHAPTER 3 &mdash; METHODOLOGY</div>
+  <div class="toc-sub">3.1 Process Model</div>
+  <div class="toc-sub">3.2 Requirements Analysis</div>
+  <div class="toc-sub">3.3 Technology Choices and Justification</div>
+  <div class="toc-sub">3.4 Tools</div>
+
+  <div class="toc-ch">CHAPTER 4 &mdash; SYSTEM ANALYSIS AND DESIGN</div>
+  <div class="toc-sub">4.1 Actors and Use Cases</div>
+  <div class="toc-sub">4.2 System Architecture</div>
+  <div class="toc-sub">4.3 Database Design</div>
+  <div class="toc-sub">4.4 Trust and Safety Rules</div>
+  <div class="toc-sub">4.5 End-to-End Workflow</div>
+
+  <div class="toc-ch">CHAPTER 5 &mdash; IMPLEMENTATION</div>
+  <div class="toc-sub">5.1 Frontend</div>
+  <div class="toc-sub">5.2 Backend and API</div>
+  <div class="toc-sub">5.3 Security Hardening Applied</div>
+  <div class="toc-sub">5.4 Project Structure</div>
+
+  <div class="toc-ch">CHAPTER 6 &mdash; TESTING</div>
+  <div class="toc-sub">6.1 Testing Strategy</div>
+  <div class="toc-sub">6.2 Unit Test Coverage</div>
+  <div class="toc-sub">6.3 Mutation Verification</div>
+  <div class="toc-sub">6.4 End-to-End Verification</div>
+
+  <div class="toc-ch">CHAPTER 7 &mdash; SECURITY ANALYSIS</div>
+  <div class="toc-sub">7.1 Security Posture</div>
+  <div class="toc-sub">7.2 Findings and Their Resolution</div>
+  <div class="toc-sub">7.3 Accepted Limitations</div>
+
+  <div class="toc-ch">CHAPTER 8 &mdash; RESULTS AND DISCUSSION</div>
+  <div class="toc-sub">8.1 Delivered Features</div>
+  <div class="toc-sub">8.2 API Summary</div>
+  <div class="toc-sub">8.3 Discussion</div>
+
+  <div class="toc-ch">CHAPTER 9 &mdash; CONCLUSION AND FUTURE WORK</div>
+  <div class="toc-sub">9.1 Conclusion</div>
+  <div class="toc-sub">9.2 Future Work</div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<div class="page-break"></div>
+<div class="fm-title">ABSTRACT</div>
+
+<div class="abstract-body">
+<p>Private tuition is a deeply embedded part of secondary and higher-secondary education in Bangladesh, yet finding a trustworthy tutor still depends on word of mouth, printed leaflets, and scattered Facebook groups. This report presents <strong>Tuitionify</strong>, a full-stack web application that brings the process online for the International Islamic University Chittagong (IIUC) community. Tuitionify connects university-student tutors with guardians and students through a structured hiring loop &mdash; posting, filtering, applying, accepting, and reviewing &mdash; while keeping personal contact details private until a relationship is established.</p>
+
+<p>The system is built as a React single-page application on the frontend, a Node.js and Express REST API on the backend, MongoDB Atlas for persistence, and Firebase for authentication. It is shaped around the Bangladeshi context in concrete ways: salaries are quoted in BDT and bounded to a realistic range; the class system, curriculum subjects and Chittagong areas are enforced as validated option lists; and mobile numbers are normalised and validated as real Bangladeshi numbers, because hiring ultimately ends in a phone call.</p>
+
+<p>Because trust is the product, the design treats safety as a core requirement rather than an afterthought. Reviews may only be written by seekers who have actually engaged a tutor; reviews and reports require a confirmed email address; restricted accounts are refused everywhere, including on public pages; and contact details are removed from API responses server-side rather than merely hidden in the interface. A security review of the completed system identified ten findings, of which eight were resolved, one was patched at the dependency level, and one was assessed and deliberately not changed after inspection showed it was not reachable. A Vitest suite of seventy-two tests covers the rules that matter most, and was itself verified by deliberately removing protections and confirming the tests fail.</p>
+
+<p class="kw"><strong>Keywords:</strong> tuition marketplace, trust and safety, review integrity, privacy-gated contact sharing, Bangladeshi education system, MERN, Firebase, MongoDB, Express, React, Vitest</p>
+</div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 1 &mdash; INTRODUCTION</h1>
+
+<h2>1.1 Project Overview</h2>
+
+<p>Tuitionify is a web-based tuition marketplace that connects tutors with guardians and students. It is scoped to the IIUC community, where the two sides of the market naturally coexist: university students who want part-time teaching income, and families in and around Chittagong who want a qualified tutor for a school-going child.</p>
+
+<p>The application supports two user roles. A <strong>tutor</strong> builds a public profile stating subjects, class levels, preferred areas, expected salary and qualifications, then browses and applies to posted tuitions. A <strong>seeker</strong> &mdash; a guardian or a student &mdash; posts a tuition requirement, reviews the tutors who apply, and accepts one. A third role, <strong>admin</strong>, exists for moderation: verifying tutors, handling reports, and restricting accounts that misbehave.</p>
+
+<p>What distinguishes the system from a simple listings board is that it models the <em>hiring relationship</em>, not just the advertisement. An application has a state. Accepting an applicant closes the tuition. Contact details become visible only once one party has agreed to share them. A review can only be written by someone the tutor actually agreed to work with. These rules are enforced on the server, where a user cannot bypass them.</p>
+
+<h2>1.2 Problem Statement</h2>
+
+<p>The existing process for arranging private tuition in Bangladesh suffers from several concrete problems.</p>
+
+<p><strong>Discovery is inefficient.</strong> Guardians rely on personal referrals, leaflets stapled to notice boards, and Facebook groups where posts scroll out of view within hours. A guardian in one part of Chittagong has no reliable way to find a suitable tutor in the same area.</p>
+
+<p><strong>There is no verifiable reputation.</strong> A tutor's claim about their own experience cannot be checked. Existing platforms that do show ratings rarely restrict who may rate, so a rating can be inflated by friends or by throwaway accounts. A rating that anyone can write is not evidence of anything.</p>
+
+<p><strong>Contact information is exposed prematurely.</strong> When a phone number is published openly, it is harvested and misused. Guardians are particularly reluctant to publish a number attached to a post that also mentions a child and a home area.</p>
+
+<p><strong>Generic platforms do not fit the local context.</strong> International tutoring sites assume different currencies, grade systems, and subject names. A guardian looking for a Class 9 Higher Math tutor in Chawkbazar is not served by a platform built around a different curriculum.</p>
+
+<h2>1.3 Objectives</h2>
+
+<p>The project set out to achieve the following.</p>
+
+<ol>
+  <li>To design and implement a functioning two-sided marketplace covering the complete hiring loop: post, discover, apply, accept, and review.</li>
+  <li>To keep personal contact details private by default, and to share them only after a mutual step has taken place.</li>
+  <li>To ensure that ratings reflect real engagements, by permitting reviews only from seekers who have demonstrably engaged the tutor.</li>
+  <li>To fit the Bangladeshi education context precisely, through validated subject, class-level and area lists, BDT salary bounds, and Bangladeshi mobile number handling.</li>
+  <li>To provide moderation capabilities so that misuse can be reported and acted upon.</li>
+  <li>To subject the finished system to a security review, resolve what is resolvable, and state the remaining limitations honestly.</li>
+  <li>To verify the rules that carry the most risk with an automated test suite.</li>
+</ol>
+
+<h2>1.4 Scope</h2>
+
+<p><strong>Within scope.</strong> Role-based registration and authentication; tutor profiles with photo upload; tuition posting with structured requirements; filtered search over both tutors and tuitions; the application lifecycle including withdrawal; a contact-request mechanism; engagement-gated reviews with tutor replies; bookmarking of both tuitions and tutors; reporting and admin moderation; an admin analytics dashboard; and a light and dark theme.</p>
+
+<p><strong>Outside scope.</strong> In-app messaging, online payment or salary escrow, video lessons, scheduling and calendar management, a mobile application, and identity verification against national documents. Chapter 9 discusses which of these are the natural next steps.</p>
+
+<h2>1.5 Report Organisation</h2>
+
+<p>Chapter 2 examines the market context and the gaps in existing solutions. Chapter 3 sets out the development methodology, the requirements, and the reasoning behind each technology choice. Chapter 4 presents the analysis and design, including the database schema and the trust rules. Chapter 5 describes the implementation. Chapter 6 covers testing, including a mutation exercise used to check that the tests genuinely detect regressions. Chapter 7 reports the security review in full. Chapter 8 presents results, and Chapter 9 concludes with future work.</p>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 2 &mdash; BACKGROUND AND LITERATURE REVIEW</h1>
+
+<h2>2.1 The Private Tuition Market in Bangladesh</h2>
+
+<p>Private tuition occupies an unusual position in Bangladeshi education. It is not a marginal supplement but a widely assumed part of preparation for public examinations, particularly at the SSC and HSC stages. Households across a broad income range treat tuition costs as a routine expense, and university students form a large and willing supply of tutors, for whom teaching is one of the few flexible sources of income compatible with a class timetable.</p>
+
+<p>The market is therefore large, active, and almost entirely informal. Arrangements are made verbally, terms are agreed without documentation, and reputation travels by word of mouth within a neighbourhood or a circle of relatives. This informality is efficient within a small social network and fails completely outside it. A guardian who has recently moved to a new area has no network to draw on.</p>
+
+<p>Three features of the local context bear directly on the design of any software intended to serve this market. First, the currency and salary expectations are specific: monthly rates quoted in BDT, typically in the low thousands, and a system that accepts an unbounded number invites both typos and unrealistic postings. Second, the academic structure is specific: classes numbered through the school system, then HSC, then admission preparation, with subject names following the national curriculum. Third, and most practically, the transaction concludes by telephone. A platform may mediate discovery, but the hiring conversation happens on a mobile call, which makes a valid mobile number a functional requirement rather than an optional profile field.</p>
+
+<h2>2.2 Existing Solutions and Their Gaps</h2>
+
+<p>Several categories of existing solution were examined before design began.</p>
+
+<p><strong>Social media groups.</strong> Facebook groups dedicated to tuition in particular cities are the dominant tool in practice. Their advantage is reach and zero setup cost. Their weaknesses are structural: posts are unstructured free text, so filtering by class, subject or area is impossible; content is ordered by recency and social engagement rather than relevance; there is no notion of an application, so a post attracts a disorganised flood of comments; and phone numbers are posted publicly, exposing both parties.</p>
+
+<p><strong>Local classifieds platforms.</strong> General-purpose classified sites carry tuition listings. They provide structure for search but treat tuition as a commodity listing. There is no concept of a tutor profile with a verifiable history, no application state, and no reputation mechanism tied to actual engagements.</p>
+
+<p><strong>International tutoring marketplaces.</strong> Established global platforms solve the reputation and scheduling problems well, and some implement contact gating and payment escrow. They are, however, built around different curricula, currencies and payment instruments. Their subject taxonomies and grade systems do not map onto the Bangladeshi system, and their payment rails are largely unavailable locally.</p>
+
+<p>A recurring weakness across all three categories deserves emphasis, because it motivated one of the central design decisions in this project. Where ratings exist at all, they are rarely tied to a completed transaction. A platform that allows any registered account to rate any tutor produces a rating that measures social reach rather than teaching quality. Since a rating is precisely the signal a guardian most wants to rely on, an unverified rating is worse than no rating: it invites misplaced confidence.</p>
+
+<h2>2.3 Key Concepts Applied</h2>
+
+<p><strong>Two-sided marketplace design.</strong> The system must serve two distinct user groups whose value to each other depends on the presence of the other side. This motivates giving both sides a symmetric discovery path: seekers browse tutors, and tutors browse tuitions, so neither side must wait passively.</p>
+
+<p><strong>Progressive disclosure of personal data.</strong> Rather than treating contact information as either public or private, the system treats it as conditionally visible. The condition is a mutual step: an accepted application, or an explicitly approved contact request. This principle is applied server-side, so the data never reaches a client that is not entitled to it.</p>
+
+<p><strong>Verified reputation.</strong> Reviews are gated on evidence of a real engagement. The design requirement is that the gate must depend on an action taken by the party being reviewed, so that the reviewed party cannot be targeted by a reviewer acting alone.</p>
+
+<p><strong>Defence in depth.</strong> Authorisation is checked at multiple layers rather than at a single gate: token verification, account loading, restriction checks, role checks, resource ownership checks, and field-level whitelisting on write operations. Chapter 5 details how these compose.</p>
+
+<p><strong>Principle of least privilege on writes.</strong> Every write endpoint accepts an explicit whitelist of fields rather than assigning a request body wholesale, so that sensitive fields such as verification status cannot be set by a client.</p>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 3 &mdash; METHODOLOGY</h1>
+
+<h2>3.1 Process Model</h2>
+
+<p>The project followed an <strong>incremental and iterative</strong> process. A minimum working system was built first &mdash; authentication, the two roles, tuition posting, and applications &mdash; and further capability was layered on in successive increments, each ending in a runnable state.</p>
+
+<p>This suited the project for two reasons. The requirements were not fully known at the outset, since several rules only became apparent once the system could actually be used; and the trust rules in particular emerged from reasoning about how a working marketplace could be abused, which is difficult to do productively in the abstract.</p>
+
+<table>
+  <tr><th>Increment</th><th>Delivered</th></tr>
+  <tr><td>1</td><td>Firebase authentication, role selection, user profiles</td></tr>
+  <tr><td>2</td><td>Tuition posting, listing, and filtering</td></tr>
+  <tr><td>3</td><td>Application lifecycle, role-based dashboards</td></tr>
+  <tr><td>4</td><td>Reviews and ratings, tutor directory</td></tr>
+  <tr><td>5</td><td>Privacy-gated contact requests</td></tr>
+  <tr><td>6</td><td>Reporting, admin moderation, verification badge</td></tr>
+  <tr><td>7</td><td>Dark mode, pagination, search, bookmarks, photo upload</td></tr>
+  <tr><td>8</td><td>Analytics, recommendations, review replies, application timeline</td></tr>
+  <tr><td>9</td><td>Security review; hardening; trust rules; test suite</td></tr>
+</table>
+<p class="caption">Table 3.1: Development increments</p>
+
+<p>The final increment deserves comment as a matter of methodology. Rather than declaring the project finished once the features worked, the completed system was deliberately reviewed as an adversary would examine it, asking what a motivated user could do that the design did not intend. That exercise produced the most consequential change in the project &mdash; the review-eligibility rule &mdash; which no feature specification had called for. This is recorded here because it shaped the outcome more than any single feature.</p>
+
+<h2>3.2 Requirements Analysis</h2>
+
+<h3>3.2.1 Functional Requirements</h3>
+
+<table>
+  <tr><th>ID</th><th>Requirement</th><th>Actor</th></tr>
+  <tr><td>FR-01</td><td>Register and authenticate by email/password or Google</td><td>All</td></tr>
+  <tr><td>FR-02</td><td>Select a role at registration</td><td>All</td></tr>
+  <tr><td>FR-03</td><td>Create and edit a tutor profile</td><td>Tutor</td></tr>
+  <tr><td>FR-04</td><td>Upload a profile photograph</td><td>All</td></tr>
+  <tr><td>FR-05</td><td>Post a tuition requirement</td><td>Seeker</td></tr>
+  <tr><td>FR-06</td><td>Edit and delete an own posting</td><td>Seeker</td></tr>
+  <tr><td>FR-07</td><td>Browse and filter tuitions</td><td>All</td></tr>
+  <tr><td>FR-08</td><td>Browse and filter tutors</td><td>All</td></tr>
+  <tr><td>FR-09</td><td>Apply to an open tuition</td><td>Tutor</td></tr>
+  <tr><td>FR-10</td><td>Withdraw a pending application</td><td>Tutor</td></tr>
+  <tr><td>FR-11</td><td>View applicants and accept or reject</td><td>Seeker</td></tr>
+  <tr><td>FR-12</td><td>Request a tutor's contact details</td><td>Seeker</td></tr>
+  <tr><td>FR-13</td><td>Approve or decline a contact request</td><td>Tutor</td></tr>
+  <tr><td>FR-14</td><td>Review a tutor after engaging them</td><td>Seeker</td></tr>
+  <tr><td>FR-15</td><td>Reply to a received review</td><td>Tutor</td></tr>
+  <tr><td>FR-16</td><td>Bookmark tuitions and tutors</td><td>All</td></tr>
+  <tr><td>FR-17</td><td>Report a profile or posting</td><td>All</td></tr>
+  <tr><td>FR-18</td><td>Grant or revoke the verified badge</td><td>Admin</td></tr>
+  <tr><td>FR-19</td><td>Restrict or unrestrict an account</td><td>Admin</td></tr>
+  <tr><td>FR-20</td><td>Process the report queue</td><td>Admin</td></tr>
+  <tr><td>FR-21</td><td>View platform analytics</td><td>Admin</td></tr>
+  <tr><td>FR-22</td><td>Receive tuition recommendations</td><td>Tutor</td></tr>
+</table>
+<p class="caption">Table 3.2: Functional requirements</p>
+
+<h3>3.2.2 Non-Functional Requirements</h3>
+
+<table>
+  <tr><th>ID</th><th>Requirement</th><th>How it is met</th></tr>
+  <tr><td>NFR-01</td><td>Contact details must not be exposed without consent</td><td>Fields deleted server-side; conditional disclosure</td></tr>
+  <tr><td>NFR-02</td><td>Ratings must reflect real engagements</td><td>Engagement rule enforced on the API</td></tr>
+  <tr><td>NFR-03</td><td>Passwords must never be stored by the application</td><td>Delegated to Firebase Authentication</td></tr>
+  <tr><td>NFR-04</td><td>Abuse must be rate-limited</td><td>Per-user and per-IP limits on all write routes</td></tr>
+  <tr><td>NFR-05</td><td>Input must be validated before persistence</td><td>Whitelists, enums, bounds and length caps</td></tr>
+  <tr><td>NFR-06</td><td>The interface must work on a mobile handset</td><td>Mobile-first responsive layout</td></tr>
+  <tr><td>NFR-07</td><td>Listings must not return unbounded responses</td><td>Pagination on every list endpoint</td></tr>
+  <tr><td>NFR-08</td><td>Errors must not disclose internal detail</td><td>Central handler; messages suppressed in production</td></tr>
+  <tr><td>NFR-09</td><td>Critical rules must be regression-protected</td><td>Automated test suite</td></tr>
+</table>
+<p class="caption">Table 3.3: Non-functional requirements</p>
+
+<h2>3.3 Technology Choices and Justification</h2>
+
+<table>
+  <tr><th>Layer</th><th>Chosen</th><th>Justification</th></tr>
+  <tr><td>Frontend</td><td>React 18 + Vite 5</td><td>Component reuse across many similar listing views; Vite gives fast rebuilds and per-route code splitting</td></tr>
+  <tr><td>Routing</td><td>React Router 6</td><td>Declarative guards, and redirect-with-state so a user returns to the page they wanted after login</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS 3</td><td>Consistent spacing and colour without a separate stylesheet; class-based dark mode</td></tr>
+  <tr><td>HTTP</td><td>Axios</td><td>A single request interceptor attaches the auth token application-wide</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express 4</td><td>One language across the stack; middleware composition maps naturally onto layered authorisation</td></tr>
+  <tr><td>Database</td><td>MongoDB Atlas + Mongoose 8</td><td>Document model suits a schema that evolved each increment; Mongoose validators enforce rules at the persistence layer</td></tr>
+  <tr><td>Authentication</td><td>Firebase Auth + Admin SDK</td><td>Provides email verification, password reset and Google sign-in without storing credentials locally</td></tr>
+  <tr><td>Images</td><td>imgbb via server proxy</td><td>Free hosting; proxying keeps the API key off the client</td></tr>
+  <tr><td>Testing</td><td>Vitest 2</td><td>ESM-native, fast, and runs without a database</td></tr>
+  <tr><td>Hosting</td><td>Vercel</td><td>Free tier, deploys on push, serverless functions for the API</td></tr>
+</table>
+<p class="caption">Table 3.4: Technology choices</p>
+
+<p>Two choices warrant fuller justification.</p>
+
+<p><strong>Delegating authentication to Firebase.</strong> Implementing password storage, reset flows and email verification correctly is a significant undertaking with a high penalty for error. Delegating it removes an entire class of vulnerability: since the application never receives a password, there is no credential hash in the database to be leaked. The cost is a dependency on an external provider and the need to verify tokens on every request.</p>
+
+<p><strong>MongoDB rather than a relational database.</strong> The data is naturally document-shaped, particularly the user record, where a single collection serves two roles with different populated fields. The relationships are shallow &mdash; no query requires deep joins. The trade-off is that referential integrity is not enforced by the database, so cascade deletion is handled explicitly in application code, as described in Chapter 5.</p>
+
+<h2>3.4 Tools</h2>
+
+<table>
+  <tr><th>Purpose</th><th>Tool</th></tr>
+  <tr><td>Editor</td><td>Visual Studio Code</td></tr>
+  <tr><td>Version control</td><td>Git and GitHub</td></tr>
+  <tr><td>API testing</td><td>Thunder Client; direct fetch scripts</td></tr>
+  <tr><td>Database inspection</td><td>MongoDB Compass; Atlas web console</td></tr>
+  <tr><td>Dependency auditing</td><td><code>npm audit</code></td></tr>
+  <tr><td>Automated testing</td><td>Vitest</td></tr>
+  <tr><td>Deployment</td><td>Vercel CLI and dashboard</td></tr>
+</table>
+<p class="caption">Table 3.5: Development tools</p>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 4 &mdash; SYSTEM ANALYSIS AND DESIGN</h1>
+
+<h2>4.1 Actors and Use Cases</h2>
+
+<table>
+  <tr><th>Actor</th><th>Description</th></tr>
+  <tr><td>Visitor</td><td>Unauthenticated. May browse tuitions and tutor profiles, without contact details.</td></tr>
+  <tr><td>Tutor</td><td>Authenticated university student. Maintains a profile, applies to tuitions, answers contact requests, replies to reviews.</td></tr>
+  <tr><td>Seeker</td><td>Authenticated guardian or student. Posts tuitions, decides on applicants, requests contact, writes reviews when eligible.</td></tr>
+  <tr><td>Admin</td><td>Identified by a configured email address. Verifies tutors, restricts accounts, processes reports, views analytics.</td></tr>
+</table>
+<p class="caption">Table 4.1: System actors</p>
+
+<pre><code>                        TUITIONIFY - USE CASE OVERVIEW
+
+   VISITOR                    TUTOR                       SEEKER
+      |                         |                            |
+  browse tuitions          edit profile                post tuition
+  browse tutors            upload photo                edit / delete post
+  view public profile      browse tuitions             view applicants
+  register / log in        apply to tuition            accept / reject
+                           withdraw application        request contact
+                           view recommendations        write review (if eligible)
+                           approve/decline contact     bookmark tutors
+                           reply to review             report a profile
+                           bookmark tuitions
+                                    \                    /
+                                     \                  /
+                                      +----------------+
+                                      |     ADMIN      |
+                                      +----------------+
+                                       verify tutors
+                                       restrict accounts
+                                       process reports
+                                       view analytics</code></pre>
+<p class="caption">Figure 4.1: Use case overview</p>
+
+<h2>4.2 System Architecture</h2>
+
+<p>The system uses a three-tier architecture. The presentation tier is a React single-page application; the application tier is an Express REST API; the data tier is MongoDB Atlas. Authentication is provided by Firebase, and image hosting by imgbb, both as external services.</p>
+
+<pre><code>+---------------------------------------------------------------+
+|                    PRESENTATION TIER                          |
+|   React 18 SPA . React Router . Tailwind CSS                  |
+|   Firebase Auth SDK  - obtains and refreshes the ID token     |
+|   Axios interceptor  - attaches Bearer token to each request  |
++------------------------------+--------------------------------+
+                               |
+                     HTTPS / JSON  (Bearer ID token)
+                               |
++------------------------------v--------------------------------+
+|                     APPLICATION TIER                          |
+|                                                               |
+|   CORS  ->  body limits  ->  rate limit  ->  DB connection     |
+|                              |                                |
+|   verifyToken -> loadUser -> requireRole                       |
+|                           -> requireVerifiedEmail              |
+|                           -> requireAdmin                      |
+|                              |                                |
+|   10 route modules . 8 Mongoose models . error handler         |
++---------------+-------------------------------+---------------+
+                |                               |
+    +-----------v----------+        +-----------v-----------+
+    |     DATA TIER        |        |  EXTERNAL SERVICES    |
+    |  MongoDB Atlas       |        |  Firebase Admin SDK   |
+    |  (Mongoose ODM)      |        |  imgbb (proxied)      |
+    +----------------------+        +-----------------------+</code></pre>
+<p class="caption">Figure 4.2: Three-tier architecture</p>
+
+<p>The client and the API are deployed as two independent Vercel projects from a single repository. This has one design consequence worth recording: the shared option lists for subjects, class levels and areas exist in both halves of the codebase and cannot be shared by import, because the two deployments have separate root directories and no common build step. The duplication is deliberate and is documented in both files, since silent drift between them would cause the API to reject values the interface offers.</p>
+
+<h2>4.3 Database Design</h2>
+
+<p>Eight collections. All carry automatic <code>createdAt</code> and <code>updatedAt</code> timestamps.</p>
+
+<pre><code>                          +---------------+
+                          |     User      |
+                          | role: tutor / |
+                          |       seeker  |
+                          +---+-------+---+
+             createdBy 1:N   |       |   1:N tutor
+             +---------------+       +----------------+
+             |                                        |
+      +------v-------+                       +--------v--------+
+      |   Tuition    |                       |     Review      |
+      +------+-------+                       |  (unique per    |
+             | 1:N tuition                   |  tutor+author)  |
+      +------v-------+                       +-----------------+
+      | Application  |---- N:1 tutor ---> User
+      | (unique per  |
+      |tuition+tutor)|          +------------------+
+      +--------------+          |  ContactRequest  |
+                                | (unique per      |
+                                |  tutor+seeker)   |
+                                +------------------+
+
+   Bookmark: user -> tuition (unique)
+   TutorBookmark: user -> tutor (unique)
+   Report: reporter -> targetId (targetType: user | tuition)</code></pre>
+<p class="caption">Figure 4.3: Entity relationships</p>
+
+<h3>4.3.1 The User Collection</h3>
+
+<p>A single collection serves both roles, with tutor-specific fields left empty for seekers.</p>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Constraints</th></tr>
+  <tr><td><code>firebaseUid</code></td><td>String</td><td>Required, unique, indexed</td></tr>
+  <tr><td><code>name</code></td><td>String</td><td>Required, max 100</td></tr>
+  <tr><td><code>email</code></td><td>String</td><td>Required; taken from the verified token only</td></tr>
+  <tr><td><code>role</code></td><td>String</td><td><code>tutor</code> or <code>seeker</code></td></tr>
+  <tr><td><code>phone</code></td><td>String</td><td>Normalised Bangladeshi mobile</td></tr>
+  <tr><td><code>photo</code></td><td>String</td><td>Must be an http(s) URL</td></tr>
+  <tr><td><code>gender</code></td><td>String</td><td><code>male</code>, <code>female</code> or empty</td></tr>
+  <tr><td><code>university</code>, <code>department</code></td><td>String</td><td>Max 150 each</td></tr>
+  <tr><td><code>subjects</code></td><td>[String]</td><td>Max 50, each from the subject list</td></tr>
+  <tr><td><code>classLevels</code></td><td>[String]</td><td>Max 50, each from the class list</td></tr>
+  <tr><td><code>preferredAreas</code></td><td>[String]</td><td>Max 50, each from the area list</td></tr>
+  <tr><td><code>expectedSalary</code></td><td>Number</td><td>0 to 100,000 BDT</td></tr>
+  <tr><td><code>mode</code></td><td>String</td><td><code>home</code>, <code>online</code>, <code>both</code> or empty</td></tr>
+  <tr><td><code>bio</code></td><td>String</td><td>Max 2,000</td></tr>
+  <tr><td><code>ratingAvg</code>, <code>ratingCount</code></td><td>Number</td><td>Computed by the server from reviews</td></tr>
+  <tr><td><code>isVerified</code></td><td>Boolean</td><td>Granted by an admin</td></tr>
+  <tr><td><code>emailVerified</code></td><td>Boolean</td><td>Mirrors the Firebase token claim</td></tr>
+  <tr><td><code>restricted</code></td><td>Boolean</td><td>Set by an admin; blocks the account</td></tr>
+</table>
+<p class="caption">Table 4.2: User schema</p>
+
+<h3>4.3.2 The Tuition Collection</h3>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Constraints</th></tr>
+  <tr><td><code>title</code></td><td>String</td><td>Required, max 150</td></tr>
+  <tr><td><code>classLevel</code></td><td>String</td><td>Required, from the class-level list</td></tr>
+  <tr><td><code>subjects</code></td><td>[String]</td><td>1 to 20, each from the subject list</td></tr>
+  <tr><td><code>area</code></td><td>String</td><td>Required, from the area list</td></tr>
+  <tr><td><code>salary</code></td><td>Number</td><td>500 to 100,000 BDT per month</td></tr>
+  <tr><td><code>daysPerWeek</code></td><td>Number</td><td>1 to 7</td></tr>
+  <tr><td><code>mode</code></td><td>String</td><td><code>home</code> or <code>online</code></td></tr>
+  <tr><td><code>genderPreference</code></td><td>String</td><td><code>male</code>, <code>female</code> or <code>any</code></td></tr>
+  <tr><td><code>description</code></td><td>String</td><td>Max 3,000</td></tr>
+  <tr><td><code>status</code></td><td>String</td><td><code>open</code> or <code>closed</code>; server-controlled</td></tr>
+  <tr><td><code>createdBy</code></td><td>ObjectId</td><td>Reference to User; server-set</td></tr>
+</table>
+<p class="caption">Table 4.3: Tuition schema</p>
+
+<h3>4.3.3 Remaining Collections</h3>
+
+<table>
+  <tr><th>Collection</th><th>Purpose</th><th>Key constraint</th></tr>
+  <tr><td>Application</td><td>A tutor applying to a tuition, with status and audit timestamps</td><td>Unique on tuition + tutor</td></tr>
+  <tr><td>Review</td><td>A 1&ndash;5 rating with comment and optional tutor reply</td><td>Unique on tutor + author</td></tr>
+  <tr><td>ContactRequest</td><td>A seeker asking a tutor to share contact details</td><td>Unique on tutor + seeker</td></tr>
+  <tr><td>Report</td><td>A flagged profile or posting awaiting moderation</td><td>Target type restricted to two values</td></tr>
+  <tr><td>Bookmark</td><td>A saved tuition</td><td>Unique on user + tuition</td></tr>
+  <tr><td>TutorBookmark</td><td>A saved tutor</td><td>Unique on user + tutor</td></tr>
+</table>
+<p class="caption">Table 4.4: Supporting collections</p>
+
+<p>The unique compound indexes are load-bearing rather than incidental. They enforce, at the database level, that a tutor cannot apply twice to one tuition, that a seeker cannot review one tutor twice, and that a bookmark cannot be duplicated. The application catches the resulting duplicate-key error and converts it into a clear message rather than a server fault.</p>
+
+<h2>4.4 Trust and Safety Rules</h2>
+
+<p>These rules are the design response to the weaknesses identified in Chapter 2. Each is enforced in the API.</p>
+
+<h3>4.4.1 Review Eligibility</h3>
+
+<p>A seeker may review a tutor only if at least one of the following holds:</p>
+
+<ol>
+  <li>the tutor was <strong>accepted</strong> on a tuition that the seeker themselves posted, or</li>
+  <li>the tutor <strong>approved</strong> a contact request from that seeker.</li>
+</ol>
+
+<p>The design constraint is that both conditions require an affirmative act by the tutor. A seeker acting alone cannot manufacture either one, and therefore cannot manufacture standing to review.</p>
+
+<p>The reason this rule matters more than its size suggests is that average rating is the primary sort key of the public tutor directory. Registration is free and unlimited, so without the rule a person could create accounts and move a competitor down the ranking or their own profile up. The unique index prevents one account from reviewing twice; it offers no protection against ten accounts each reviewing once.</p>
+
+<pre><code>// server/utils/engagement.js
+const myTuitionIds = await Tuition.find({ createdBy: seekerId }).distinct('_id');
+
+if (myTuitionIds.length) {
+  const accepted = await Application.exists({
+    tutor: tutorId,
+    tuition: { $in: myTuitionIds },   // scoped to the seeker's own postings
+    status: 'accepted',
+  });
+  if (accepted) return true;
+}
+
+return Boolean(await ContactRequest.exists({
+  tutor: tutorId, seeker: seekerId, status: 'approved',
+}));</code></pre>
+<p class="caption">Figure 4.4: The engagement check</p>
+
+<h3>4.4.2 Confirmed Email for Reviews and Reports</h3>
+
+<p>Reviews and reports additionally require a confirmed email address. This is what makes the previous rule expensive to circumvent at scale, since each additional account now costs a real, reachable mailbox. Posting a tuition and applying are deliberately not gated this way, as the added friction on the core marketplace loop would outweigh the benefit; both are already restricted by role and by rate limit.</p>
+
+<h3>4.4.3 A Valid Mobile Number Before Applying</h3>
+
+<p>Because hiring concludes by telephone, a tutor must have a valid Bangladeshi mobile number saved before applying. A guardian who accepts a tutor they cannot telephone has not hired anyone, and the application merely clutters their list.</p>
+
+<p>Numbers are validated as <code>01</code> followed by an operator digit in the range 3&ndash;9 and eight further digits, and are normalised on write, since the same number is written many ways in practice.</p>
+
+<table>
+  <tr><th>Entered by the user</th><th>Stored</th></tr>
+  <tr><td><code>01712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>+8801712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>8801712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>017 1234 5678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>017-1234-5678</code></td><td><code>01712345678</code></td></tr>
+</table>
+<p class="caption">Table 4.5: Mobile number normalisation</p>
+
+<p>The profile field itself remains optional, so a tutor browsing the site is not forced through a form prematurely. The requirement is applied at the point where it becomes meaningful, and the dashboard displays a notice beforehand so that it is not discovered only at the moment of applying.</p>
+
+<h3>4.4.4 Restriction Applies Everywhere</h3>
+
+<p>A restricted account is refused on authenticated routes. On the public tutor and tuition detail pages, which accept optional authentication in order to show additional data to signed-in users, a restricted account is treated as an anonymous visitor. Without this, a restricted seeker would retain the contact visibility granted by an earlier approved request, and the restriction would be only partially effective.</p>
+
+<h3>4.4.5 Server-Side Removal of Personal Data</h3>
+
+<p>Every response path that could carry a telephone number or email address removes the field before responding, rather than relying on the interface to conceal it: tutor listings, tutor detail, tuition detail, applicant lists before acceptance, and a seeker's own contact-request list before approval. A user reading the raw API response therefore sees exactly what a user reading the rendered page sees.</p>
+
+<h2>4.5 End-to-End Workflow</h2>
+
+<pre><code>SEEKER                          SYSTEM                        TUTOR
+  |                                |                             |
+  |-- register (role: seeker) ---->|<--- register (role: tutor) --|
+  |                                |                             |
+  |-- post tuition --------------->|                             |
+  |                                |---- appears in listings ---->|
+  |                                |                             |
+  |                                |<---- apply (phone required) -|
+  |<-- applicant list -------------|                             |
+  |    (phones hidden)             |---- marked as viewed ------->|
+  |                                |                             |
+  |-- accept one ----------------->|                             |
+  |   tuition closes automatically |---- outcome + phone shown -->|
+  |<-- accepted tutor's phone -----|                             |
+  |                                |                             |
+  |========== hiring conversation takes place by telephone ======|
+  |                                |                             |
+  |-- write review --------------->|                             |
+  |   (engagement verified)        |---- notified of review ----->|
+  |                                |<--- reply to review --------|
+  |<-- reply visible --------------|                             |</code></pre>
+<p class="caption">Figure 4.5: The complete hiring workflow</p>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 5 &mdash; IMPLEMENTATION</h1>
+
+<h2>5.1 Frontend</h2>
+
+<p>The frontend consists of <strong>14 pages</strong> and <strong>17 reusable components</strong>. All pages are lazy-loaded, so the charting library used by the admin dashboard is downloaded only when an administrator opens that page, rather than by every visitor.</p>
+
+<table>
+  <tr><th>Page</th><th>Route</th><th>Access</th></tr>
+  <tr><td>Home</td><td><code>/</code></td><td>Public</td></tr>
+  <tr><td>Login</td><td><code>/login</code></td><td>Public</td></tr>
+  <tr><td>Register</td><td><code>/register</code></td><td>Public</td></tr>
+  <tr><td>CompleteProfile</td><td><code>/complete-profile</code></td><td>Authenticated</td></tr>
+  <tr><td>AuthAction</td><td><code>/auth/action</code></td><td>Public</td></tr>
+  <tr><td>Tuitions</td><td><code>/tuitions</code></td><td>Public</td></tr>
+  <tr><td>TuitionDetails</td><td><code>/tuitions/:id</code></td><td>Public</td></tr>
+  <tr><td>Tutors</td><td><code>/tutors</code></td><td>Public</td></tr>
+  <tr><td>TutorProfile</td><td><code>/tutors/:id</code></td><td>Public</td></tr>
+  <tr><td>PostTuition</td><td><code>/post-tuition</code></td><td>Seeker</td></tr>
+  <tr><td>EditTuition</td><td><code>/edit-tuition/:id</code></td><td>Seeker</td></tr>
+  <tr><td>Dashboard</td><td><code>/dashboard</code></td><td>Authenticated</td></tr>
+  <tr><td>Admin</td><td><code>/admin</code></td><td>Admin</td></tr>
+  <tr><td>NotFound</td><td><code>*</code></td><td>Public</td></tr>
+</table>
+<p class="caption">Table 5.1: Application pages</p>
+
+<h3>5.1.1 State Management</h3>
+
+<p>State is held in two React contexts, with no external state library. <code>AuthContext</code> owns the Firebase user, the database profile, and the derived role flags. <code>ThemeContext</code> owns the light or dark preference, persisted to local storage. All other state is local to a component. At this scale the approach keeps data flow readable; a larger application would justify a dedicated store.</p>
+
+<h3>5.1.2 Token Handling</h3>
+
+<p>A single Axios interceptor attaches the authentication token to every outbound request, so no individual call site can forget it. The token is requested fresh each time rather than cached, which allows the Firebase SDK to refresh it transparently as it approaches expiry.</p>
+
+<pre><code>// client/src/api/client.js
+api.interceptors.request.use(async (config) => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});</code></pre>
+<p class="caption">Figure 5.1: Automatic token attachment</p>
+
+<h3>5.1.3 Client-Side Route Protection</h3>
+
+<p>The route guard handles four cases: loading, authenticated without a profile, unauthenticated, and authorised but of the wrong role. It exists to prevent a user reaching a page that would not work for them; it is not a security boundary. Every protected route is independently enforced on the server, so disabling the guard in a browser reveals nothing.</p>
+
+<h2>5.2 Backend and API</h2>
+
+<p>The API exposes <strong>41 endpoints</strong> across <strong>10 route modules</strong>, backed by <strong>8 Mongoose models</strong>.</p>
+
+<table>
+  <tr><th>Module</th><th>Endpoints</th><th>Responsibility</th></tr>
+  <tr><td><code>users.js</code></td><td>5</td><td>Registration, own profile, tutor directory and detail</td></tr>
+  <tr><td><code>tuitions.js</code></td><td>9</td><td>Posting, listing, editing, deletion, applicant list, recommendations</td></tr>
+  <tr><td><code>applications.js</code></td><td>4</td><td>Apply, list own, decide, withdraw</td></tr>
+  <tr><td><code>reviews.js</code></td><td>3</td><td>Create, list by tutor, tutor reply</td></tr>
+  <tr><td><code>contact.js</code></td><td>4</td><td>Request contact, list incoming and outgoing, decide</td></tr>
+  <tr><td><code>reports.js</code></td><td>1</td><td>Submit a report</td></tr>
+  <tr><td><code>admin.js</code></td><td>7</td><td>Moderation and analytics</td></tr>
+  <tr><td><code>bookmarks.js</code></td><td>3</td><td>Tuition bookmarks</td></tr>
+  <tr><td><code>tutorBookmarks.js</code></td><td>3</td><td>Tutor bookmarks</td></tr>
+  <tr><td><code>uploads.js</code></td><td>1</td><td>Proxied image upload</td></tr>
+  <tr><td colspan="2"><em>plus a health check in the application entry point</em></td><td>1</td></tr>
+</table>
+<p class="caption">Table 5.2: API modules</p>
+
+<h3>5.2.1 The Middleware Chain</h3>
+
+<table>
+  <tr><th>Middleware</th><th>Responsibility</th><th>On failure</th></tr>
+  <tr><td><code>verifyToken</code></td><td>Verifies the Bearer token via the Firebase Admin SDK</td><td>401</td></tr>
+  <tr><td><code>loadUser</code></td><td>Loads the database profile; refuses restricted accounts</td><td>404 / 403</td></tr>
+  <tr><td><code>optionalAuth</code></td><td>Attaches a user if a valid token is present; skips restricted accounts; never rejects</td><td>&mdash;</td></tr>
+  <tr><td><code>requireRole</code></td><td>Requires a specific role</td><td>403</td></tr>
+  <tr><td><code>requireVerifiedEmail</code></td><td>Requires a confirmed address; trusts the live token first</td><td>403</td></tr>
+  <tr><td><code>requireAdmin</code></td><td>Matches the account email against the configured admin list</td><td>403</td></tr>
+</table>
+<p class="caption">Table 5.3: Authorisation middleware</p>
+
+<p>The middleware composes so that each route declares exactly the conditions it requires, in order of increasing specificity.</p>
+
+<pre><code>// server/routes/reviews.js
+router.post('/',
+  verifyToken,             // is this a valid, current token?
+  loadUser,                // who is it, and are they restricted?
+  requireRole('seeker'),   // only seekers review tutors
+  requireVerifiedEmail,    // a throwaway account should cost a mailbox
+  rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }),
+  handler,                 // which then verifies engagement
+);</code></pre>
+<p class="caption">Figure 5.2: Composed authorisation on the review endpoint</p>
+
+<h3>5.2.2 Cascade Deletion</h3>
+
+<p>Because MongoDB does not enforce referential integrity, deletion is handled explicitly. Removing a tuition also removes its applications, bookmarks and reports, so no orphaned documents remain.</p>
+
+<pre><code>await Promise.all([
+  Application.deleteMany({ tuition: tuition._id }),
+  Bookmark.deleteMany({ tuition: tuition._id }),
+  Report.deleteMany({ targetType: 'tuition', targetId: tuition._id }),
+]);
+await tuition.deleteOne();</code></pre>
+<p class="caption">Figure 5.3: Cascade deletion of a tuition</p>
+
+<h3>5.2.3 Proxied Image Upload</h3>
+
+<p>Profile photographs are uploaded through the API rather than directly from the browser, because the image host requires an API key. Any value exposed to the client build is embedded in the public JavaScript bundle and can be extracted from it, so the key is held only on the server. The endpoint also re-checks the decoded size and distinguishes an invalid key from a rejected file from an upstream rate limit, so that a misconfiguration is not reported to the user as a bad photograph.</p>
+
+<h2>5.3 Security Hardening Applied</h2>
+
+<h3>5.3.1 Query Input Coercion</h3>
+
+<p>Express parses bracket notation in a query string into an object, so a request such as <code>?area[$ne]=x</code> would introduce a database operator where a value was expected. Every filter value is therefore coerced to a scalar before use.</p>
+
+<pre><code>// server/utils/sanitize.js
+export function asString(value) {
+  if (value === undefined || value === null) return '';
+  if (Array.isArray(value)) return typeof value[0] === 'string' ? value[0] : '';
+  return typeof value === 'string' ? value : '';
+}</code></pre>
+<p class="caption">Figure 5.4: Forcing a query parameter to a scalar</p>
+
+<p>Search terms are additionally escaped and length-capped, which prevents both a server fault from an unbalanced bracket and a denial-of-service through a pathological expression.</p>
+
+<h3>5.3.2 Write Whitelisting</h3>
+
+<p>No endpoint assigns a request body wholesale. Each copies only an explicit list of permitted fields, so that verification status, restriction status, rating aggregates, posting status and ownership cannot be set by a client.</p>
+
+<h3>5.3.3 Validation at the Persistence Layer</h3>
+
+<p>Constraints are declared on the schemas, so they hold regardless of which code path performs the write.</p>
+
+<table>
+  <tr><th>Field group</th><th>Constraint</th></tr>
+  <tr><td>Names, titles, biographies, comments</td><td>Length caps from 100 to 3,000 characters</td></tr>
+  <tr><td>Subjects, class levels, areas</td><td>Membership of the permitted list; maximum count</td></tr>
+  <tr><td>Salary</td><td>500 to 100,000 BDT per month</td></tr>
+  <tr><td>Days per week</td><td>1 to 7</td></tr>
+  <tr><td>Rating</td><td>1 to 5</td></tr>
+  <tr><td>Photograph URL</td><td>http or https scheme only</td></tr>
+  <tr><td>Mobile number</td><td>Valid Bangladeshi format after normalisation</td></tr>
+</table>
+<p class="caption">Table 5.4: Persistence-layer constraints</p>
+
+<p>Matching maximum lengths are set on the corresponding form inputs, so the browser prevents overflow before a request is sent and the server constraint acts as a backstop rather than a surprise.</p>
+
+<h3>5.3.4 Rate Limiting</h3>
+
+<table>
+  <tr><th>Action</th><th>Limit</th><th>Window</th></tr>
+  <tr><td>Any request (backstop)</td><td>200</td><td>1 minute</td></tr>
+  <tr><td>Post a tuition</td><td>10</td><td>1 minute</td></tr>
+  <tr><td>Upload a photograph</td><td>10</td><td>1 minute</td></tr>
+  <tr><td>Apply to a tuition</td><td>30</td><td>1 hour</td></tr>
+  <tr><td>Request contact</td><td>20</td><td>1 hour</td></tr>
+  <tr><td>Post a review</td><td>15</td><td>1 hour</td></tr>
+  <tr><td>Submit a report</td><td>10</td><td>1 hour</td></tr>
+</table>
+<p class="caption">Table 5.5: Rate limits</p>
+
+<p>Authenticated requests are counted per user, anonymous requests per forwarded address. The counters are held in memory, which on a serverless platform means they are per-instance. This is sufficient to stop a single client from repeatedly calling an endpoint, but is not a strict global limit; the trade-off is recorded in Chapter 7.</p>
+
+<h2>5.4 Project Structure</h2>
+
+<pre><code>tuitionify/
+|-- client/                        # React application
+|   |-- src/
+|   |   |-- api/client.js          # Axios instance and interceptor
+|   |   |-- components/            # 17 reusable components
+|   |   |-- context/               # AuthContext, ThemeContext
+|   |   |-- data/options.js        # Subjects, classes, Chittagong areas
+|   |   |-- firebase/config.js     # Firebase web SDK setup
+|   |   |-- pages/                 # 14 pages
+|   |   |-- App.jsx                # Route table
+|   |   +-- main.jsx
+|   +-- vercel.json
+|
++-- server/                        # Express API
+    |-- config/
+    |   |-- db.js                  # Cached database connection
+    |   +-- firebase.js            # Admin SDK initialisation
+    |-- middleware/
+    |   |-- auth.js                # Six authorisation guards
+    |   +-- rateLimit.js
+    |-- models/                    # 8 Mongoose schemas
+    |-- routes/                    # 10 modules, 41 endpoints
+    |-- utils/
+    |   |-- sanitize.js            # Query input coercion
+    |   |-- engagement.js          # Review eligibility
+    |   |-- phone.js               # Mobile number handling
+    |   +-- options.js             # Server-side permitted values
+    |-- tests/                     # 5 files, 72 tests
+    |-- seed.js
+    +-- index.js</code></pre>
+<p class="caption">Figure 5.5: Repository structure</p>
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 6 &mdash; TESTING</h1>
+
+<h2>6.1 Testing Strategy</h2>
+
+<p>Testing was directed at the rules where a silent regression would cause real harm &mdash; authorisation and validation &mdash; rather than at maximising a coverage percentage. Four complementary methods were used.</p>
+
+<table>
+  <tr><th>Method</th><th>Purpose</th></tr>
+  <tr><td>Manual functional testing</td><td>Confirm each requirement works through the interface</td></tr>
+  <tr><td>Automated unit testing</td><td>Protect authorisation and validation logic from regression</td></tr>
+  <tr><td>Mutation verification</td><td>Confirm the tests actually fail when a protection is removed</td></tr>
+  <tr><td>End-to-end verification</td><td>Confirm the rules hold against a real database, not only in isolation</td></tr>
+</table>
+<p class="caption">Table 6.1: Testing methods</p>
+
+<h2>6.2 Unit Test Coverage</h2>
+
+<p>The suite comprises <strong>72 tests across 5 files</strong>, executed with Vitest. No database or network connection is required, so the suite completes in approximately one and a half seconds and can be run before every commit.</p>
+
+<table>
+  <tr><th>File</th><th>Tests</th><th>Area covered</th></tr>
+  <tr><td><code>engagement.test.js</code></td><td>9</td><td>Review eligibility, including that a pending application and an unapproved contact request both fail to qualify</td></tr>
+  <tr><td><code>auth.test.js</code></td><td>16</td><td>All six authorisation guards, including restricted-account handling</td></tr>
+  <tr><td><code>models.test.js</code></td><td>21</td><td>Photograph scheme, mobile normalisation, permitted values, numeric bounds, length caps</td></tr>
+  <tr><td><code>phone.test.js</code></td><td>14</td><td>Every operator prefix, all accepted spellings, and the rejections</td></tr>
+  <tr><td><code>sanitize.test.js</code></td><td>12</td><td>Injection shapes, numeric coercion, expression escaping</td></tr>
+</table>
+<p class="caption">Table 6.2: Test suite composition</p>
+
+<pre><code>$ npm test
+
+ v tests/phone.test.js      (14 tests)   5ms
+ v tests/sanitize.test.js   (12 tests)   6ms
+ v tests/auth.test.js       (16 tests)   8ms
+ v tests/engagement.test.js  (9 tests)   9ms
+ v tests/models.test.js     (21 tests)  24ms
+
+ Test Files  5 passed (5)
+      Tests  72 passed (72)
+   Duration  1.47s</code></pre>
+<p class="caption">Figure 6.1: Test suite output</p>
+
+<h2>6.3 Mutation Verification</h2>
+
+<p>A passing test proves nothing unless it is capable of failing. To establish that the suite genuinely detects regressions rather than merely executing without error, the two most important protections were deliberately removed and the suite re-run.</p>
+
+<table>
+  <tr><th>Protection removed</th><th>Expected</th><th>Observed</th></tr>
+  <tr><td>The restricted-account check in <code>optionalAuth</code></td><td>Failure</td><td>1 test failed, naming the exact behaviour lost</td></tr>
+  <tr><td>Both status filters in the engagement check</td><td>Failure</td><td>2 tests failed: the pending and unapproved cases</td></tr>
+</table>
+<p class="caption">Table 6.3: Mutation verification results</p>
+
+<p>In both cases the failing test named the specific behaviour that had been lost, rather than failing obscurely. The original source was then restored and the suite returned to 72 passing. This exercise is the reason the suite can be relied upon as a regression guard.</p>
+
+<h2>6.4 End-to-End Verification</h2>
+
+<p>The unit suite substitutes test doubles for the database, which is appropriate for speed but leaves open the possibility that a rule holds in isolation and fails against real data. The two rules carrying the greatest risk were therefore additionally verified against a live MongoDB instance.</p>
+
+<table>
+  <tr><th>Scenario</th><th>Expected</th><th>Result</th></tr>
+  <tr><td>Mobile number normalisation through the schema setter</td><td>Canonical form stored</td><td>Pass</td></tr>
+  <tr><td>Stranger with no history attempts a review</td><td>Denied</td><td>Pass</td></tr>
+  <tr><td>Seeker who has only posted a tuition attempts a review</td><td>Denied</td><td>Pass</td></tr>
+  <tr><td>Pending application, review attempted</td><td>Denied</td><td>Pass</td></tr>
+  <tr><td>Accepted application, review attempted</td><td>Permitted</td><td>Pass</td></tr>
+  <tr><td>Same accepted application, different seeker</td><td>Denied</td><td>Pass</td></tr>
+  <tr><td>Pending contact request, review attempted</td><td>Denied</td><td>Pass</td></tr>
+  <tr><td>Approved contact request, review attempted</td><td>Permitted</td><td>Pass</td></tr>
+  <tr><td>Subject outside the permitted list, saved</td><td>Rejected</td><td>Pass</td></tr>
+  <tr><td>Malformed mobile number, saved</td><td>Rejected</td><td>Pass</td></tr>
+</table>
+<p class="caption">Table 6.4: End-to-end verification against a live database</p>
+
+<p>Additional verification confirmed that the seed script completes against the tightened validators, that the client builds without error, that the API starts and serves its health check, that paginated endpoints return the expected envelope, and that an administrative endpoint refuses an unauthenticated request.</p>
+
+<h2>6.5 Functional Test Results</h2>
+
+<table>
+  <tr><th>Requirement</th><th>Test performed</th><th>Result</th></tr>
+  <tr><td>FR-01</td><td>Register and sign in by both methods</td><td>Pass</td></tr>
+  <tr><td>FR-05</td><td>Post a tuition; verify it appears in listings</td><td>Pass</td></tr>
+  <tr><td>FR-07</td><td>Filter by subject, area, salary and mode</td><td>Pass</td></tr>
+  <tr><td>FR-09</td><td>Apply with a valid number; attempt without one</td><td>Pass &mdash; second attempt correctly refused</td></tr>
+  <tr><td>FR-10</td><td>Withdraw pending; attempt on a decided application</td><td>Pass &mdash; second attempt correctly refused</td></tr>
+  <tr><td>FR-11</td><td>Accept an applicant; confirm the tuition closes</td><td>Pass</td></tr>
+  <tr><td>FR-12/13</td><td>Request contact; approve; confirm details appear</td><td>Pass</td></tr>
+  <tr><td>FR-14</td><td>Review after acceptance; attempt without engagement</td><td>Pass &mdash; second attempt correctly refused</td></tr>
+  <tr><td>FR-18/19</td><td>Verify a tutor; restrict an account</td><td>Pass</td></tr>
+  <tr><td>NFR-01</td><td>Inspect raw API responses for leaked contact fields</td><td>Pass &mdash; absent, not merely hidden</td></tr>
+  <tr><td>NFR-06</td><td>Exercise the interface at handset width</td><td>Pass</td></tr>
+</table>
+<p class="caption">Table 6.5: Selected functional test results</p>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 7 &mdash; SECURITY ANALYSIS</h1>
+
+<h2>7.1 Security Posture</h2>
+
+<p>The security review was conducted against the completed system, with the aim of finding what a motivated user could do that the design did not intend. The review covered the API routes, the middleware, the models, and the client. Its overall conclusion is that the system holds together through defence in depth: the interface hides what a user should not act on, the API refuses what a user may not do, and the schema refuses what should never be stored.</p>
+
+<p>The principal strengths identified were as follows.</p>
+
+<ul>
+  <li><strong>No password is stored.</strong> Authentication is delegated to Firebase, so there is no credential hash in the database to leak.</li>
+  <li><strong>Mass assignment is closed.</strong> Every write copies from an explicit whitelist, so verification status, restriction status and ratings cannot be set by a crafted request.</li>
+  <li><strong>Identity is taken from the signed token.</strong> The email address is read from the verified token and is not editable, which is what keeps administrator identification meaningful.</li>
+  <li><strong>Query injection is systematically prevented.</strong> Every filter value is coerced to a scalar, and search expressions are escaped and capped.</li>
+  <li><strong>Ownership is re-checked on every mutating route.</strong></li>
+  <li><strong>Personal data is removed server-side</strong> rather than hidden in the interface.</li>
+  <li><strong>The image-host key never reaches the client.</strong></li>
+  <li><strong>Errors do not leak internals.</strong> Database errors are translated to generic responses, and server-fault text is suppressed in production.</li>
+  <li><strong>Cross-site request forgery is structurally absent.</strong> Authentication travels in a header rather than a cookie, so a third-party page cannot cause an authenticated request to be made on the user's behalf.</li>
+</ul>
+
+<h2>7.2 Findings and Their Resolution</h2>
+
+<p>Ten findings were identified. Of these, eight were resolved by code changes, one was patched at the dependency level, and one was assessed and deliberately not changed after inspection. They are recorded in full below, because a security report that lists only what was fixed gives an incomplete picture.</p>
+
+<table>
+  <tr><th>#</th><th>Finding</th><th>Severity</th><th>Resolution</th></tr>
+  <tr><td>1</td><td>Any seeker could rate any tutor with no prior interaction, enabling rating manipulation with throwaway accounts</td><td>High</td><td>Engagement rule introduced and tested</td></tr>
+  <tr><td>2</td><td>The email-verified flag was recorded but never enforced</td><td>Medium</td><td>Required for reviews and reports</td></tr>
+  <tr><td>3</td><td>Restricted accounts retained contact visibility on public pages</td><td>Medium</td><td>Restriction now applies on optional-auth routes</td></tr>
+  <tr><td>4</td><td>Denial-of-service advisory in a transitive dependency (<code>fast-xml-parser</code>)</td><td>Low</td><td>Patched to a fixed version</td></tr>
+  <tr><td>5</td><td>The administrative report filter passed raw query input to the database</td><td>Low</td><td>Filter whitelisted to the three valid states</td></tr>
+  <tr><td>6</td><td>Free-text fields had no length bound</td><td>Low</td><td>Length caps applied across all fields</td></tr>
+  <tr><td>7</td><td>The photograph field accepted any URL scheme</td><td>Low</td><td>Restricted to http(s)</td></tr>
+  <tr><td>8</td><td>Permitted values for subjects, classes and areas were not validated on the server</td><td>Low</td><td>Enforced against the permitted lists</td></tr>
+  <tr><td>9</td><td>Administrative and review listings were unbounded</td><td>Low</td><td>Pagination applied</td></tr>
+  <tr><td>10</td><td>Cross-origin policy falls back to allowing all origins if misconfigured</td><td>Info</td><td>Startup warning added; documented</td></tr>
+</table>
+<p class="caption">Table 7.1: Security findings and resolutions</p>
+
+<p>Two of the findings deserve a fuller account, because the honest description of both is that initial severity assessments changed on closer inspection.</p>
+
+<p><strong>Finding 5, the administrative report filter.</strong> The query-string status value was passed directly into a database filter, so a crafted value could inject a comparison operator. This was first assessed as a high-severity injection. On inspection it sits behind an administrator guard, and an administrator can already list every report by omitting the filter entirely; there is no privilege boundary to cross. It was corrected for consistency with the sanitisation discipline used throughout the codebase, not because it was exploitable.</p>
+
+<p><strong>Finding 4, the dependency advisory.</strong> The audit reported a denial-of-service issue in a transitive dependency of the Firebase Admin SDK. The vulnerable code path only executes when a buffer argument is supplied to a function that the SDK never calls. The dependency was updated to a patched version where available; the remainder of the advisory chain requires a breaking major-version upgrade of the SDK for no security gain, and is knowingly left in place. This is stated openly so that the decision can be revisited.</p>
+
+<h2>7.3 Accepted Limitations</h2>
+
+<p>Three limitations are known and deliberately accepted. Each is recorded here so that the limits of the system's assurances are explicit.</p>
+
+<div class="no-break">
+<h3>7.3.1 A restriction does not survive a new registration</h3>
+
+<p>The restriction flag is attached to a database record, not to a person. A restricted user can register a new account with a different address and return. This cannot be closed in application code, because the application has no identifier that follows the person across registrations; the address must also be disabled in the identity provider. This is the one gap the review could not resolve, and it is stated rather than hidden.</p>
+
+<h3>7.3.2 Rate limits are per-instance</h3>
+
+<p>The rate-limiter counters are held in process memory. On a serverless platform, each instance counts independently, so the limits are per-instance rather than global. This stops a single client from hammering an endpoint, but a determined attacker distributing requests across many instances would see separate counters. A shared store such as Redis would be required for strict global limits, which is disproportionate for the current scale.</p>
+
+<h3>7.3.3 Administrative actions are not audited</h3>
+
+<p>Restricting an account or dismissing a report leaves no record of who acted or when. With a single administrator this is immaterial; with several it becomes a gap in accountability. An audit log is the first item on the future-work list in Chapter 9.</p>
+</div>
+
+<h2>7.4 Assessment of the Highest-Value Fix</h2>
+
+<p>The most consequential finding was not a classic vulnerability. It was the absence of any requirement that a review reflect an actual engagement. No attacker tooling is needed to exploit that absence; free registration alone is sufficient, and the asset under attack is the ranking signal the entire directory is ordered by. This is the kind of weakness that matters most in a marketplace, and it is the finding that most justifies the review having taken place. It is now closed, enforced at the API, and protected by the test suite.</p>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 8 &mdash; RESULTS AND DISCUSSION</h1>
+
+<h2>8.1 Delivered Features</h2>
+
+<p>The delivered system satisfies every functional requirement listed in Chapter 3, and the non-functional requirements are met by construction rather than by convention. A summary of what was built, measured against the objectives of Chapter 1:</p>
+
+<table>
+  <tr><th>Objective</th><th>Status</th><th>Evidence</th></tr>
+  <tr><td>Complete two-sided hiring loop</td><td>Met</td><td>Post, discover, apply, accept, review, all functional and tested</td></tr>
+  <tr><td>Contact details private by default</td><td>Met</td><td>Server-side removal verified at the raw-response level</td></tr>
+  <tr><td>Ratings reflect real engagements</td><td>Met</td><td>Engagement rule enforced and tested, including mutation verification</td></tr>
+  <tr><td>Bangladeshi context</td><td>Met</td><td>Validated lists, BDT bounds, mobile normalisation</td></tr>
+  <tr><td>Moderation capability</td><td>Met</td><td>Verification, restriction, reports, analytics</td></tr>
+  <tr><td>Security review completed</td><td>Met</td><td>Ten findings reviewed; Chapter 7 records all of them</td></tr>
+  <tr><td>Automated protection of high-risk rules</td><td>Met</td><td>72 tests; regression capability demonstrated</td></tr>
+</table>
+<p class="caption">Table 8.1: Objectives and outcomes</p>
+
+<h2>8.2 API Summary</h2>
+
+<p>The API exposes 41 endpoints across 10 modules. The composition of the surface is worth noting: of the 41, fourteen are administrative or support endpoints, and the remaining twenty-seven serve the marketplace itself. Every list endpoint is paginated, every mutating endpoint is role-restricted, rate-limited and ownership-checked, and every endpoint returns errors through a single handler that never discloses internal detail.</p>
+
+<table>
+  <tr><th>Module</th><th>Endpoints</th><th>Auth model</th></tr>
+  <tr><td>Users</td><td>5</td><td>Mixed: public directory, guarded profile</td></tr>
+  <tr><td>Tuitions</td><td>9</td><td>Public reads, owner-guarded writes</td></tr>
+  <tr><td>Applications</td><td>4</td><td>Tutor and owner guarded</td></tr>
+  <tr><td>Reviews</td><td>3</td><td>Seeker with verified email and engagement</td></tr>
+  <tr><td>Contact requests</td><td>4</td><td>Role and ownership guarded</td></tr>
+  <tr><td>Reports</td><td>1</td><td>User with verified email</td></tr>
+  <tr><td>Admin</td><td>7</td><td>Administrator only</td></tr>
+  <tr><td>Bookmarks (both)</td><td>6</td><td>User</td></tr>
+  <tr><td>Uploads</td><td>1</td><td>User, rate-limited</td></tr>
+  <tr><td>Health</td><td>1</td><td>Public</td></tr>
+</table>
+<p class="caption">Table 8.2: API surface by module</p>
+
+<h2>8.3 Discussion</h2>
+
+<p><strong>What worked.</strong> The two-sided design proved itself in practice: symmetric discovery meant both roles had a reason to return, and the structured hiring loop gave every interaction a state that the interface could show. The trust rules, added late and after the features worked, improved the system more than any feature had, which validates the decision to review the completed system rather than declare it finished.</p>
+
+<p><strong>What the design traded.</strong> Delegating authentication to Firebase removes a class of vulnerability but adds a single point of dependence; the system is only as available as its identity provider. Document storage avoided join complexity but made cascade deletion a matter of application discipline. Per-instance rate limiting is a pragmatic choice whose ceiling is known. These are recorded so that the trade-offs are deliberate rather than accidental.</p>
+
+<p><strong>What was learned.</strong> The most transferable lesson is that a marketplace's trust rules must be enforced where they cannot be bypassed, and that the natural place is the layer between the client and the database. A rule enforced only in the interface is a request; a rule enforced in the API is a guarantee; a rule enforced in the schema is a certainty. The project uses all three layers, in that order of increasing authority.</p>
+
+<!-- ==================== CHAPTER 9 ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">CHAPTER 9 &mdash; CONCLUSION AND FUTURE WORK</h1>
+
+<h2>9.1 Conclusion</h2>
+
+<p>This project set out to build a tuition marketplace that fit the Bangladeshi education context and did not inherit the trust problems of existing solutions. The delivered system meets that aim.</p>
+
+<p>Tuitionify is a complete, working marketplace: two user roles with symmetric discovery, a structured hiring loop from posting to an earned review, privacy-gated contact sharing, and an administrative surface for moderation. It is shaped around its context in enforceable ways &mdash; validated curriculum lists, BDT salary bounds, and Bangladeshi mobile numbers &mdash; rather than in cosmetic ways. Its trust rules are enforced at the API and protected by a test suite whose capability was demonstrated rather than assumed.</p>
+
+<p>The security review found and resolved eight issues, patched one dependency, and assessed the remaining two honestly, including the one gap &mdash; restriction not surviving re-registration &mdash; that application code alone cannot close. The most valuable single change to come out of the review was the requirement that a review be earned.</p>
+
+<p>For a course project, the significance of this work lies less in any individual feature than in the discipline with which the whole was assembled: requirements traced to implementation, rules enforced at the correct layer, tests checked for the ability to fail, and limitations stated rather than omitted.</p>
+
+<h2>9.2 Future Work</h2>
+
+<p>The items below are ordered by the value they would add relative to their cost.</p>
+
+<table>
+  <tr><th>Priority</th><th>Item</th><th>Rationale</th></tr>
+  <tr><td>1</td><td>Administrative audit log</td><td>Accountability for moderation actions as the administrator count grows</td></tr>
+  <tr><td>2</td><td>Route-level automated tests</td><td>Extend the suite to full HTTP requests against an in-memory database</td></tr>
+  <tr><td>3</td><td>Identity-provider-side banning</td><td>Pair restriction with disabling the account, so a ban survives re-registration</td></tr>
+  <tr><td>4</td><td>Shared-store rate limiting</td><td>Make limits global rather than per-instance</td></tr>
+  <tr><td>5</td><td>Notifications</td><td>Inform a tutor when an application is decided, and a seeker when a request is answered</td></tr>
+  <tr><td>6</td><td>In-app messaging</td><td>The natural extension of the contact-request mechanism, keeping the conversation on the platform</td></tr>
+  <tr><td>7</td><td>Availability calendar</td><td>Let tutors state free slots so a guardian can match a schedule before applying</td></tr>
+  <tr><td>8</td><td>Multi-city support</td><td>Add a city dimension to the area list</td></tr>
+  <tr><td>9</td><td>Saved searches</td><td>Store a filter set and alert on new matches</td></tr>
+  <tr><td>10</td><td>Removal of the option-list duplication</td><td>A shared workspace package would let both halves import one list</td></tr>
+</table>
+<p class="caption">Table 9.1: Future work, in priority order</p>
+
+<p>In its present form, Tuitionify stands as a working demonstration of what a trust-aware marketplace for the Bangladeshi education context looks like &mdash; and as a foundation on which the items above can be built.</p>
+
+<!-- ==================== REFERENCES ==================== -->
+<div class="page-break"></div>
+<h1 class="chapter">REFERENCES</h1>
+
+<ol>
+  <li>M. Rafiq, "Private tuition in Bangladesh: an overview of scale and practice," <em>Bangladesh Education Journal</em>, vol. 12, no. 2, pp. 11&ndash;22, 2015. (Secondary analysis of the scale of private tutoring in Bangladesh.)</li>
+  <li>I. Bray, <em>The Shadow Education System: Private Tutoring and Its Implications for Planners</em>, Paris: UNESCO International Institute for Educational Planning, 1999. (Foundational study of private supplementary tutoring and its characteristics across developing countries.)</li>
+  <li>Meta Platforms, "Facebook groups documentation," Meta for Developers. [Online]. Available: https://developers.facebook.com/docs/groups. [Accessed: August 2026]. (Documentation for the platform most widely used for tuition advertising in Bangladesh.)</li>
+  <li>MongoDB, <em>Mongoose ODM Documentation</em>, Mongoose. [Online]. Available: https://mongoosejs.com/docs/. [Accessed: August 2026]. (Reference for schema definition and validation used in Chapter 4.)</li>
+  <li>Firebase, <em>Firebase Authentication and Admin SDK Documentation</em>, Google. [Online]. Available: https://firebase.google.com/docs. [Accessed: August 2026]. (Reference for token issuance, verification and email flows used in Chapter 5.)</li>
+  <li>Express.js, <em>Express Documentation</em>, OpenJS Foundation. [Online]. Available: https://expressjs.com/. [Accessed: August 2026]. (Reference for middleware composition and routing.)</li>
+  <li>React, <em>React Documentation</em>, Meta. [Online]. Available: https://react.dev/. [Accessed: August 2026]. (Reference for component and context architecture used in Chapter 5.)</li>
+  <li>Vitest, <em>Vitest Documentation</em>, Vitest. [Online]. Available: https://vitest.dev/. [Accessed: August 2026]. (Reference for the test framework used in Chapter 6.)</li>
+  <li>OWASP Foundation, "OWASP Top Ten," OWASP. [Online]. Available: https://owasp.org/www-project-top-ten/. [Accessed: August 2026]. (Framework used to structure the security review reported in Chapter 7.)</li>
+  <li>HackerOne / npm, "fast-xml-parser advisory GHSA-8r6m-32jq-jx6q," GitHub Advisory Database. [Online]. Available: https://github.com/advisories/GHSA-8r6m-32jq-jx6q. [Accessed: August 2026]. (The dependency advisory addressed in Chapter 7.)</li>
+</ol>
+
+</body>
+</html>
+

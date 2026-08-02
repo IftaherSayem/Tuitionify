@@ -319,13 +319,13 @@
     </svg>
   </div>
   <h1>Tuition<span>ify</span></h1>
-  <p class="subtitle">Comprehensive Project Guide & Security Report</p>
+  <p class="subtitle">Comprehensive Project Guide &amp; Security Report</p>
   <div class="meta">
     <strong>Project Type:</strong> Full-Stack Web Application<br>
     <strong>Domain:</strong> University Tuition Marketplace<br>
     <strong>Target:</strong> International Islamic University Chittagong (IIUC)<br>
-    <strong>Version:</strong> 1.0.0<br>
-    <strong>Date:</strong> July 2026<br>
+    <strong>Version:</strong> 1.1.0<br>
+    <strong>Date:</strong> August 2026<br>
     <strong>Author:</strong> Iftaher Sayem
   </div>
 </div>
@@ -339,1004 +339,1005 @@
     <li><a href="#overview">Project Overview</a></li>
     <li><a href="#architecture">System Architecture</a></li>
     <li><a href="#tech-stack">Technology Stack</a></li>
-    <li><a href="#features">Features & How They Work</a></li>
-    <li><a href="#data-models">Database Schema & Data Models</a></li>
+    <li><a href="#walkthrough">The System End to End &mdash; Two Complete Journeys</a></li>
+    <li><a href="#features">Features &amp; How They Work</a></li>
+    <li><a href="#trust">Trust &amp; Safety Rules</a></li>
+    <li><a href="#data-models">Database Schema &amp; Data Models</a></li>
     <li><a href="#api">API Endpoints Reference</a></li>
-    <li><a href="#auth">Authentication & Authorization</a></li>
-    <li><a href="#client">Frontend Structure & Components</a></li>
-    <li><a href="#security">Security Analysis & Report</a></li>
+    <li><a href="#auth">Authentication &amp; Authorization</a></li>
+    <li><a href="#client">Frontend Structure &amp; Components</a></li>
+    <li><a href="#security">Security Analysis &amp; Report</a></li>
+    <li><a href="#testing">Testing</a></li>
     <li><a href="#deployment">Deployment Guide</a></li>
-    <li><a href="#recommendations">Recommendations & Future Improvements</a></li>
+    <li><a href="#recommendations">Known Limitations &amp; Roadmap</a></li>
   </ol>
 </div>
 
 <!-- ======================== 1. PROJECT OVERVIEW ======================== -->
 <h2 id="overview"><span class="num">1</span> Project Overview</h2>
 
-<p><strong>Tuitionify</strong> is a full-stack web application that serves as a <strong>tuition marketplace</strong> specifically designed for the <strong>International Islamic University Chittagong (IIUC)</strong> community and the broader Bangladeshi education system. It connects two groups of users:</p>
+<p><strong>Tuitionify</strong> is a full-stack web application that serves as a <strong>tuition marketplace</strong> built for the <strong>International Islamic University Chittagong (IIUC)</strong> community and the Bangladeshi education system. It connects two groups of users:</p>
 
 <ul>
-  <li><strong>Tutors</strong> &mdash; University students who offer private tutoring services</li>
-  <li><strong>Seekers</strong> (Guardians/Students) &mdash; Parents or students looking to hire tutors</li>
+  <li><strong>Tutors</strong> &mdash; university students who offer private tutoring</li>
+  <li><strong>Seekers</strong> (guardians / students) &mdash; parents or students looking to hire a tutor</li>
 </ul>
 
 <div class="card card-green">
   <h4>Core Value Proposition</h4>
-  <p>Tuitionify eliminates the friction of finding tutors in Bangladesh by providing a trusted, verified, and filterable directory with privacy-aware contact sharing, review systems, and a structured application flow &mdash; all tailored to the Bangladeshi education system (BDT currency, local class levels like SSC/HSC, Chittagong areas/thanas).</p>
+  <p>Tuitionify removes the friction of finding a tutor in Bangladesh with a trusted, verified, filterable directory &mdash; privacy-aware contact sharing, earned reviews, and a structured application flow, all shaped around the local context: BDT salaries, the BD class system (Class 1&ndash;12, SSC, HSC, Admission), Chittagong thanas, and the plain fact that hiring here ends on a phone call.</p>
 </div>
 
 <div class="stat-row">
   <div class="stat-box"><span class="num">2</span><div class="lbl">User Roles</div></div>
-  <div class="stat-box"><span class="num">7</span><div class="lbl">Data Models</div></div>
-  <div class="stat-box"><span class="num">25+</span><div class="lbl">API Endpoints</div></div>
-  <div class="stat-box"><span class="num">12</span><div class="lbl">Pages</div></div>
+  <div class="stat-box"><span class="num">8</span><div class="lbl">Data Models</div></div>
+  <div class="stat-box"><span class="num">41</span><div class="lbl">API Endpoints</div></div>
+  <div class="stat-box"><span class="num">14</span><div class="lbl">Pages</div></div>
 </div>
+<div class="stat-row">
+  <div class="stat-box"><span class="num">17</span><div class="lbl">Components</div></div>
+  <div class="stat-box"><span class="num">10</span><div class="lbl">Route Modules</div></div>
+  <div class="stat-box"><span class="num">72</span><div class="lbl">Tests</div></div>
+  <div class="stat-box"><span class="num">2</span><div class="lbl">Vercel Projects</div></div>
+</div>
+
+<h3>What makes this Bangladesh-specific</h3>
+
+<p>These are not cosmetic touches &mdash; each one is enforced in code, and several are validated on the server so the API cannot be bypassed by a crafted request:</p>
+
+<table>
+  <tr><th>Aspect</th><th>How it is handled</th></tr>
+  <tr><td>Currency</td><td>BDT (&#2547;) throughout; salaries are monthly, bounded to &#2547;500&ndash;100,000</td></tr>
+  <tr><td>Class system</td><td>Class 1-5, 6-8, 9-10, SSC, HSC, Admission, O Level, A Level</td></tr>
+  <tr><td>Subjects</td><td>BD curriculum: Bangla, English, Math, Higher Math, Physics, Chemistry, Biology, Science, ICT, Accounting, Economics, Religion</td></tr>
+  <tr><td>Geography</td><td>33 Chittagong thanas and landmarks plus "Online" &mdash; Kumira and Sitakunda first, since IIUC sits there</td></tr>
+  <tr><td>Phone numbers</td><td>Validated as real BD mobiles (<code>01</code> + operator digit 3&ndash;9 + 8 digits) and normalised from <code>+88</code>, <code>88</code>, spaced and dashed spellings</td></tr>
+  <tr><td>Hiring reality</td><td>A tutor must have a saved mobile number before applying &mdash; a guardian who accepts a tutor they cannot phone has hired nobody</td></tr>
+  <tr><td>Gender preference</td><td>First-class filter on both tuitions and tutors, reflecting how families actually choose</td></tr>
+</table>
 
 <!-- ======================== 2. ARCHITECTURE ======================== -->
 <h2 id="architecture" class="page-break"><span class="num">2</span> System Architecture</h2>
 
-<p>Tuitionify follows a <strong>client-server architecture</strong> with a React single-page application (SPA) communicating with a Node.js/Express REST API, backed by MongoDB Atlas for persistence and Firebase for authentication.</p>
+<p>Tuitionify is a <strong>client-server application</strong>: a React single-page app talks to a Node/Express REST API, with MongoDB Atlas for persistence and Firebase for identity. The client and the API deploy as <strong>two separate Vercel projects</strong> from one repository.</p>
 
 <div class="arch-diagram">
-+---------------------------------------------------+
-|                    CLIENT (React)                  |
-|  Vite + React 18 + React Router + Tailwind CSS    |
-|  Firebase Auth SDK (login/signup/tokens)           |
-|  Axios HTTP client (auto-attaches Bearer token)    |
-+----------------------------+-----------------------+
-                             |
-                     HTTPS / REST API
-                             |
-+----------------------------+-----------------------+
-|                 SERVER (Express.js)                |
-|  Firebase Admin SDK (verifies ID tokens)           |
-|  Mongoose ODM (MongoDB driver)                     |
-|  CORS middleware (origin-locked)                   |
-|  Role-based route guards (tutor/seeker/admin)      |
-+----------------------------+-----------------------+
-                             |
-              +--------------+--------------+
-              |                             |
-    +---------+----------+    +-------------+---------+
-    |   MongoDB Atlas     |    |   Firebase Auth       |
-    |   (Data storage)    |    |   (Identity provider) |
-    |   6 collections     |    |   Email + Google      |
-    +--------------------+    +-----------------------+
++---------------------------------------------------------------+
+|                       CLIENT (React SPA)                       |
+|   Vite . React 18 . React Router . Tailwind CSS                |
+|   Firebase Auth SDK  -- issues + refreshes the ID token        |
+|   Axios interceptor  -- attaches Bearer token to every call    |
++------------------------------+--------------------------------+
+                               |
+                    HTTPS / JSON REST  (Bearer ID token)
+                               |
++------------------------------v--------------------------------+
+|                      SERVER (Express API)                      |
+|                                                                |
+|   CORS  ->  body limits  ->  rate limit  ->  DB connect        |
+|                               |                                |
+|   verifyToken -> loadUser -> requireRole / requireVerifiedEmail |
+|                               |                                |
+|   10 route modules . 8 Mongoose models . central error handler |
++---------------+-------------------------------+---------------+
+                |                               |
+       +--------v---------+          +----------v-----------+
+       | MongoDB Atlas    |          | Firebase Admin SDK   |
+       | (Mongoose ODM)   |          | verifies ID tokens   |
+       +------------------+          +----------------------+
+                |
+       +--------v---------+
+       | imgbb (proxied)  |  server-side key, never in the bundle
+       +------------------+
 </div>
 
-<h3>Request Flow</h3>
+<h3>2.1 Request Flow</h3>
+
 <div class="flow-diagram">
-  <span class="flow-step">User Action</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">React Component</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">Axios + Firebase Token</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">Express API</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">verifyToken Middleware</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">Route Handler</span>
-  <span class="flow-arrow">&rarr;</span>
-  <span class="flow-step">MongoDB</span>
+  <span class="flow-step">React page</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Axios + token</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Express middleware</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Route handler</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Mongoose</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">MongoDB Atlas</span>
 </div>
 
-<h3>Project Structure</h3>
-<pre>
-tuitionify/
-├── client/                    # React Frontend (Vite)
+<p>Every request passes the same gauntlet before a handler ever runs. The order is deliberate and is defined in <code>server/index.js</code>:</p>
+
+<ol>
+  <li><strong>CORS</strong> &mdash; origin restricted to <code>CLIENT_URL</code>. If that variable is unset in production the server logs a warning at boot, because the fallback is <code>*</code>.</li>
+  <li><strong>Body parsing with split limits</strong> &mdash; <code>/api/uploads</code> accepts 4.5&nbsp;MB (base64 photos need it); every other route is capped at 100&nbsp;KB so one request cannot tie up memory.</li>
+  <li><strong>Global rate limit</strong> &mdash; 200 requests/minute as a backstop; individual write routes set tighter limits.</li>
+  <li><strong>Database connection</strong> &mdash; a cached, serverless-safe connect that runs before any handler.</li>
+  <li><strong>Route handler</strong> &mdash; with its own auth and rate-limit chain.</li>
+  <li><strong>Central error handler</strong> &mdash; converts Mongoose <code>CastError</code> to 400 "Invalid id", names the offending fields on a <code>ValidationError</code>, maps oversized bodies to 413, and hides internal messages on 500s in production.</li>
+</ol>
+
+<h3>2.2 Why the client and API are separate deployments</h3>
+
+<p>This has one consequence worth stating plainly, because it shapes the code:</p>
+
+<div class="card card-amber">
+  <h4>The option lists are deliberately duplicated</h4>
+  <p>Subjects, class levels and areas live in <strong>both</strong> <code>client/src/data/options.js</code> and <code>server/utils/options.js</code>. They are not shared by import, because the two Vercel projects have separate root directories and no common build step &mdash; a cross-directory import resolves on a laptop and fails in production.</p>
+  <p style="margin-top:8px"><strong>If you edit one, edit the other</strong>, or the API will reject values the UI happily offers. Both files carry this warning in a comment.</p>
+</div>
+
+<h3>2.3 Project Structure</h3>
+
+<pre><code>tuitionify/
+├── client/                        # React SPA (Vercel project #1)
 │   ├── src/
-│   │   ├── api/client.js      # Axios instance with auth interceptor
-│   │   ├── components/        # 16 reusable UI components
-│   │   ├── context/           # AuthContext + ThemeContext
-│   │   ├── data/options.js    # BD education system data
-│   │   ├── firebase/config.js # Firebase client SDK init
-│   │   ├── pages/             # 11 page components
-│   │   ├── App.jsx            # Router setup
-│   │   └── main.jsx           # Entry point
-│   ├── tailwind.config.js     # Custom brand palette
-│   └── vite.config.js
+│   │   ├── api/client.js          # Axios instance + token interceptor
+│   │   ├── components/            # 17 reusable components
+│   │   ├── context/               # AuthContext, ThemeContext
+│   │   ├── data/options.js        # BD subjects / classes / Chittagong areas
+│   │   ├── firebase/config.js     # Firebase web SDK init
+│   │   ├── pages/                 # 14 route-level pages
+│   │   ├── App.jsx                # Route table (lazy-loaded)
+│   │   └── main.jsx               # Entry point
+│   └── vercel.json                # SPA rewrite -> index.html
 │
-├── server/                    # Express REST API
-│   ├── config/
-│   │   ├── db.js              # MongoDB Atlas connection (cached)
-│   │   └── firebase.js        # Firebase Admin SDK init
-│   ├── middleware/auth.js     # Token verification + role guards
-│   ├── models/                # 7 Mongoose schemas
-│   ├── routes/                # 8 route modules
-│   ├── index.js               # Express app entry
-│   └── seed.js                # Demo data seeder
-│
-└── README.md
-</pre>
+└── server/                        # Express API (Vercel project #2)
+    ├── config/
+    │   ├── db.js                  # Cached Mongo connection
+    │   └── firebase.js            # Firebase Admin init
+    ├── middleware/
+    │   ├── auth.js                # verifyToken, loadUser, optionalAuth,
+    │   │                          #   requireRole, requireVerifiedEmail,
+    │   │                          #   requireAdmin
+    │   └── rateLimit.js           # In-memory limiter
+    ├── models/                    # 8 Mongoose schemas
+    ├── routes/                    # 10 route modules, 41 endpoints
+    ├── utils/
+    │   ├── sanitize.js            # Query-input coercion (anti-injection)
+    │   ├── engagement.js          # Who may review a tutor
+    │   ├── phone.js               # BD mobile normalise + validate
+    │   └── options.js             # Server-side allowed values
+    ├── tests/                     # Vitest suite (72 tests)
+    ├── seed.js                    # Demo data
+    └── index.js                   # App assembly + error handler</code></pre>
 
 <!-- ======================== 3. TECH STACK ======================== -->
 <h2 id="tech-stack" class="page-break"><span class="num">3</span> Technology Stack</h2>
 
 <table>
-  <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
-  <tr><td>Frontend Framework</td><td>React</td><td>18.3.1</td><td>Component-based UI with hooks</td></tr>
-  <tr><td>Build Tool</td><td>Vite</td><td>5.3.4</td><td>Fast dev server, optimized builds, HMR</td></tr>
-  <tr><td>Routing</td><td>React Router DOM</td><td>6.25.1</td><td>Client-side routing with lazy loading</td></tr>
-  <tr><td>Styling</td><td>Tailwind CSS</td><td>3.4.7</td><td>Utility-first CSS with custom brand palette</td></tr>
-  <tr><td>Icons</td><td>Lucide React</td><td>0.417.0</td><td>Consistent icon set (tree-shakeable)</td></tr>
-  <tr><td>HTTP Client</td><td>Axios</td><td>1.7.2</td><td>API calls with request interceptor for auth</td></tr>
-  <tr><td>Notifications</td><td>react-hot-toast</td><td>2.4.1</td><td>Toast notifications for user feedback</td></tr>
-  <tr><td>Auth (Client)</td><td>Firebase Auth</td><td>10.12.4</td><td>Email/Password + Google sign-in</td></tr>
-  <tr><td>Backend</td><td>Express.js</td><td>4.19.2</td><td>REST API server</td></tr>
-  <tr><td>Database</td><td>MongoDB Atlas</td><td>Cloud</td><td>NoSQL document database</td></tr>
-  <tr><td>ODM</td><td>Mongoose</td><td>8.5.1</td><td>Schema validation + query builder</td></tr>
-  <tr><td>Auth (Server)</td><td>Firebase Admin</td><td>12.3.1</td><td>Server-side token verification</td></tr>
-  <tr><td>Deployment</td><td>Vercel</td><td>&mdash;</td><td>Serverless deployment (client + API)</td></tr>
+  <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+  <tr><td>Frontend framework</td><td>React 18 + Vite 5</td><td>Fast HMR, tiny production bundles, code-splitting per route</td></tr>
+  <tr><td>Routing</td><td>React Router 6</td><td>Nested routes, lazy loading, redirect-with-state for login returns</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS 3</td><td>Utility-first, dark mode via a class strategy, no separate CSS files</td></tr>
+  <tr><td>HTTP client</td><td>Axios 1.7</td><td>Request interceptor attaches the Firebase token in one place</td></tr>
+  <tr><td>Icons / toasts</td><td>lucide-react, react-hot-toast</td><td>Consistent icon set; non-blocking feedback</td></tr>
+  <tr><td>Charts</td><td>Recharts 2.12</td><td>Admin analytics; lazy-loaded so it never hits the main bundle</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express 4</td><td>Minimal, well-understood, deploys cleanly as a serverless function</td></tr>
+  <tr><td>Database</td><td>MongoDB Atlas + Mongoose 8</td><td>Flexible documents suit an evolving schema; validators enforce rules</td></tr>
+  <tr><td>Authentication</td><td>Firebase Auth + Firebase Admin</td><td>Email/password and Google sign-in without storing passwords ourselves</td></tr>
+  <tr><td>Image hosting</td><td>imgbb (server-proxied)</td><td>Free tier; the key stays server-side</td></tr>
+  <tr><td>Testing</td><td>Vitest 2</td><td>Fast, ESM-native, no database needed for the suite</td></tr>
+  <tr><td>Hosting</td><td>Vercel (&times;2)</td><td>Free tier, Git-push deploys, serverless functions for the API</td></tr>
 </table>
 
-<!-- ======================== 4. FEATURES ======================== -->
-<h2 id="features" class="page-break"><span class="num">4</span> Features & How They Work</h2>
-
-<h3>4.1 Authentication System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ol>
-    <li><strong>Firebase handles identity</strong> &mdash; Users sign up/login via Email+Password or Google OAuth using the Firebase client SDK.</li>
-    <li><strong>Firebase sends a verification email</strong> on signup &mdash; users see a banner on their dashboard until verified.</li>
-    <li><strong>After Firebase login, a Mongo profile is created</strong> via <code>POST /api/users/register</code>. The server extracts <code>uid</code>, <code>email</code>, and <code>name</code> from the verified Firebase token.</li>
-    <li><strong>Every API request attaches the Firebase ID token</strong> via an Axios request interceptor (<code>Authorization: Bearer &lt;token&gt;</code>).</li>
-    <li><strong>The server verifies the token</strong> using Firebase Admin SDK before processing any protected request.</li>
-  </ol>
-  <h4>Supported auth flows:</h4>
-  <ul>
-    <li>Email/Password registration with email verification</li>
-    <li>Google OAuth sign-in (popup)</li>
-    <li>Password reset via email link</li>
-    <li>Email recovery (Firebase action handler)</li>
-    <li>Resend verification email from dashboard</li>
-  </ul>
-</div>
-
-<h3>4.2 Two-Role System (Tutor & Seeker)</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <p>At registration, users choose their role: <strong>Tutor</strong> (university student offering tuition) or <strong>Seeker</strong> (guardian/student looking for a tutor). The role is stored in MongoDB and determines what features the user can access:</p>
-  <table>
-    <tr><th>Feature</th><th>Tutor</th><th>Seeker</th><th>Admin</th></tr>
-    <tr><td>Browse tuitions & tutors</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-    <tr><td>Post a tuition</td><td>No</td><td>Yes</td><td>No</td></tr>
-    <tr><td>Apply to a tuition</td><td>Yes</td><td>No</td><td>No</td></tr>
-    <tr><td>Accept/reject applicants</td><td>No</td><td>Yes (own posts)</td><td>No</td></tr>
-    <tr><td>Edit tutor profile</td><td>Yes</td><td>No</td><td>No</td></tr>
-    <tr><td>Write a review</td><td>No</td><td>Yes</td><td>No</td></tr>
-    <tr><td>Request tutor contact</td><td>No</td><td>Yes</td><td>No</td></tr>
-    <tr><td>Approve contact requests</td><td>Yes</td><td>No</td><td>No</td></tr>
-    <tr><td>Report users/tuitions</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-    <tr><td>Verify tutors / manage reports</td><td>No</td><td>No</td><td>Yes</td></tr>
-  </table>
-  <p>If a user signs in with Google but hasn't chosen a role yet, they are redirected to the <code>/complete-profile</code> page.</p>
-</div>
-
-<h3>4.3 Tuition Posting & Application Flow</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <div class="flow-diagram">
-    <span class="flow-step">Seeker posts tuition</span>
-    <span class="flow-arrow">&rarr;</span>
-    <span class="flow-step">Tutors browse & apply</span>
-    <span class="flow-arrow">&rarr;</span>
-    <span class="flow-step">Seeker reviews applicants</span>
-    <span class="flow-arrow">&rarr;</span>
-    <span class="flow-step">Accept / Reject</span>
-  </div>
-  <ul>
-    <li><strong>Posting:</strong> A seeker fills in title, class level, subjects, area, salary, days/week, mode (home/online), gender preference, and description. Stored in the <code>Tuition</code> collection with status <code>open</code>.</li>
-    <li><strong>Applying:</strong> A tutor writes an optional message and submits. A unique compound index <code>(tuition, tutor)</code> prevents duplicate applications.</li>
-    <li><strong>Managing applicants:</strong> The tuition owner sees all applicants with their profile info. They can accept or reject each one.</li>
-    <li><strong>Auto-close:</strong> Accepting an applicant automatically sets the tuition status to <code>closed</code>.</li>
-    <li><strong>Reopen:</strong> A seeker can toggle their tuition between open/closed from their dashboard.</li>
-    <li><strong>Contact sharing:</strong> The tutor's phone number is only shown to the seeker after the application is accepted.</li>
-  </ul>
-</div>
-
-<h3>4.4 Advanced Filtering System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <p>Both the <strong>Tuitions</strong> and <strong>Tutors</strong> listing pages share a <code>FilterSidebar</code> component with these filters:</p>
-  <table>
-    <tr><th>Filter</th><th>Type</th><th>Backend Query</th></tr>
-    <tr><td>Subjects</td><td>Multi-select chips</td><td><code>{ $in: [...] }</code></td></tr>
-    <tr><td>Class Level</td><td>Dropdown</td><td>Exact match</td></tr>
-    <tr><td>Area/Thana</td><td>Dropdown (35+ Chittagong areas)</td><td>Exact match / <code>$in</code> for preferred areas</td></tr>
-    <tr><td>Mode</td><td>Dropdown (Home/Online)</td><td>Exact match + "both" option for tutors</td></tr>
-    <tr><td>Gender Preference</td><td>Dropdown</td><td>Includes "any" preference</td></tr>
-    <tr><td>Salary Range</td><td>Min/Max number inputs</td><td><code>{ $gte, $lte }</code></td></tr>
-    <tr><td>Rating (tutors only)</td><td>Dropdown</td><td><code>{ $gte }</code></td></tr>
-    <tr><td>Verified only (tutors)</td><td>Checkbox</td><td><code>isVerified: true</code></td></tr>
-    <tr><td>Name search (tutors)</td><td>Text input</td><td>Regex <code>{ $regex, $options: 'i' }</code></td></tr>
-  </table>
-  <p>Filters are applied client-side as query parameters and processed server-side via MongoDB queries. The filter state updates trigger a <code>useCallback</code>/<code>useEffect</code> chain that re-fetches data.</p>
-</div>
-
-<h3>4.5 Privacy-Gated Contact System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <p>Tutor contact details (phone, email) are <strong>never publicly visible</strong>. A privacy-aware contact request system protects tutors:</p>
-  <ol>
-    <li><strong>Public profile</strong> shows subjects, areas, rating, bio &mdash; but NOT phone or email</li>
-    <li><strong>Seeker sends a contact request</strong> with an optional introduction message</li>
-    <li><strong>Tutor reviews the request</strong> on their dashboard and approves or declines</li>
-    <li><strong>If approved</strong>, the seeker's tutor profile page reveals the phone and email</li>
-    <li><strong>Server enforces this</strong> &mdash; the <code>publicTutor()</code> function strips contact fields unless the viewer has an approved contact request</li>
-  </ol>
-  <p>A unique compound index <code>(tutor, seeker)</code> ensures only one request per pair.</p>
-</div>
-
-<h3>4.6 Review & Rating System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li>Only <strong>seekers</strong> can leave reviews for tutors (1-5 star rating + optional comment)</li>
-    <li>A unique index <code>(tutor, author)</code> limits each seeker to <strong>one review per tutor</strong></li>
-    <li>After each review, the server <strong>recomputes the tutor's average rating</strong> using a MongoDB aggregation pipeline (<code>$avg</code>, <code>$sum</code>)</li>
-    <li>The computed <code>ratingAvg</code> and <code>ratingCount</code> are denormalized onto the <code>User</code> document for fast listing queries</li>
-    <li>Reviews display on the tutor's public profile page</li>
-  </ul>
-</div>
-
-<h3>4.7 Reporting & Trust/Safety System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li>Any logged-in user can <strong>report a tutor profile or tuition post</strong> via a modal dialog</li>
-    <li>Reports include a category (Fake profile, Spam, Inappropriate behavior, etc.) and optional details</li>
-    <li>Reports are stored in the <code>Report</code> collection with status: <code>open</code>, <code>reviewed</code>, or <code>dismissed</code></li>
-    <li>Admins can review and update report statuses from the Admin panel</li>
-  </ul>
-</div>
-
-<h3>4.8 Admin Panel</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li>Admin access is determined by <strong>email whitelist</strong> in the server's <code>ADMIN_EMAILS</code> environment variable</li>
-    <li>The admin panel has two tabs:
-      <ul>
-        <li><strong>Tutors Tab:</strong> Lists all tutors with verify/revoke badge buttons. Verified tutors get a badge and rank higher in search results.</li>
-        <li><strong>Reports Tab:</strong> Lists all user/tuition reports with options to mark as reviewed or dismissed.</li>
-      </ul>
-    </li>
-    <li>Client-side: <code>ProtectedRoute</code> checks <code>profile.isAdmin</code> before rendering the admin page</li>
-    <li>Server-side: <code>requireAdmin</code> middleware checks the user's email against the <code>ADMIN_EMAILS</code> list</li>
-  </ul>
-</div>
-
-<h3>4.9 Email Verification & Password Recovery</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li>On signup, Firebase sends a <strong>verification email</strong> automatically</li>
-    <li>A yellow banner appears on the dashboard if the email is unverified, with a "Resend" button</li>
-    <li>The <code>/auth/action</code> page handles Firebase's email action links (verify email, reset password, recover email)</li>
-    <li>The server syncs the <code>emailVerified</code> status from the Firebase token to MongoDB on each <code>GET /users/me</code> request</li>
-    <li>Password reset: user enters email on login page &rarr; Firebase sends reset link &rarr; <code>/auth/action?mode=resetPassword</code> lets them set a new password</li>
-  </ul>
-</div>
-
-<h3>4.10 Responsive UI & Design System</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li>Built with <strong>Tailwind CSS</strong> with a custom green brand palette (<code>#1baf78</code> primary)</li>
-    <li><strong>Custom component classes</strong> in <code>index.css</code>: <code>.btn-primary</code>, <code>.btn-outline</code>, <code>.card</code>, <code>.badge</code>, <code>.chip</code>, <code>.input</code>, <code>.label</code></li>
-    <li><strong>Mobile-first responsive design</strong> &mdash; sticky navbar with hamburger menu, grid layouts that stack on mobile</li>
-    <li><strong>Code splitting</strong> via React's <code>lazy()</code> + <code>Suspense</code> for all page components</li>
-    <li><strong>Loading states</strong> (spinner), <strong>empty states</strong>, and <strong>error states</strong> throughout the app</li>
-    <li><strong>Toast notifications</strong> for all user actions (success, error, info)</li>
-    <li>Custom SVG logo with gradient for branding</li>
-  </ul>
-</div>
-
-<h3>4.11 Dark Mode</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Tailwind <code>darkMode: 'class'</code></strong> &mdash; Dark mode is activated by toggling the <code>dark</code> class on the <code>&lt;html&gt;</code> element. A <code>ThemeContext</code> provider manages the state.</li>
-    <li><strong>Persistent preference</strong> &mdash; The chosen theme is saved to <code>localStorage('theme')</code>. On first visit, falls back to the user's OS preference via <code>prefers-color-scheme: dark</code>.</li>
-    <li><strong>Toggle button</strong> &mdash; A Sun/Moon icon button in the Navbar lets users switch themes with one click.</li>
-    <li><strong>CSS component classes</strong> &mdash; All custom component classes (<code>.btn-primary</code>, <code>.card</code>, <code>.input</code>, <code>.badge</code>, <code>.chip</code>, <code>.label</code>) include <code>dark:</code> variants in <code>index.css</code>, so most components inherit dark styles automatically.</li>
-    <li><strong>Page-level dark classes</strong> &mdash; Every page and component has been updated with inline <code>dark:</code> Tailwind classes for text, backgrounds, borders, and hover states.</li>
-  </ul>
-</div>
-
-<h3>4.12 Pagination</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Server-side pagination</strong> &mdash; Both <code>GET /api/tuitions</code> and <code>GET /api/users/tutors</code> accept <code>page</code> and <code>limit</code> query parameters (defaults: page=1, limit=12, max limit=50).</li>
-    <li><strong>Response shape</strong> &mdash; Paginated endpoints return <code>{ data, page, totalPages, total }</code> instead of a raw array.</li>
-    <li><strong>Efficient queries</strong> &mdash; Uses <code>Promise.all([find().skip().limit(), countDocuments()])</code> to fetch the page and total count in parallel.</li>
-    <li><strong>Reusable Pagination component</strong> &mdash; Renders prev/next buttons and a page number window with ellipsis for large page counts.</li>
-    <li><strong>Filter-aware</strong> &mdash; Page resets to 1 whenever filters or search queries change.</li>
-  </ul>
-</div>
-
-<h3>4.13 Search Bar</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Tuition search</strong> &mdash; The <code>q</code> query parameter triggers a MongoDB <code>$or</code> regex search across <code>title</code>, <code>description</code>, and <code>subjects</code> fields.</li>
-    <li><strong>Tutor search</strong> &mdash; Expanded from name-only to <code>$or</code> across <code>name</code>, <code>university</code>, <code>department</code>, and <code>subjects</code>.</li>
-    <li><strong>Debounced input</strong> &mdash; A 400ms debounce using a <code>setTimeout</code> ref pattern prevents excessive API calls while typing.</li>
-    <li><strong>Search icon input</strong> &mdash; A styled search bar with a <code>Search</code> icon appears above the results grid on both Tuitions and Tutors pages.</li>
-    <li><strong>Page reset</strong> &mdash; Changing the search query resets pagination to page 1.</li>
-  </ul>
-</div>
-
-<h3>4.14 Bookmark / Save Tuitions</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Toggle bookmark</strong> &mdash; Logged-in users can click a bookmark icon on any tuition card. <code>POST /api/bookmarks/:tuitionId</code> creates or deletes the bookmark (toggle pattern).</li>
-    <li><strong>Batch check</strong> &mdash; When the tuitions page loads, <code>GET /api/bookmarks/check?tuitionIds=...</code> checks which tuitions on the current page are bookmarked, populating the bookmark icon state.</li>
-    <li><strong>Saved tuitions dashboard</strong> &mdash; The Dashboard page includes a "Saved Tuitions" section that fetches <code>GET /api/bookmarks</code> and renders bookmarked tuition cards with a remove button.</li>
-    <li><strong>Data model</strong> &mdash; A <code>Bookmark</code> model with a unique compound index on <code>(user, tuition)</code> prevents duplicates.</li>
-    <li><strong>Click isolation</strong> &mdash; The bookmark button uses <code>e.preventDefault()</code> and <code>e.stopPropagation()</code> to prevent navigating to the tuition detail page when toggling a bookmark.</li>
-  </ul>
-</div>
-
-<h3>4.15 Profile Photo Upload</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Firebase Storage</strong> &mdash; Profile photos are uploaded to Firebase Storage at <code>profile-photos/{uid}/{timestamp}_{filename}</code>.</li>
-    <li><strong>PhotoUpload component</strong> &mdash; A reusable component with a circular image preview and a camera icon overlay button. Clicking opens the native file picker.</li>
-    <li><strong>Validation</strong> &mdash; Accepts only <code>image/*</code> files up to 5 MB in size.</li>
-    <li><strong>Upload flow</strong> &mdash; Uses <code>uploadBytes()</code> to upload the file, then <code>getDownloadURL()</code> to get the public URL, which is saved to the user's <code>photo</code> field.</li>
-    <li><strong>Replaces URL input</strong> &mdash; The old photo URL text input in the tutor profile form has been replaced with this visual uploader.</li>
-  </ul>
-</div>
-
-<h3>4.16 Edit / Delete Tuitions</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Edit tuition</strong> &mdash; Seekers can edit any of their posted tuitions via the <code>/edit-tuition/:id</code> page. The form pre-populates with the existing data and submits a <code>PUT /api/tuitions/:id</code> request.</li>
-    <li><strong>Delete tuition</strong> &mdash; A delete button (with a confirmation modal) allows seekers to permanently remove a tuition post. Uses <code>DELETE /api/tuitions/:id</code>.</li>
-    <li><strong>Cascade cleanup</strong> &mdash; Deleting a tuition also removes all related applications, bookmarks, and reports from the database.</li>
-    <li><strong>Ownership verification</strong> &mdash; Both edit and delete endpoints verify that the logged-in user is the tuition's creator before allowing the operation.</li>
-    <li><strong>Access points</strong> &mdash; Edit and Delete buttons appear in the Seeker Dashboard (My Posted Tuitions) and on the tuition detail page when the owner is viewing it.</li>
-    <li><strong>Confirmation modal</strong> &mdash; A reusable <code>ConfirmModal</code> component prevents accidental deletions with a clear warning message.</li>
-  </ul>
-</div>
-
-<h3>4.17 Analytics Dashboard (Admin)</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Admin-only tab</strong> &mdash; A third "Analytics" tab in the admin panel displays key metrics, charts, and rankings.</li>
-    <li><strong>Aggregated statistics</strong> &mdash; The server endpoint <code>GET /api/admin/analytics</code> returns total counts (users, tuitions, applications), weekly signup/posting trends, and top subjects/areas.</li>
-    <li><strong>Charts with Recharts</strong> &mdash; Bar charts visualize signups and tuitions posted per week over the last 8 weeks.</li>
-    <li><strong>Top rankings</strong> &mdash; The most popular subjects and areas are displayed as ranked lists with progress bars.</li>
-    <li><strong>CSV Export</strong> &mdash; An "Export CSV" button generates a downloadable CSV file of all analytics data client-side.</li>
-  </ul>
-</div>
-
-<h3>4.18 Favorites / Saved Tutors</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>TutorBookmark model</strong> &mdash; A new <code>TutorBookmark</code> collection with <code>{ user, tutor }</code> fields and a unique compound index, mirroring the tuition bookmark pattern.</li>
-    <li><strong>Toggle API</strong> &mdash; <code>POST /api/tutor-bookmarks/:tutorId</code> toggles the bookmark on/off. <code>GET /check</code> supports batch checking.</li>
-    <li><strong>Heart icon on TutorCard</strong> &mdash; Each tutor card shows a heart icon that fills red when bookmarked. Uses <code>e.stopPropagation()</code> to prevent card navigation.</li>
-    <li><strong>Dashboard section</strong> &mdash; A "Saved Tutors" section on the dashboard lists bookmarked tutors with the ability to remove them.</li>
-  </ul>
-</div>
-
-<h3>4.19 Tuition Recommendations</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Matching algorithm</strong> &mdash; <code>GET /api/tuitions/recommended</code> finds open tuitions matching the tutor's subjects, preferred areas, or class levels.</li>
-    <li><strong>Overlap scoring</strong> &mdash; Results are scored by how many fields match (subjects worth 2 points, area and class level worth 1 each), sorted by score descending.</li>
-    <li><strong>"Recommended for You" section</strong> &mdash; Appears at the top of the tutor dashboard when recommendations are available, displaying up to 6 matching tuitions.</li>
-  </ul>
-</div>
-
-<h3>4.20 Review Replies</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Reply fields on Review</strong> &mdash; The Review schema has <code>reply</code> (String) and <code>replyAt</code> (Date) fields added.</li>
-    <li><strong>Tutor-only endpoint</strong> &mdash; <code>PATCH /api/reviews/:id/reply</code> allows only the reviewed tutor to post a single reply.</li>
-    <li><strong>Display on profile</strong> &mdash; Replies appear below reviews with a styled left-border callout and "Tutor's reply" label.</li>
-    <li><strong>Reply button</strong> &mdash; When viewing their own profile, tutors see a "Reply" button on unreplied reviews that reveals an inline textarea.</li>
-  </ul>
-</div>
-
-<h3>4.21 Application Tracking Timeline</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>New timestamp fields</strong> &mdash; The Application model has <code>viewedAt</code> and <code>decidedAt</code> fields that record when the seeker first views and decides on the application.</li>
-    <li><strong>Auto-view marking</strong> &mdash; When a seeker fetches applicants for their tuition, all unviewed applications are automatically marked as viewed.</li>
-    <li><strong>Visual timeline</strong> &mdash; A 3-step dot timeline (Applied &rarr; Viewed &rarr; Decision) shows below each application, with timestamps and color-coded progress.</li>
-    <li><strong>Both perspectives</strong> &mdash; The timeline is visible to both seekers (on the tuition detail page) and tutors (on their dashboard's "My Applications" section).</li>
-  </ul>
-</div>
-
-<h3>4.22 Guardian Management &amp; User Restriction</h3>
-<div class="card">
-  <h4>How it works:</h4>
-  <ul>
-    <li><strong>Guardians tab</strong> &mdash; Admins can view all registered guardians (seekers) with their name, email, phone, and registration date in a new &ldquo;Guardians&rdquo; tab on the Admin panel.</li>
-    <li><strong>Restrict / Unrestrict</strong> &mdash; Admins can restrict any user (tutor or guardian) with a single click. Restricted users receive a <code>403</code> on all authenticated routes and see an &ldquo;account restricted&rdquo; message.</li>
-    <li><strong>Backend enforcement</strong> &mdash; The <code>loadUser</code> middleware checks the <code>restricted</code> field; restricted users are blocked before any route handler runs.</li>
-    <li><strong>Visual status</strong> &mdash; A red &ldquo;Restricted&rdquo; badge appears next to restricted users. The restrict button toggles between red (restrict) and green (unrestrict).</li>
-    <li><strong>API endpoints</strong> &mdash; <code>GET /api/admin/guardians</code> lists seekers; <code>PATCH /api/admin/users/:id/restrict</code> toggles restriction for any user.</li>
-  </ul>
-</div>
-
-<!-- ======================== 5. DATA MODELS ======================== -->
-<h2 id="data-models" class="page-break"><span class="num">5</span> Database Schema & Data Models</h2>
-
-<p>Tuitionify uses <strong>8 MongoDB collections</strong> managed through Mongoose schemas:</p>
-
-<h3>5.1 User Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
-  <tr><td><code>firebaseUid</code></td><td>String</td><td>Yes (unique)</td><td>Links to Firebase Auth account</td></tr>
-  <tr><td><code>name</code></td><td>String</td><td>Yes</td><td>Full name</td></tr>
-  <tr><td><code>email</code></td><td>String</td><td>Yes</td><td>Email (lowercase, trimmed)</td></tr>
-  <tr><td><code>role</code></td><td>Enum</td><td>Yes</td><td><code>tutor</code> | <code>seeker</code></td></tr>
-  <tr><td><code>phone</code></td><td>String</td><td>No</td><td>Contact number (private)</td></tr>
-  <tr><td><code>photo</code></td><td>String</td><td>No</td><td>Profile photo URL</td></tr>
-  <tr><td><code>gender</code></td><td>Enum</td><td>No</td><td><code>male</code> | <code>female</code> | <code>""</code></td></tr>
-  <tr><td><code>university</code></td><td>String</td><td>No</td><td>Tutor's university name</td></tr>
-  <tr><td><code>department</code></td><td>String</td><td>No</td><td>Tutor's department</td></tr>
-  <tr><td><code>subjects</code></td><td>[String]</td><td>No</td><td>Subjects the tutor teaches</td></tr>
-  <tr><td><code>classLevels</code></td><td>[String]</td><td>No</td><td>Class levels (e.g., HSC, Class 9-10)</td></tr>
-  <tr><td><code>preferredAreas</code></td><td>[String]</td><td>No</td><td>Areas/thanas for home tuition</td></tr>
-  <tr><td><code>expectedSalary</code></td><td>Number</td><td>No</td><td>Monthly salary expectation (BDT)</td></tr>
-  <tr><td><code>mode</code></td><td>Enum</td><td>No</td><td><code>home</code> | <code>online</code> | <code>both</code></td></tr>
-  <tr><td><code>bio</code></td><td>String</td><td>No</td><td>Tutor's self-description</td></tr>
-  <tr><td><code>ratingAvg</code></td><td>Number</td><td>No</td><td>Denormalized average rating</td></tr>
-  <tr><td><code>ratingCount</code></td><td>Number</td><td>No</td><td>Denormalized review count</td></tr>
-  <tr><td><code>isVerified</code></td><td>Boolean</td><td>No</td><td>Admin-granted verification badge</td></tr>
-  <tr><td><code>emailVerified</code></td><td>Boolean</td><td>No</td><td>Synced from Firebase token</td></tr>
-  <tr><td><code>restricted</code></td><td>Boolean</td><td>No</td><td>Admin-set flag; blocked from all authenticated routes when true</td></tr>
-</table>
-
-<h3>5.2 Tuition Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>title</code></td><td>String</td><td>Tuition post title</td></tr>
-  <tr><td><code>classLevel</code></td><td>String</td><td>Target class (e.g., "HSC")</td></tr>
-  <tr><td><code>subjects</code></td><td>[String]</td><td>Required subjects</td></tr>
-  <tr><td><code>area</code></td><td>String</td><td>Location/thana</td></tr>
-  <tr><td><code>salary</code></td><td>Number</td><td>Monthly salary in BDT</td></tr>
-  <tr><td><code>daysPerWeek</code></td><td>Number</td><td>Teaching days per week</td></tr>
-  <tr><td><code>mode</code></td><td>Enum</td><td><code>home</code> | <code>online</code></td></tr>
-  <tr><td><code>genderPreference</code></td><td>Enum</td><td><code>male</code> | <code>female</code> | <code>any</code></td></tr>
-  <tr><td><code>description</code></td><td>String</td><td>Additional details</td></tr>
-  <tr><td><code>status</code></td><td>Enum</td><td><code>open</code> | <code>closed</code></td></tr>
-  <tr><td><code>createdBy</code></td><td>ObjectId (ref User)</td><td>The seeker who posted</td></tr>
-</table>
-
-<h3>5.3 Application Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>tuition</code></td><td>ObjectId (ref Tuition)</td><td>The tuition being applied to</td></tr>
-  <tr><td><code>tutor</code></td><td>ObjectId (ref User)</td><td>The applying tutor</td></tr>
-  <tr><td><code>message</code></td><td>String</td><td>Application message</td></tr>
-  <tr><td><code>status</code></td><td>Enum</td><td><code>pending</code> | <code>accepted</code> | <code>rejected</code></td></tr>
-</table>
-<p><em>Unique compound index: <code>(tuition, tutor)</code> &mdash; prevents duplicate applications.</em></p>
-
-<h3>5.4 Review Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>tutor</code></td><td>ObjectId (ref User)</td><td>The reviewed tutor</td></tr>
-  <tr><td><code>author</code></td><td>ObjectId (ref User)</td><td>The seeker who wrote the review</td></tr>
-  <tr><td><code>authorName</code></td><td>String</td><td>Snapshot of author's name</td></tr>
-  <tr><td><code>rating</code></td><td>Number (1-5)</td><td>Star rating</td></tr>
-  <tr><td><code>comment</code></td><td>String</td><td>Review text</td></tr>
-</table>
-<p><em>Unique compound index: <code>(tutor, author)</code> &mdash; one review per seeker per tutor.</em></p>
-
-<h3>5.5 ContactRequest Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>tutor</code></td><td>ObjectId (ref User)</td><td>The tutor being contacted</td></tr>
-  <tr><td><code>seeker</code></td><td>ObjectId (ref User)</td><td>The seeker requesting contact</td></tr>
-  <tr><td><code>message</code></td><td>String</td><td>Introduction message</td></tr>
-  <tr><td><code>status</code></td><td>Enum</td><td><code>pending</code> | <code>approved</code> | <code>declined</code></td></tr>
-</table>
-<p><em>Unique compound index: <code>(tutor, seeker)</code> &mdash; one request per pair.</em></p>
-
-<h3>5.6 Report Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>reporter</code></td><td>ObjectId (ref User)</td><td>Who submitted the report</td></tr>
-  <tr><td><code>targetType</code></td><td>Enum</td><td><code>user</code> | <code>tuition</code></td></tr>
-  <tr><td><code>targetId</code></td><td>ObjectId</td><td>The reported entity</td></tr>
-  <tr><td><code>reason</code></td><td>String</td><td>Report category</td></tr>
-  <tr><td><code>details</code></td><td>String</td><td>Additional context</td></tr>
-  <tr><td><code>status</code></td><td>Enum</td><td><code>open</code> | <code>reviewed</code> | <code>dismissed</code></td></tr>
-</table>
-
-<h3>5.7 Bookmark Model</h3>
-<table>
-  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>user</code></td><td>ObjectId (ref User)</td><td>The user who bookmarked</td></tr>
-  <tr><td><code>tuition</code></td><td>ObjectId (ref Tuition)</td><td>The bookmarked tuition</td></tr>
-</table>
-<p><em>Unique compound index: <code>(user, tuition)</code> &mdash; prevents duplicate bookmarks.</em></p>
-
-<!-- ======================== 6. API ENDPOINTS ======================== -->
-<h2 id="api" class="page-break"><span class="num">6</span> API Endpoints Reference</h2>
-
-<p>Base URL: <code>/api</code></p>
-
-<h3>6.1 User Routes (<code>/api/users</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/register</code></td><td>Firebase Token</td><td>Any</td><td>Create Mongo profile after Firebase signup</td></tr>
-  <tr><td>GET</td><td><code>/me</code></td><td>Firebase Token</td><td>Any</td><td>Get current user profile (syncs emailVerified)</td></tr>
-  <tr><td>PUT</td><td><code>/me</code></td><td>Firebase Token</td><td>Any</td><td>Update own profile (whitelisted fields only)</td></tr>
-  <tr><td>GET</td><td><code>/tutors</code></td><td>None</td><td>&mdash;</td><td>List/filter tutors (public, no contact info)</td></tr>
-  <tr><td>GET</td><td><code>/tutors/:id</code></td><td>Optional</td><td>&mdash;</td><td>Tutor profile + reviews + contact status</td></tr>
-</table>
-
-<h3>6.2 Tuition Routes (<code>/api/tuitions</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/</code></td><td>None</td><td>&mdash;</td><td>List/filter open tuitions</td></tr>
-  <tr><td>GET</td><td><code>/:id</code></td><td>None</td><td>&mdash;</td><td>Single tuition details</td></tr>
-  <tr><td>POST</td><td><code>/</code></td><td>Firebase Token</td><td>Seeker</td><td>Post a new tuition</td></tr>
-  <tr><td>GET</td><td><code>/mine/posted</code></td><td>Firebase Token</td><td>Any</td><td>List own posted tuitions</td></tr>
-  <tr><td>PATCH</td><td><code>/:id/status</code></td><td>Firebase Token</td><td>Owner</td><td>Open/close own tuition</td></tr>
-  <tr><td>GET</td><td><code>/:id/applications</code></td><td>Firebase Token</td><td>Owner</td><td>View applicants for own tuition</td></tr>
-</table>
-
-<h3>6.3 Application Routes (<code>/api/applications</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/</code></td><td>Firebase Token</td><td>Tutor</td><td>Apply to a tuition</td></tr>
-  <tr><td>GET</td><td><code>/mine</code></td><td>Firebase Token</td><td>Tutor</td><td>List own applications</td></tr>
-  <tr><td>PATCH</td><td><code>/:id</code></td><td>Firebase Token</td><td>Owner</td><td>Accept/reject an application</td></tr>
-</table>
-
-<h3>6.4 Review Routes (<code>/api/reviews</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/</code></td><td>Firebase Token</td><td>Seeker</td><td>Review a tutor (1-5 stars)</td></tr>
-  <tr><td>GET</td><td><code>/tutor/:id</code></td><td>None</td><td>&mdash;</td><td>List reviews for a tutor</td></tr>
-</table>
-
-<h3>6.5 Contact Request Routes (<code>/api/contact-requests</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/</code></td><td>Firebase Token</td><td>Seeker</td><td>Request a tutor's contact info</td></tr>
-  <tr><td>GET</td><td><code>/incoming</code></td><td>Firebase Token</td><td>Tutor</td><td>View contact requests received</td></tr>
-  <tr><td>GET</td><td><code>/mine</code></td><td>Firebase Token</td><td>Seeker</td><td>View own sent requests</td></tr>
-  <tr><td>PATCH</td><td><code>/:id</code></td><td>Firebase Token</td><td>Tutor</td><td>Approve/decline a request</td></tr>
-</table>
-
-<h3>6.6 Report Routes (<code>/api/reports</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/</code></td><td>Firebase Token</td><td>Any</td><td>Report a user or tuition</td></tr>
-</table>
-
-<h3>6.7 Admin Routes (<code>/api/admin</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/tutors</code></td><td>Firebase + Admin</td><td>Admin</td><td>List all tutors with verify status</td></tr>
-  <tr><td>PATCH</td><td><code>/tutors/:id/verify</code></td><td>Firebase + Admin</td><td>Admin</td><td>Grant/revoke verified badge</td></tr>
-  <tr><td>GET</td><td><code>/reports</code></td><td>Firebase + Admin</td><td>Admin</td><td>List all reports</td></tr>
-  <tr><td>PATCH</td><td><code>/reports/:id</code></td><td>Firebase + Admin</td><td>Admin</td><td>Update report status</td></tr>
-</table>
-
-<h3>6.8 Bookmark Routes (<code>/api/bookmarks</code>)</h3>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th></tr>
-  <tr><td>POST</td><td><code>/:tuitionId</code></td><td>Firebase Token</td><td>Any</td><td>Toggle bookmark on a tuition (create or remove)</td></tr>
-  <tr><td>GET</td><td><code>/</code></td><td>Firebase Token</td><td>Any</td><td>List user's bookmarked tuitions (populated)</td></tr>
-  <tr><td>GET</td><td><code>/check</code></td><td>Firebase Token</td><td>Any</td><td>Batch check which tuition IDs are bookmarked</td></tr>
-</table>
-
-<!-- ======================== 7. AUTH ======================== -->
-<h2 id="auth" class="page-break"><span class="num">7</span> Authentication & Authorization</h2>
-
-<h3>7.1 Authentication Flow</h3>
 <div class="card card-blue">
-  <pre style="background: transparent; color: #1e293b; padding: 0;">
-Client (React)                    Server (Express)              Firebase
-     |                                 |                           |
-     |-- signInWithEmailAndPassword -->|                           |
-     |<-- Firebase ID Token -----------|                           |
-     |                                 |                           |
-     |-- GET /api/users/me ----------->|                           |
-     |   [Authorization: Bearer token] |                           |
-     |                                 |-- verifyIdToken() ------->|
-     |                                 |<-- decoded token ---------|
-     |                                 |                           |
-     |                                 |-- User.findOne({uid}) --->|
-     |                                 |<-- Mongo user profile ----|
-     |<-- { profile + isAdmin } -------|                           |
-  </pre>
+  <h4>A note on password storage</h4>
+  <p>Tuitionify never stores or even sees a password. Firebase owns the credential; the server only ever receives a signed ID token and asks the Firebase Admin SDK to verify it. That removes an entire class of vulnerability &mdash; there is no password hash in this database to leak.</p>
 </div>
+<!-- ======================== 4. END-TO-END WALKTHROUGH ======================== -->
+<h2 id="walkthrough" class="page-break"><span class="num">4</span> The System End to End &mdash; Two Complete Journeys</h2>
 
-<h3>7.2 Middleware Chain</h3>
-<table>
-  <tr><th>Middleware</th><th>Purpose</th><th>Location</th></tr>
-  <tr><td><code>verifyToken</code></td><td>Extracts and verifies Firebase ID token from <code>Authorization</code> header. Sets <code>req.firebaseUser</code>.</td><td><code>middleware/auth.js</code></td></tr>
-  <tr><td><code>loadUser</code></td><td>Loads the MongoDB user document by <code>firebaseUid</code>. Sets <code>req.dbUser</code>.</td><td><code>middleware/auth.js</code></td></tr>
-  <tr><td><code>optionalAuth</code></td><td>Like <code>verifyToken + loadUser</code> but never rejects. Used for pages that show extra data to logged-in users.</td><td><code>middleware/auth.js</code></td></tr>
-  <tr><td><code>requireRole(role)</code></td><td>Guards a route to a specific role (<code>tutor</code> or <code>seeker</code>). Returns 403 otherwise.</td><td><code>middleware/auth.js</code></td></tr>
-  <tr><td><code>requireAdmin</code></td><td>Checks if <code>req.dbUser.email</code> is in <code>ADMIN_EMAILS</code> env var. Returns 403 otherwise.</td><td><code>middleware/auth.js</code></td></tr>
-</table>
+<p>The sections after this one describe features individually. This one follows the system as it is actually used, in order, from an empty database to a completed hire and an earned review. Every step names the file and endpoint that does the work, so the guide can be read alongside the code.</p>
 
-<h3>7.3 Client-Side Route Protection</h3>
-<p>The <code>ProtectedRoute</code> component wraps protected pages and checks:</p>
+<h3>4.1 Journey A &mdash; Kamal, a guardian, hires a tutor</h3>
+
+<h4>Step 1 &mdash; Sign up and choose a role</h4>
+<p>Kamal opens <code>/register</code> and signs up with email and password, or with Google. Firebase creates the credential client-side and returns a user object with a UID.</p>
 <ul>
-  <li>Is the user logged in with Firebase? If not &rarr; redirect to <code>/login</code></li>
-  <li>Does the user have a Mongo profile? If not &rarr; redirect to <code>/complete-profile</code></li>
-  <li>Is the <code>admin</code> prop set? Check <code>profile.isAdmin</code> &rarr; redirect to dashboard if not admin</li>
-  <li>Is a specific <code>role</code> required? Check <code>profile.role</code> &rarr; redirect if mismatch</li>
+  <li><strong>Client:</strong> <code>Register.jsx</code> calls <code>signupEmail()</code> from <code>AuthContext</code>, which calls Firebase's <code>createUserWithEmailAndPassword</code>, sets the display name, and sends a verification email.</li>
+  <li><strong>Client:</strong> he picks the <em>Seeker</em> role and submits, which calls <code>POST /api/users/register</code>.</li>
+  <li><strong>Server:</strong> <code>routes/users.js</code> reads <code>uid</code>, <code>email</code> and <code>email_verified</code> <em>from the verified token</em>, never from the request body. The role is validated against <code>['tutor','seeker']</code>. A Mongo profile is created.</li>
 </ul>
 
-<!-- ======================== 8. FRONTEND STRUCTURE ======================== -->
-<h2 id="client" class="page-break"><span class="num">8</span> Frontend Structure & Components</h2>
+<div class="card card-amber">
+  <h4>Why email comes from the token, not the body</h4>
+  <p>Admin access is granted by matching <code>user.email</code> against the <code>ADMIN_EMAILS</code> environment variable. If the client could supply its own email at registration, anyone could claim an admin address and self-promote. Taking it from the signed token closes that path, and <code>email</code> is deliberately absent from the editable-fields list on <code>PUT /api/users/me</code> so it cannot be changed afterwards either.</p>
+</div>
 
-<h3>8.1 Pages (11 total)</h3>
-<table>
-  <tr><th>Page</th><th>Route</th><th>Access</th><th>Description</th></tr>
-  <tr><td>Home</td><td><code>/</code></td><td>Public</td><td>Landing page with hero, how-it-works, popular subjects, CTA sections</td></tr>
-  <tr><td>Login</td><td><code>/login</code></td><td>Public</td><td>Email/password + Google login + forgot password</td></tr>
-  <tr><td>Register</td><td><code>/register</code></td><td>Public</td><td>Role picker + email/password + Google signup</td></tr>
-  <tr><td>CompleteProfile</td><td><code>/complete-profile</code></td><td>Firebase user</td><td>Role selection for Google sign-in users</td></tr>
-  <tr><td>Tuitions</td><td><code>/tuitions</code></td><td>Public</td><td>Filterable list of open tuition posts</td></tr>
-  <tr><td>TuitionDetails</td><td><code>/tuitions/:id</code></td><td>Public</td><td>Single tuition + apply (tutor) + manage applicants (owner)</td></tr>
-  <tr><td>PostTuition</td><td><code>/post-tuition</code></td><td>Seeker only</td><td>Form to create a new tuition post</td></tr>
-  <tr><td>Tutors</td><td><code>/tutors</code></td><td>Public</td><td>Filterable directory of tutors</td></tr>
-  <tr><td>TutorProfile</td><td><code>/tutors/:id</code></td><td>Public</td><td>Tutor profile + reviews + contact request flow</td></tr>
-  <tr><td>Dashboard</td><td><code>/dashboard</code></td><td>Logged in</td><td>Role-specific dashboard (tutor: profile/apps/requests; seeker: posts)</td></tr>
-  <tr><td>Admin</td><td><code>/admin</code></td><td>Admin only</td><td>Verify tutors + manage reports</td></tr>
-  <tr><td>AuthAction</td><td><code>/auth/action</code></td><td>Public</td><td>Firebase email verification / password reset handler</td></tr>
-  <tr><td>NotFound</td><td><code>*</code></td><td>Public</td><td>404 page</td></tr>
-</table>
+<h4>Step 2 &mdash; Post a tuition</h4>
+<p>Kamal fills the form at <code>/post-tuition</code>: title, class level, subjects, area, monthly salary in BDT, days per week, mode, and gender preference.</p>
+<ul>
+  <li><strong>Client:</strong> <code>PostTuition.jsx</code> builds the payload from the shared option lists, so every dropdown value is legal by construction. Text inputs carry <code>maxLength</code> matching the server caps.</li>
+  <li><strong>Server:</strong> <code>POST /api/tuitions</code> runs <code>requireRole('seeker')</code>, then copies <strong>only</strong> the nine whitelisted fields from the body. <code>status</code>, <code>createdBy</code> and the timestamps are set by the server, so a crafted request cannot pre-set them.</li>
+  <li><strong>Model:</strong> <code>Tuition</code> validates <code>classLevel</code> and <code>area</code> against enums, checks every subject is a real option, and bounds salary to &#2547;500&ndash;100,000 and <code>daysPerWeek</code> to 1&ndash;7.</li>
+  <li><strong>Limit:</strong> 10 posts per minute.</li>
+</ul>
 
-<h3>8.2 Reusable Components (16 total)</h3>
-<table>
-  <tr><th>Component</th><th>Description</th></tr>
-  <tr><td><code>Navbar</code></td><td>Sticky top nav with responsive mobile menu, role-aware links (Dashboard/Admin/Logout)</td></tr>
-  <tr><td><code>Footer</code></td><td>4-column footer with links and branding</td></tr>
-  <tr><td><code>Logo</code></td><td>Custom SVG mortarboard icon with gradient + wordmark</td></tr>
-  <tr><td><code>ProtectedRoute</code></td><td>HOC for auth/role/admin gating with redirects</td></tr>
-  <tr><td><code>FilterSidebar</code></td><td>Shared filter panel with subject chips, dropdowns, salary range</td></tr>
-  <tr><td><code>TuitionCard</code></td><td>Card component for tuition listings (title, subjects, area, salary, mode)</td></tr>
-  <tr><td><code>TutorCard</code></td><td>Card component for tutor listings (photo, name, rating, subjects, area, salary)</td></tr>
-  <tr><td><code>TutorProfileForm</code></td><td>Editable form for tutor profile (subjects, areas, salary, bio, etc.)</td></tr>
-  <tr><td><code>StarRating</code></td><td>Dual export: <code>StarDisplay</code> (read-only) + <code>StarInput</code> (interactive picker)</td></tr>
-  <tr><td><code>VerifiedBadge</code></td><td>Green shield icon with tooltip, shown next to verified tutors</td></tr>
-  <tr><td><code>ReportModal</code></td><td>Modal dialog for reporting users/tuitions with reason dropdown</td></tr>
-  <tr><td><code>EmptyState</code></td><td>Placeholder for empty lists with icon, title, message, and optional CTA</td></tr>
-  <tr><td><code>Spinner</code></td><td>Loading indicator (full-page or inline variants)</td></tr>
-  <tr><td><code>Pagination</code></td><td>Reusable pagination with prev/next buttons and page number window with ellipsis</td></tr>
-  <tr><td><code>PhotoUpload</code></td><td>Firebase Storage photo uploader with circular preview and camera icon overlay</td></tr>
-  <tr><td><code>ThemeContext</code></td><td>Dark mode provider with localStorage persistence and OS preference fallback</td></tr>
-</table>
+<h4>Step 3 &mdash; Tutors apply; Kamal reviews the applicants</h4>
+<ul>
+  <li>Kamal opens <code>/dashboard</code>. <code>GET /api/tuitions/mine/posted</code> lists his posts; <code>GET /api/tuitions/:id/applications</code> lists the applicants for one.</li>
+  <li><strong>Ownership is re-checked server-side</strong> on that endpoint &mdash; the tuition's <code>createdBy</code> must equal the caller. Passing someone else's tuition id returns 403.</li>
+  <li>Unseen applications are stamped <code>viewedAt</code> in a single <code>updateMany</code>, which drives the tutor's timeline later.</li>
+  <li><strong>Applicant phone numbers are stripped</strong> from the response unless that application is already <code>accepted</code>.</li>
+</ul>
 
-<!-- ======================== 9. SECURITY ======================== -->
-<h2 id="security" class="page-break"><span class="num">9</span> Security Analysis & Report</h2>
+<h4>Step 4 &mdash; Accept one</h4>
+<ul>
+  <li><code>PATCH /api/applications/:id</code> with <code>{ status: 'accepted' }</code>. The server verifies Kamal owns the parent tuition, stamps <code>decidedAt</code>, and <strong>closes the tuition automatically</strong> so it stops appearing in listings.</li>
+  <li>The accepted tutor's phone now appears in Kamal's applicant list. He calls them. <em>This is the moment the whole product exists for</em> &mdash; and it is why a tutor cannot apply without a valid number.</li>
+</ul>
+
+<h4>Step 5 &mdash; Review the tutor afterwards</h4>
+<ul>
+  <li>On the tutor's profile Kamal sees a review form, because <code>GET /api/users/tutors/:id</code> returned <code>canReview: true</code> for him.</li>
+  <li><code>POST /api/reviews</code> re-checks that on the server via <code>hasEngagement()</code>, requires a confirmed email, validates the 1&ndash;5 rating, and recomputes the tutor's <code>ratingAvg</code> / <code>ratingCount</code> aggregates.</li>
+  <li>A unique index on <code>{tutor, author}</code> means one review per person per tutor; a second attempt returns 409.</li>
+</ul>
+
+<h3>4.2 Journey B &mdash; Tanvir, a CSE student, gets hired</h3>
+
+<h4>Step 1 &mdash; Register as a tutor and complete the profile</h4>
+<ul>
+  <li>Same signup, role <em>Tutor</em>. Tutor-specific fields may be sent at registration, but only from a whitelist &mdash; <code>isVerified</code>, <code>restricted</code> and <code>ratingAvg</code> are not in it.</li>
+  <li>At <code>/dashboard?edit=1</code>, <code>TutorProfileForm.jsx</code> collects university, department, subjects, class levels, preferred areas, expected salary, mode, bio and photo.</li>
+  <li><strong>The dashboard nudges him twice:</strong> once if subjects or areas are empty (he would be unfindable), and once if his phone is missing (he could not apply). Both are plain amber notices, not blockers.</li>
+</ul>
+
+<h4>Step 2 &mdash; Upload a profile photo</h4>
+<ul>
+  <li><code>PhotoUpload.jsx</code> checks the MIME type and the 3&nbsp;MB cap client-side, converts the file to base64, and posts it to <code>POST /api/uploads/photo</code>.</li>
+  <li><strong>The server proxies it to imgbb using a server-side key.</strong> The key is never in a <code>VITE_*</code> variable, because anything with that prefix is inlined into the public JavaScript bundle and can be read by anyone.</li>
+  <li>The server re-checks the decoded size, distinguishes a revoked key (503) from a rejected file (502) from an upstream rate limit (429), and logs the real upstream reason either way.</li>
+  <li>Only the returned <code>display_url</code> is stored, and the <code>photo</code> field validates that it is an <code>http(s)</code> URL &mdash; so <code>javascript:</code> and <code>data:</code> values cannot be persisted.</li>
+</ul>
+
+<h4>Step 3 &mdash; Find work</h4>
+<ul>
+  <li><code>GET /api/tuitions</code> with filters, or <code>GET /api/tuitions/recommended</code>, which scores open tuitions against his own subjects (+2), preferred areas (+1) and class levels (+1) and returns the top six.</li>
+</ul>
+
+<h4>Step 4 &mdash; Apply</h4>
+<ul>
+  <li><code>POST /api/applications</code>. The chain is <code>verifyToken &rarr; loadUser &rarr; requireRole('tutor') &rarr; rate limit</code>, then two checks: <strong>his phone must be a valid BD mobile</strong>, and the tuition must still be open.</li>
+  <li>A unique index on <code>{tuition, tutor}</code> prevents double-applying; the duplicate-key error is translated to a friendly 409.</li>
+  <li><strong>Limit:</strong> 30 applications per hour.</li>
+</ul>
+
+<h4>Step 5 &mdash; Track it, or withdraw</h4>
+<ul>
+  <li><code>GET /api/applications/mine</code> feeds a four-stage timeline: Applied &rarr; Viewed &rarr; Decision &rarr; Outcome, using <code>createdAt</code>, <code>viewedAt</code> and <code>decidedAt</code>.</li>
+  <li>While an application is still <code>pending</code> he can withdraw it: <code>DELETE /api/applications/:id</code>. Once a decision has been made the endpoint refuses with a 400 explaining why &mdash; the outcome is part of the guardian's record and the tuition may already be closed against it.</li>
+</ul>
+
+<h4>Step 6 &mdash; Handle a contact request</h4>
+<ul>
+  <li>A guardian who has not hired him may still ask for his number. <code>GET /api/contact-requests/incoming</code> lists those; <code>PATCH /api/contact-requests/:id</code> approves or declines.</li>
+  <li>Approving is what releases his phone and email to that one seeker &mdash; nobody else.</li>
+</ul>
 
 <div class="card card-green">
-  <h4>Overall Security Rating: <span class="badge badge-info">GOOD for a University Project</span></h4>
-  <p>The application demonstrates strong security awareness with Firebase-based authentication, server-side token verification, role-based access control, privacy-gated contact sharing, and proper CORS configuration. Several areas can be improved for production readiness.</p>
+  <h4>The invariant behind both journeys</h4>
+  <p>Every privacy and trust decision is enforced <strong>on the server, by deleting fields from the response</strong> &mdash; never by hiding them in the UI. The client's own checks exist to keep the interface honest; they are not the security boundary. A user reading the raw API responses sees exactly what a user reading the rendered page sees.</p>
 </div>
 
-<h3>9.1 Security Strengths</h3>
+<h3>4.3 What happens when things go wrong</h3>
+
+<table>
+  <tr><th>Situation</th><th>Response</th><th>Where</th></tr>
+  <tr><td>No token on a protected route</td><td>401 "No auth token provided"</td><td><code>verifyToken</code></td></tr>
+  <tr><td>Expired or forged token</td><td>401 "Invalid or expired token"</td><td><code>verifyToken</code></td></tr>
+  <tr><td>Token valid, no Mongo profile yet</td><td>404 &rarr; client redirects to <code>/complete-profile</code></td><td><code>loadUser</code></td></tr>
+  <tr><td>Account restricted by an admin</td><td>403 on authenticated routes; treated as logged-out on public ones</td><td><code>loadUser</code> / <code>optionalAuth</code></td></tr>
+  <tr><td>Wrong role for the action</td><td>403 "Only tutors/seekers can perform this action"</td><td><code>requireRole</code></td></tr>
+  <tr><td>Unconfirmed email on a review or report</td><td>403 with a "check your inbox" message</td><td><code>requireVerifiedEmail</code></td></tr>
+  <tr><td>Acting on someone else's resource</td><td>403 "Not your tuition / application / request"</td><td>Per-route ownership check</td></tr>
+  <tr><td>Malformed ObjectId in the URL</td><td>400 "Invalid id"</td><td>Central handler (<code>CastError</code>)</td></tr>
+  <tr><td>Value fails a model rule</td><td>400 naming the offending fields</td><td>Central handler (<code>ValidationError</code>)</td></tr>
+  <tr><td>Body over the route's limit</td><td>413 "Request body too large"</td><td>Central handler</td></tr>
+  <tr><td>Too many requests</td><td>429 with a <code>Retry-After</code> header</td><td><code>rateLimit</code></td></tr>
+  <tr><td>Duplicate application / review / request</td><td>409 with a specific message</td><td>Route catch on error 11000</td></tr>
+  <tr><td>Unexpected server fault</td><td>500 "Server error" in production, real message in dev</td><td>Central handler</td></tr>
+</table>
+<!-- ======================== 5. FEATURES ======================== -->
+<h2 id="features" class="page-break"><span class="num">5</span> Features &amp; How They Work</h2>
+
+<h3>5.1 Authentication System</h3>
+<p>Firebase Authentication handles identity; the server verifies tokens with the Firebase Admin SDK and keeps its own user profile keyed by <code>firebaseUid</code>.</p>
+<p><strong>Flows supported:</strong> email/password signup with verification, Google sign-in (one-tap popup), password reset by email, and email-verification resend.</p>
+<p><strong>How a request is authenticated:</strong> the Axios interceptor in <code>api/client.js</code> calls <code>auth.currentUser.getIdToken()</code> before every request and sets the <code>Authorization: Bearer</code> header. Firebase refreshes the token transparently when it nears expiry, so a long session never breaks.</p>
+
+<h3>5.2 Two-Role System</h3>
+<p>One <code>User</code> collection serves both roles, with tutor-only fields left empty for seekers. The role is chosen at signup, validated server-side, and drives route access, dashboard layout, and which actions the API will accept.</p>
+
+<h3>5.3 Tuition Posting &amp; Application Flow</h3>
+<p>Seekers post; tutors apply; seekers accept or reject. Accepting closes the tuition. Tutors may withdraw while pending. Covered step by step in &sect;4.</p>
+
+<h3>5.4 Advanced Filtering</h3>
+<p>Both directories filter on subject (multi-select), class level, area, salary range, mode and gender preference; tutors additionally on minimum rating and verified status. Every value is coerced through <code>utils/sanitize.js</code> before it reaches Mongo.</p>
+<p>Free-text search runs over a small set of fields with a regex that is escaped and length-capped &mdash; see &sect;11.</p>
+
+<h3>5.5 Privacy-Gated Contact System</h3>
+<p>A tutor's phone and email are never in a public listing. A seeker requests contact; the tutor approves or declines; only an approved request reveals the details, and only to that seeker.</p>
+<p>Implementation: <code>PRIVATE_FIELDS = '-phone -email'</code> on list queries, and a <code>publicTutor()</code> helper that deletes both fields unless the viewer is the tutor themselves or a seeker with an approved request. The response also carries <code>contactVisible</code> so the UI knows which state to render.</p>
+
+<h3>5.6 Review &amp; Rating System</h3>
+<p>Seekers rate tutors 1&ndash;5 with an optional comment; tutors may reply once per review. Aggregates are denormalised onto the user document for fast sorting.</p>
+<p><strong>Reviews must be earned</strong> &mdash; see &sect;6.1, which is the single most important rule in the system.</p>
+
+<h3>5.7 Reporting &amp; Trust/Safety</h3>
+<p>Any confirmed-email user can report a profile or a tuition with a reason and optional details. Reports land in the admin queue as <code>open</code> and move to <code>reviewed</code> or <code>dismissed</code>. Limit: 10 per hour.</p>
+
+<h3>5.8 Admin Panel</h3>
+<p>Admins are identified by email against <code>ADMIN_EMAILS</code>. They can grant or revoke the verified badge, restrict or unrestrict any user, work the report queue, and read the analytics dashboard. All admin routes sit behind <code>verifyToken &rarr; loadUser &rarr; requireAdmin</code> applied at the router level, so no individual route can forget it.</p>
+
+<h3>5.9 Email Verification &amp; Password Recovery</h3>
+<p>Verification mail is sent at signup and can be resent from a dashboard banner. <code>/auth/action</code> handles Firebase's callback for both verification and password reset in one page. The server syncs <code>emailVerified</code> from the token on every <code>GET /api/users/me</code>.</p>
+
+<h3>5.10 Responsive UI &amp; Design System</h3>
+<p>Mobile-first Tailwind with a custom <code>brand</code> palette, shared utility classes (<code>card</code>, <code>input</code>, <code>btn-primary</code>, <code>chip</code>, <code>badge</code>), skeleton loaders, empty states with a suggested next action, and toast notifications for every mutation.</p>
+
+<h3>5.11 Dark Mode</h3>
+<p><code>ThemeContext</code> stores the choice in <code>localStorage</code> and toggles a <code>dark</code> class on <code>&lt;html&gt;</code>; Tailwind's class strategy does the rest. Every surface has a dark variant.</p>
+
+<h3>5.12 Pagination</h3>
+<p>Public listings default to 12 per page and cap at 50. Admin tables default to 25 and cap at 100. All paginated endpoints return the same envelope:</p>
+<pre><code>{ "data": [ ... ], "page": 1, "totalPages": 4, "total": 43 }</code></pre>
+
+<h3>5.13 Search</h3>
+<p>Tuitions search across title, description and subjects; tutors across name, university, department and subjects. Terms are regex-escaped and capped at 80 characters.</p>
+
+<h3>5.14 Bookmarks &mdash; Tuitions and Tutors</h3>
+<p>Two parallel models with the same shape. Both toggle on POST, both have a unique compound index, and both expose a <code>/check</code> endpoint so a listing page can mark saved items in one round trip.</p>
+
+<h3>5.15 Profile Photo Upload</h3>
+<p>Proxied through the API to keep the imgbb key server-side. Covered in &sect;4.2.</p>
+
+<h3>5.16 Edit / Delete Tuitions</h3>
+<p>Owners may edit any of the nine content fields, or delete. <strong>Deletion cascades</strong> &mdash; applications, bookmarks and reports for that tuition are removed in one <code>Promise.all</code> before the document itself, so no orphan rows remain.</p>
+
+<h3>5.17 Analytics Dashboard</h3>
+<p>Fourteen aggregations in a single <code>Promise.all</code>: user/tuition/application counts by state, signups and posts per week over eight weeks, and the top ten subjects and areas. Rendered with Recharts on a lazy-loaded page.</p>
+
+<h3>5.18 Tuition Recommendations</h3>
+<p>Scored against the tutor's own profile: subject match +2, area +1, class level +1. Top six returned. Returns an empty array rather than an error for a tutor who has not filled in a profile yet.</p>
+
+<h3>5.19 Application Tracking Timeline</h3>
+<p>Applied &rarr; Viewed &rarr; Decision &rarr; Outcome, driven by <code>createdAt</code>, <code>viewedAt</code> and <code>decidedAt</code>. The "Viewed" stamp is set when the guardian opens the applicant list, which is honest about what it means: seen, not judged.</p>
+
+<h3>5.20 Guardian Management &amp; User Restriction</h3>
+<p>Admins can restrict any user. A restricted account is refused on every authenticated route and is treated as anonymous on public ones, so a ban is not partially escapable.</p>
+
+<h3>5.21 Application Withdrawal</h3>
+<p>A tutor can withdraw a <code>pending</code> application. Accepted or rejected ones cannot be withdrawn &mdash; that outcome belongs to the guardian's record.</p>
+
+<!-- ======================== 6. TRUST & SAFETY ======================== -->
+<h2 id="trust" class="page-break"><span class="num">6</span> Trust &amp; Safety Rules</h2>
+
+<p>These are the rules that make the marketplace worth trusting. Each is enforced in the API, and each is covered by the test suite.</p>
+
+<h3>6.1 A review must be earned</h3>
+
 <div class="card card-green">
-  <h4>What the project does well:</h4>
-  <ul>
-    <li><strong>Server-side token verification</strong> &mdash; Every protected endpoint verifies the Firebase ID token on the server using Firebase Admin SDK. Tokens cannot be forged.</li>
-    <li><strong>Role-based access control</strong> &mdash; Both client-side (<code>ProtectedRoute</code>) and server-side (<code>requireRole</code>, <code>requireAdmin</code>) guards enforce role restrictions.</li>
-    <li><strong>Privacy-gated contact info</strong> &mdash; Tutor phone/email are stripped from API responses unless the viewer has an approved contact request. The <code>publicTutor()</code> function and <code>PRIVATE_FIELDS</code> projection enforce this.</li>
-    <li><strong>Ownership checks</strong> &mdash; Update/delete operations verify the requesting user owns the resource (e.g., "Not your tuition").</li>
-    <li><strong>Unique constraints</strong> &mdash; Compound indexes prevent duplicate applications, reviews, and contact requests.</li>
-    <li><strong>CORS configured</strong> &mdash; The server restricts the <code>Access-Control-Allow-Origin</code> to the client URL.</li>
-    <li><strong>Environment variables for secrets</strong> &mdash; MongoDB URI, Firebase credentials, and admin emails are in <code>.env</code> (not hardcoded).</li>
-    <li><strong>.env files excluded from git</strong> &mdash; The <code>.gitignore</code> properly excludes <code>.env</code> files; only <code>.env.example</code> templates are tracked.</li>
-    <li><strong>Whitelisted field updates</strong> &mdash; <code>PUT /users/me</code> only accepts a specific list of editable fields, preventing privilege escalation (can't change <code>role</code>, <code>isVerified</code>, etc.).</li>
-    <li><strong>Error handling</strong> &mdash; Central error handler catches and logs errors without leaking stack traces to clients.</li>
-    <li><strong>Enum validation</strong> &mdash; Mongoose schemas use enums to constrain field values.</li>
-  </ul>
+  <h4>The rule</h4>
+  <p>A seeker may review a tutor only if <strong>one of these is true</strong>:</p>
+  <ol>
+    <li>the tutor was <strong>accepted</strong> on one of that seeker's own tuitions, or</li>
+    <li>the tutor <strong>approved</strong> that seeker's contact request.</li>
+  </ol>
+  <p style="margin-top:8px">Both require an affirmative act <em>by the tutor</em>. Neither can be manufactured by the seeker alone.</p>
 </div>
 
-<h3>9.2 Security Findings</h3>
+<p><strong>Why it matters.</strong> <code>ratingAvg</code> is the primary sort key of the public tutor directory. Without this rule, signup is free and unlimited, so anyone could create throwaway accounts and move a competitor down the listings or their own profile up. The unique index only stops <em>one account</em> from reviewing twice; it does nothing against ten accounts.</p>
 
-<!-- Finding 1 -->
-<div class="card card-red">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-critical">CRITICAL</span>
-    <strong>Real credentials in local .env files</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/.env</code>, <code>client/.env</code></p>
-  <p><strong>Issue:</strong> The local <code>.env</code> files contain real production credentials (MongoDB Atlas password, Firebase private key, Firebase API key). While these are NOT tracked in git (correctly excluded by <code>.gitignore</code>), if the repository is ever shared, copied, or backed up with these files included, all credentials would be exposed.</p>
-  <p><strong>Impact:</strong> An attacker with the MongoDB URI could read/write/delete all database records. The Firebase private key could be used to impersonate any user.</p>
-  <p><strong>Recommendation:</strong></p>
-  <ul>
-    <li>Rotate all credentials immediately if you suspect they've been shared</li>
-    <li>Never copy <code>.env</code> files when sharing the project</li>
-    <li>Use environment-specific credential management (Vercel env vars for production)</li>
-    <li>Consider IP-whitelisting the MongoDB Atlas cluster</li>
-  </ul>
-</div>
+<p><strong>Where it lives.</strong> <code>server/utils/engagement.js</code>, called from two places:</p>
+<ul>
+  <li><code>POST /api/reviews</code> &mdash; enforcement. Returns 403 with an explanation if it fails.</li>
+  <li><code>GET /api/users/tutors/:id</code> &mdash; returns <code>canReview</code> so the UI can show the reason instead of a form that would be rejected on submit.</li>
+</ul>
 
-<!-- Finding 2 -->
+<pre><code>// The two proofs, both requiring a tutor-side action.
+const myTuitionIds = await Tuition.find({ createdBy: seekerId }).distinct('_id');
+
+if (myTuitionIds.length) {
+  const accepted = await Application.exists({
+    tutor: tutorId,
+    tuition: { $in: myTuitionIds },   // scoped to the seeker's OWN posts
+    status: 'accepted',
+  });
+  if (accepted) return true;
+}
+
+return Boolean(await ContactRequest.exists({
+  tutor: tutorId, seeker: seekerId, status: 'approved',
+}));</code></pre>
+
 <div class="card card-amber">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-medium">MEDIUM</span>
-    <strong>Regex injection via name search</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/routes/users.js:114</code></p>
-  <p><strong>Issue:</strong> The tutor search uses <code>{ $regex: q, $options: 'i' }</code> where <code>q</code> comes directly from user input. Malicious regex patterns (e.g., <code>((((((((((a])*)*)*)*)*)*)*)*)*)*</code>) can cause catastrophic backtracking (ReDoS), hanging the server.</p>
-  <p><strong>Recommendation:</strong> Escape the user input before using it in a regex, or use MongoDB's <code>$text</code> index for full-text search.</p>
-  <pre>// Fix: escape regex special characters
-const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-filter.name = { $regex: escaped, $options: 'i' };</pre>
+  <h4>This rule is retroactive</h4>
+  <p>Reviews written before it existed remain visible. Some of their authors could not post them today. If the data matters for a demo, it is worth a look.</p>
 </div>
 
-<!-- Finding 3 -->
-<div class="card card-amber">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-medium">MEDIUM</span>
-    <strong>Mass assignment on tuition creation</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/routes/tuitions.js:51</code></p>
-  <p><strong>Issue:</strong> <code>Tuition.create({ ...req.body, createdBy: req.dbUser._id })</code> spreads the entire request body into the document. While Mongoose schema validation will reject unknown fields, a user could potentially set <code>status: 'closed'</code> or override <code>createdBy</code> (though the explicit <code>createdBy</code> overrides it).</p>
-  <p><strong>Recommendation:</strong> Destructure only the expected fields from <code>req.body</code>, similar to the profile update endpoint.</p>
+<h3>6.2 Reviews and reports require a confirmed email</h3>
+<p>Both actions run through <code>requireVerifiedEmail</code>. This is what makes &sect;6.1 expensive to work around at scale: a throwaway account now costs a real, reachable mailbox.</p>
+<p>The middleware trusts the <strong>live token</strong> first and falls back to the stored mirror, so a user who has just clicked the verification link is not rejected by a stale database field.</p>
+<p>Posting a tuition and applying are deliberately <em>not</em> gated this way &mdash; that would add friction to the core marketplace loop for little gain, since those actions are already role-limited and rate-limited.</p>
+
+<h3>6.3 Applying requires a real Bangladeshi mobile number</h3>
+<p>Hiring here ends on a phone call. A guardian who accepts a tutor with no number has hired nobody, and that dead application clutters their list.</p>
+<p><code>utils/phone.js</code> validates <code>01</code> + operator digit <code>3&ndash;9</code> + 8 digits, and a Mongoose setter normalises the spellings people actually type:</p>
+<table>
+  <tr><th>Typed</th><th>Stored</th></tr>
+  <tr><td><code>01712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>+8801712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>8801712345678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>017 1234 5678</code></td><td><code>01712345678</code></td></tr>
+  <tr><td><code>017-1234-5678</code></td><td><code>01712345678</code></td></tr>
+</table>
+<p>The profile field itself stays optional &mdash; the gate is at the point it matters, so browsing tutors are not forced through a form they do not need yet. The dashboard shows an amber notice so nobody discovers the requirement only at the moment they try to apply.</p>
+
+<h3>6.4 A ban applies everywhere</h3>
+<p><code>loadUser</code> refuses restricted users with a 403. <code>optionalAuth</code> &mdash; used by the public tutor and tuition detail pages &mdash; loads the same user but <strong>does not attach it</strong> if restricted, so a banned seeker is treated as an anonymous visitor and loses any contact access an earlier approval had granted.</p>
+
+<h3>6.5 Contact details are removed, not hidden</h3>
+<p>Every path that could expose a phone or email deletes the field server-side before responding: tutor listings, tutor detail, tuition detail (poster's phone), applicant lists (until accepted), and the seeker's own contact-request list (until approved).</p>
+
+<h3>6.6 Server-controlled fields are never taken from the body</h3>
+<p>Every write route copies from an explicit whitelist. <code>isVerified</code>, <code>restricted</code>, <code>ratingAvg</code>, <code>ratingCount</code>, <code>emailVerified</code>, <code>status</code>, <code>createdBy</code> and all timestamps are set by the server or an admin, and appear in no whitelist.</p>
+
+<h3>6.7 Rate limits</h3>
+<table>
+  <tr><th>Action</th><th>Limit</th><th>Window</th></tr>
+  <tr><td>Any API request (backstop)</td><td>200</td><td>1 minute</td></tr>
+  <tr><td>Post a tuition</td><td>10</td><td>1 minute</td></tr>
+  <tr><td>Upload a photo</td><td>10</td><td>1 minute</td></tr>
+  <tr><td>Apply to a tuition</td><td>30</td><td>1 hour</td></tr>
+  <tr><td>Request contact</td><td>20</td><td>1 hour</td></tr>
+  <tr><td>Post a review</td><td>15</td><td>1 hour</td></tr>
+  <tr><td>File a report</td><td>10</td><td>1 hour</td></tr>
+</table>
+<p>Authenticated requests are keyed by user id, anonymous ones by forwarded IP. The limiter is in-memory, which on serverless means per-instance &mdash; enough to stop a single client hammering an endpoint, not a substitute for a shared store at scale. This is a documented trade-off, not an oversight.</p>
+
+<h3>6.8 Input bounds</h3>
+<table>
+  <tr><th>Field</th><th>Bound</th></tr>
+  <tr><td>Name</td><td>100 characters</td></tr>
+  <tr><td>Bio</td><td>2,000 characters</td></tr>
+  <tr><td>University / department</td><td>150 characters each</td></tr>
+  <tr><td>Tuition title</td><td>150 characters</td></tr>
+  <tr><td>Tuition description</td><td>3,000 characters</td></tr>
+  <tr><td>Review comment / reply</td><td>2,000 characters each</td></tr>
+  <tr><td>Application message</td><td>2,000 characters</td></tr>
+  <tr><td>Contact-request message</td><td>1,000 characters</td></tr>
+  <tr><td>Report reason / details</td><td>100 / 2,000 characters</td></tr>
+  <tr><td>Subjects, class levels, areas (tutor)</td><td>&le; 50 entries, each from the option list</td></tr>
+  <tr><td>Subjects (tuition)</td><td>1&ndash;20 entries, each from the option list</td></tr>
+  <tr><td>Salary</td><td>&#2547;500 &ndash; &#2547;100,000 per month</td></tr>
+  <tr><td>Days per week</td><td>1&ndash;7</td></tr>
+  <tr><td>Rating</td><td>1&ndash;5</td></tr>
+  <tr><td>Photo URL</td><td>Must be <code>http(s)</code></td></tr>
+  <tr><td>Upload size</td><td>3&nbsp;MB decoded</td></tr>
+</table>
+<p>Client inputs carry matching <code>maxLength</code> attributes, so the browser prevents overflow before a request is ever sent and the server cap is a backstop rather than a surprise.</p>
+<!-- ======================== 7. DATA MODELS ======================== -->
+<h2 id="data-models" class="page-break"><span class="num">7</span> Database Schema &amp; Data Models</h2>
+
+<p>Eight Mongoose models. Every one carries <code>timestamps: true</code>, so <code>createdAt</code> and <code>updatedAt</code> exist throughout and are not listed individually below.</p>
+
+<div class="arch-diagram">
+                        +-------------+
+                        |    User     |
+                        | tutor|seeker|
+                        +------+------+
+         createdBy /           |            \ tutor
+                  /            | author      \
+        +--------v-----+  +----v-----+  +-----v--------+
+        |   Tuition    |  |  Review  |  | ContactRequest|
+        +------+-------+  +----------+  +---------------+
+               | tuition
+        +------v-------+
+        | Application  |----> tutor (User)
+        +--------------+
+
+   Bookmark (user -> tuition)      TutorBookmark (user -> tutor)
+   Report   (reporter -> targetId, targetType: user|tuition)
 </div>
 
-<!-- Finding 4 -->
-<div class="card card-amber">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-medium">MEDIUM</span>
-    <strong>No rate limiting</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/index.js</code></p>
-  <p><strong>Issue:</strong> The API has no rate limiting middleware. This makes it vulnerable to brute-force attacks, scraping, and abuse of write endpoints (spamming reports, reviews, applications).</p>
-  <p><strong>Recommendation:</strong> Add <code>express-rate-limit</code> middleware, especially on auth-related and write endpoints.</p>
-  <pre>import rateLimit from 'express-rate-limit';
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-app.use('/api', limiter);</pre>
+<h3>7.1 User</h3>
+<p>One collection for both roles; tutor fields stay empty for seekers.</p>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>firebaseUid</code></td><td>String</td><td>Required, unique, indexed &mdash; the link to Firebase</td></tr>
+  <tr><td><code>name</code></td><td>String</td><td>Required, trimmed, &le; 100</td></tr>
+  <tr><td><code>email</code></td><td>String</td><td>Required, lowercased. <strong>From the token only</strong>; not editable</td></tr>
+  <tr><td><code>role</code></td><td>String</td><td><code>tutor</code> | <code>seeker</code>, required</td></tr>
+  <tr><td><code>phone</code></td><td>String</td><td>Normalised BD mobile; optional, but required to apply</td></tr>
+  <tr><td><code>photo</code></td><td>String</td><td>Must be an <code>http(s)</code> URL if present</td></tr>
+  <tr><td><code>gender</code></td><td>String</td><td><code>male</code> | <code>female</code> | <code>''</code></td></tr>
+  <tr><td><code>university</code>, <code>department</code></td><td>String</td><td>&le; 150 each (tutor)</td></tr>
+  <tr><td><code>subjects</code></td><td>[String]</td><td>&le; 50, each from the subject list</td></tr>
+  <tr><td><code>classLevels</code></td><td>[String]</td><td>&le; 50, each from the class-level list</td></tr>
+  <tr><td><code>preferredAreas</code></td><td>[String]</td><td>&le; 50, each from the area list</td></tr>
+  <tr><td><code>expectedSalary</code></td><td>Number</td><td>0 &ndash; 100,000 BDT/month</td></tr>
+  <tr><td><code>mode</code></td><td>String</td><td><code>home</code> | <code>online</code> | <code>both</code> | <code>''</code></td></tr>
+  <tr><td><code>bio</code></td><td>String</td><td>&le; 2,000</td></tr>
+  <tr><td><code>ratingAvg</code>, <code>ratingCount</code></td><td>Number</td><td><strong>Server-computed</strong> from reviews</td></tr>
+  <tr><td><code>isVerified</code></td><td>Boolean</td><td><strong>Admin-granted</strong> after checking a student ID</td></tr>
+  <tr><td><code>emailVerified</code></td><td>Boolean</td><td>Mirror of the Firebase token claim</td></tr>
+  <tr><td><code>restricted</code></td><td>Boolean</td><td><strong>Admin-set</strong>; blocks the account</td></tr>
+</table>
+
+<h3>7.2 Tuition</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>title</code></td><td>String</td><td>Required, &le; 150</td></tr>
+  <tr><td><code>classLevel</code></td><td>String</td><td>Required, enum of the BD class list</td></tr>
+  <tr><td><code>subjects</code></td><td>[String]</td><td>1&ndash;20, each from the subject list</td></tr>
+  <tr><td><code>area</code></td><td>String</td><td>Required, enum of the Chittagong area list</td></tr>
+  <tr><td><code>salary</code></td><td>Number</td><td>Required, &#2547;500&ndash;100,000/month</td></tr>
+  <tr><td><code>daysPerWeek</code></td><td>Number</td><td>1&ndash;7, default 3</td></tr>
+  <tr><td><code>mode</code></td><td>String</td><td><code>home</code> | <code>online</code></td></tr>
+  <tr><td><code>genderPreference</code></td><td>String</td><td><code>male</code> | <code>female</code> | <code>any</code></td></tr>
+  <tr><td><code>description</code></td><td>String</td><td>&le; 3,000</td></tr>
+  <tr><td><code>status</code></td><td>String</td><td><code>open</code> | <code>closed</code>. <strong>Server-controlled</strong></td></tr>
+  <tr><td><code>createdBy</code></td><td>ObjectId</td><td>&rarr; User, required, indexed. <strong>Server-set</strong></td></tr>
+</table>
+
+<h3>7.3 Application</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>tuition</code></td><td>ObjectId</td><td>&rarr; Tuition, indexed</td></tr>
+  <tr><td><code>tutor</code></td><td>ObjectId</td><td>&rarr; User, indexed</td></tr>
+  <tr><td><code>message</code></td><td>String</td><td>&le; 2,000</td></tr>
+  <tr><td><code>status</code></td><td>String</td><td><code>pending</code> | <code>accepted</code> | <code>rejected</code></td></tr>
+  <tr><td><code>viewedAt</code></td><td>Date</td><td>Set when the guardian opens the applicant list</td></tr>
+  <tr><td><code>decidedAt</code></td><td>Date</td><td>Set on accept/reject</td></tr>
+</table>
+<p><strong>Unique index</strong> on <code>{tuition, tutor}</code> &mdash; one application per tutor per tuition.</p>
+
+<h3>7.4 Review</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>tutor</code></td><td>ObjectId</td><td>&rarr; User, indexed</td></tr>
+  <tr><td><code>author</code></td><td>ObjectId</td><td>&rarr; User (the seeker)</td></tr>
+  <tr><td><code>authorName</code></td><td>String</td><td>Snapshot at write time, &le; 100</td></tr>
+  <tr><td><code>rating</code></td><td>Number</td><td>Required, 1&ndash;5</td></tr>
+  <tr><td><code>comment</code></td><td>String</td><td>&le; 2,000</td></tr>
+  <tr><td><code>reply</code>, <code>replyAt</code></td><td>String, Date</td><td>Tutor's response, &le; 2,000</td></tr>
+</table>
+<p><strong>Unique index</strong> on <code>{tutor, author}</code>. Writing one requires passing the engagement rule in &sect;6.1.</p>
+
+<h3>7.5 ContactRequest</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>tutor</code>, <code>seeker</code></td><td>ObjectId</td><td>&rarr; User, both indexed</td></tr>
+  <tr><td><code>message</code></td><td>String</td><td>&le; 1,000</td></tr>
+  <tr><td><code>status</code></td><td>String</td><td><code>pending</code> | <code>approved</code> | <code>declined</code></td></tr>
+</table>
+<p><strong>Unique index</strong> on <code>{tutor, seeker}</code>. An <code>approved</code> row is what releases contact details &mdash; and one of the two proofs of engagement.</p>
+
+<h3>7.6 Report</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Rules</th></tr>
+  <tr><td><code>reporter</code></td><td>ObjectId</td><td>&rarr; User</td></tr>
+  <tr><td><code>targetType</code></td><td>String</td><td><code>user</code> | <code>tuition</code></td></tr>
+  <tr><td><code>targetId</code></td><td>ObjectId</td><td>Indexed</td></tr>
+  <tr><td><code>reason</code></td><td>String</td><td>Required, &le; 100</td></tr>
+  <tr><td><code>details</code></td><td>String</td><td>&le; 2,000</td></tr>
+  <tr><td><code>status</code></td><td>String</td><td><code>open</code> | <code>reviewed</code> | <code>dismissed</code></td></tr>
+</table>
+
+<h3>7.7 Bookmark &amp; 7.8 TutorBookmark</h3>
+<p>Identical shape: <code>user</code> plus the saved <code>tuition</code> or <code>tutor</code>, each with a unique compound index so a double POST toggles rather than duplicates. Tuition bookmarks are cleaned up when the tuition is deleted.</p>
+
+<!-- ======================== 8. API REFERENCE ======================== -->
+<h2 id="api" class="page-break"><span class="num">8</span> API Endpoints Reference</h2>
+
+<p>Base URL <code>/api</code>. <strong>41 endpoints</strong> across 10 modules. "Auth" gives the required chain; list endpoints return the <code>{data, page, totalPages, total}</code> envelope and accept <code>?page=</code> and <code>?limit=</code>.</p>
+
+<h3>8.1 Users &mdash; <code>/api/users</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/register</code></td><td>Token</td><td>Create the Mongo profile after Firebase signup. Email and UID come from the token</td></tr>
+  <tr><td>GET</td><td><code>/me</code></td><td>User</td><td>Own profile; syncs <code>emailVerified</code>, adds <code>isAdmin</code></td></tr>
+  <tr><td>PUT</td><td><code>/me</code></td><td>User</td><td>Update own profile (12 whitelisted fields)</td></tr>
+  <tr><td>GET</td><td><code>/tutors</code></td><td>Public</td><td>Filterable tutor directory, contact fields stripped</td></tr>
+  <tr><td>GET</td><td><code>/tutors/:id</code></td><td>Optional</td><td>Tutor + up to 20 reviews + <code>requestStatus</code> + <code>canReview</code></td></tr>
+</table>
+
+<h3>8.2 Tuitions &mdash; <code>/api/tuitions</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/</code></td><td>Public</td><td>Filterable list; defaults to open posts</td></tr>
+  <tr><td>GET</td><td><code>/mine/posted</code></td><td>User</td><td>Own posts</td></tr>
+  <tr><td>GET</td><td><code>/recommended</code></td><td>Tutor</td><td>Top 6 scored against the tutor's profile</td></tr>
+  <tr><td>GET</td><td><code>/:id</code></td><td>Optional</td><td>Single tuition; poster's phone only for the owner</td></tr>
+  <tr><td>POST</td><td><code>/</code></td><td>Seeker</td><td>Create a post (10/min)</td></tr>
+  <tr><td>PATCH</td><td><code>/:id/status</code></td><td>Owner</td><td>Open/close; refuses reopen if a tutor is accepted</td></tr>
+  <tr><td>GET</td><td><code>/:id/applications</code></td><td>Owner</td><td>Applicants; phones hidden until accepted</td></tr>
+  <tr><td>PUT</td><td><code>/:id</code></td><td>Owner</td><td>Edit the nine content fields</td></tr>
+  <tr><td>DELETE</td><td><code>/:id</code></td><td>Owner</td><td>Delete, cascading applications, bookmarks and reports</td></tr>
+</table>
+
+<h3>8.3 Applications &mdash; <code>/api/applications</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/</code></td><td>Tutor</td><td>Apply. <strong>Requires a valid BD phone</strong> (30/hr)</td></tr>
+  <tr><td>GET</td><td><code>/mine</code></td><td>Tutor</td><td>Own applications with populated tuitions</td></tr>
+  <tr><td>PATCH</td><td><code>/:id</code></td><td>Owner</td><td>Accept or reject; accepting closes the tuition</td></tr>
+  <tr><td>DELETE</td><td><code>/:id</code></td><td>Tutor</td><td>Withdraw while still pending</td></tr>
+</table>
+
+<h3>8.4 Reviews &mdash; <code>/api/reviews</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/</code></td><td>Seeker + verified</td><td><strong>Requires engagement</strong> (&sect;6.1). Recomputes aggregates (15/hr)</td></tr>
+  <tr><td>GET</td><td><code>/tutor/:id</code></td><td>Public</td><td>Paginated reviews for a tutor</td></tr>
+  <tr><td>PATCH</td><td><code>/:id/reply</code></td><td>Reviewed tutor</td><td>Reply to a review</td></tr>
+</table>
+
+<h3>8.5 Contact Requests &mdash; <code>/api/contact-requests</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/</code></td><td>Seeker</td><td>Ask a tutor for contact (20/hr)</td></tr>
+  <tr><td>GET</td><td><code>/incoming</code></td><td>Tutor</td><td>Requests received</td></tr>
+  <tr><td>GET</td><td><code>/mine</code></td><td>Seeker</td><td>Requests sent; contact hidden unless approved</td></tr>
+  <tr><td>PATCH</td><td><code>/:id</code></td><td>Tutor</td><td>Approve or decline</td></tr>
+</table>
+
+<h3>8.6 Reports &mdash; <code>/api/reports</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/</code></td><td>User + verified</td><td>Flag a profile or tuition (10/hr)</td></tr>
+</table>
+
+<h3>8.7 Admin &mdash; <code>/api/admin</code></h3>
+<p>Every route below sits behind <code>verifyToken &rarr; loadUser &rarr; requireAdmin</code>, applied once at the router level.</p>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/tutors</code></td><td>Paginated tutors with verification and restriction state</td></tr>
+  <tr><td>GET</td><td><code>/guardians</code></td><td>Paginated seekers</td></tr>
+  <tr><td>PATCH</td><td><code>/users/:id/restrict</code></td><td>Restrict or unrestrict any user</td></tr>
+  <tr><td>PATCH</td><td><code>/tutors/:id/verify</code></td><td>Grant or revoke the verified badge</td></tr>
+  <tr><td>GET</td><td><code>/reports</code></td><td>Paginated reports, optional whitelisted status filter</td></tr>
+  <tr><td>PATCH</td><td><code>/reports/:id</code></td><td>Move a report to reviewed or dismissed</td></tr>
+  <tr><td>GET</td><td><code>/analytics</code></td><td>14 aggregations for the dashboard</td></tr>
+</table>
+
+<h3>8.8 Bookmarks &mdash; <code>/api/bookmarks</code> and <code>/api/tutor-bookmarks</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/:tuitionId</code> / <code>/:tutorId</code></td><td>Toggle a bookmark</td></tr>
+  <tr><td>GET</td><td><code>/</code></td><td>List saved items, populated</td></tr>
+  <tr><td>GET</td><td><code>/check</code></td><td>Which of the given ids are saved</td></tr>
+</table>
+
+<h3>8.9 Uploads &mdash; <code>/api/uploads</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>POST</td><td><code>/photo</code></td><td>User</td><td>Proxy a base64 image to imgbb, 3&nbsp;MB cap (10/min)</td></tr>
+</table>
+
+<h3>8.10 Health</h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/api/health</code></td><td><code>{ ok: true, service: 'tuitionify-api' }</code></td></tr>
+</table>
+<!-- ======================== 9. AUTH ======================== -->
+<h2 id="auth" class="page-break"><span class="num">9</span> Authentication &amp; Authorization</h2>
+
+<h3>9.1 The full authentication flow</h3>
+<div class="flow-diagram">
+  <span class="flow-step">Firebase login</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">ID token</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Axios attaches</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Admin SDK verifies</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Load Mongo user</span><span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Guards</span>
 </div>
 
-<!-- Finding 5 -->
-<div class="card card-amber">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-medium">MEDIUM</span>
-    <strong>No input sanitization for stored text</strong>
-  </div>
-  <p><strong>Location:</strong> All routes accepting user text (titles, descriptions, bios, messages, reviews)</p>
-  <p><strong>Issue:</strong> User-submitted text (tuition titles, descriptions, bio, review comments, application messages) is stored as-is in MongoDB and rendered in React. While React auto-escapes JSX content (preventing XSS), the data could be problematic if ever rendered in non-React contexts (email notifications, server-rendered pages, admin exports).</p>
-  <p><strong>Recommendation:</strong> Add a sanitization layer (e.g., <code>xss</code> or <code>sanitize-html</code>) for stored user text as a defense-in-depth measure.</p>
+<ol>
+  <li>The user signs in; Firebase issues a signed JWT holding <code>uid</code>, <code>email</code> and <code>email_verified</code>.</li>
+  <li><code>onAuthStateChanged</code> in <code>AuthContext</code> fires, and the app fetches <code>GET /api/users/me</code> for the Mongo profile that carries the role.</li>
+  <li>Every subsequent request goes through the Axios interceptor, which calls <code>getIdToken()</code> &mdash; refreshing transparently if needed &mdash; and sets the Bearer header.</li>
+  <li>The server verifies the signature with the Firebase Admin SDK. A forged or expired token fails here with a 401.</li>
+</ol>
+
+<h3>9.2 The middleware chain</h3>
+<table>
+  <tr><th>Middleware</th><th>Responsibility</th><th>Failure</th></tr>
+  <tr><td><code>verifyToken</code></td><td>Verify the Bearer token, attach <code>req.firebaseUser</code></td><td>401</td></tr>
+  <tr><td><code>loadUser</code></td><td>Load the Mongo profile into <code>req.dbUser</code>; reject restricted accounts</td><td>404 / 403</td></tr>
+  <tr><td><code>optionalAuth</code></td><td>Attach the user if a valid token is present; <strong>skip restricted users</strong>; never reject</td><td>&mdash;</td></tr>
+  <tr><td><code>requireRole(r)</code></td><td>Require <code>tutor</code> or <code>seeker</code></td><td>403</td></tr>
+  <tr><td><code>requireVerifiedEmail</code></td><td>Require a confirmed address; live token first, stored mirror as fallback</td><td>403</td></tr>
+  <tr><td><code>requireAdmin</code></td><td>Match the user's email against <code>ADMIN_EMAILS</code>, case-insensitively</td><td>403</td></tr>
+</table>
+
+<p>Typical composition, from the review route:</p>
+<pre><code>router.post('/',
+  verifyToken,             // is this a real, current token?
+  loadUser,                // who are they, and are they banned?
+  requireRole('seeker'),   // only guardians review tutors
+  requireVerifiedEmail,    // a throwaway account should cost a mailbox
+  rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }),
+  handler,                 // ...which then checks hasEngagement()
+);</code></pre>
+
+<h3>9.3 Client-side route protection</h3>
+<p><code>ProtectedRoute</code> handles four states: still loading (spinner), signed in without a profile (redirect to <code>/complete-profile</code>), signed out (redirect to <code>/login</code> carrying the intended destination), and wrong role or non-admin (redirect to <code>/dashboard</code>).</p>
+
+<div class="card card-blue">
+  <h4>The client guard is convenience, not security</h4>
+  <p><code>ProtectedRoute</code> stops a user wandering into a page that will not work for them. It is <strong>not</strong> what protects the data &mdash; every one of those routes is independently enforced server-side. Disabling the client check in a browser console reveals nothing: the API still answers 401 or 403.</p>
 </div>
 
-<!-- Finding 6 -->
-<div class="card">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-low">LOW</span>
-    <strong>No request body size limit</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/index.js:22</code></p>
-  <p><strong>Issue:</strong> <code>express.json()</code> defaults to a 100KB body limit, which is reasonable. However, explicitly setting it and adding validation for field lengths (e.g., max bio length, max description length) would be more robust.</p>
-  <p><strong>Recommendation:</strong> Add <code>express.json({ limit: '100kb' })</code> explicitly and add Mongoose <code>maxlength</code> validators to string fields.</p>
+<!-- ======================== 10. FRONTEND ======================== -->
+<h2 id="client" class="page-break"><span class="num">10</span> Frontend Structure &amp; Components</h2>
+
+<h3>10.1 Pages (14)</h3>
+<table>
+  <tr><th>Page</th><th>Route</th><th>Access</th><th>Purpose</th></tr>
+  <tr><td>Home</td><td><code>/</code></td><td>Public</td><td>Hero, search entry, featured tutors, how-it-works</td></tr>
+  <tr><td>Login</td><td><code>/login</code></td><td>Public</td><td>Email/password and Google, with password reset</td></tr>
+  <tr><td>Register</td><td><code>/register</code></td><td>Public</td><td>Signup with role selection</td></tr>
+  <tr><td>CompleteProfile</td><td><code>/complete-profile</code></td><td>Signed in</td><td>Finish registration when a Firebase user has no profile</td></tr>
+  <tr><td>AuthAction</td><td><code>/auth/action</code></td><td>Public</td><td>Firebase callback for verification and password reset</td></tr>
+  <tr><td>Tuitions</td><td><code>/tuitions</code></td><td>Public</td><td>Filterable tuition listing</td></tr>
+  <tr><td>TuitionDetails</td><td><code>/tuitions/:id</code></td><td>Public</td><td>Full post; apply box for tutors</td></tr>
+  <tr><td>Tutors</td><td><code>/tutors</code></td><td>Public</td><td>Filterable tutor directory</td></tr>
+  <tr><td>TutorProfile</td><td><code>/tutors/:id</code></td><td>Public</td><td>Profile, reviews, contact gate, review form when eligible</td></tr>
+  <tr><td>PostTuition</td><td><code>/post-tuition</code></td><td>Seeker</td><td>Create a post</td></tr>
+  <tr><td>EditTuition</td><td><code>/edit-tuition/:id</code></td><td>Seeker</td><td>Edit or delete a post</td></tr>
+  <tr><td>Dashboard</td><td><code>/dashboard</code></td><td>Signed in</td><td>Role-aware home: posts and applicants, or applications and requests</td></tr>
+  <tr><td>Admin</td><td><code>/admin</code></td><td>Admin</td><td>Verification, restriction, reports, analytics</td></tr>
+  <tr><td>NotFound</td><td><code>*</code></td><td>Public</td><td>404</td></tr>
+</table>
+<p>All 14 are lazy-loaded in <code>App.jsx</code>, so Recharts ships only when an admin opens the dashboard rather than to every visitor.</p>
+
+<h3>10.2 Components (17)</h3>
+<div class="feature-grid">
+  <div class="feature-item"><h4>Navbar / Footer</h4><p>Responsive shell with role-aware links and the theme toggle.</p></div>
+  <div class="feature-item"><h4>ProtectedRoute</h4><p>Four-state route guard (see &sect;9.3).</p></div>
+  <div class="feature-item"><h4>TuitionCard / TutorCard</h4><p>Listing cards with bookmark toggle and key facts.</p></div>
+  <div class="feature-item"><h4>FilterSidebar</h4><p>Every filter, driven by the shared option lists.</p></div>
+  <div class="feature-item"><h4>Pagination</h4><p>Shared control for the paginated envelope.</p></div>
+  <div class="feature-item"><h4>StarRating</h4><p><code>StarInput</code> for writing, <code>StarDisplay</code> for reading.</p></div>
+  <div class="feature-item"><h4>PhotoUpload</h4><p>Type and size checks, base64 conversion, proxied upload.</p></div>
+  <div class="feature-item"><h4>TutorProfileForm</h4><p>Full tutor profile editor with option chips and length caps.</p></div>
+  <div class="feature-item"><h4>ReportModal</h4><p>Reason picker plus optional details.</p></div>
+  <div class="feature-item"><h4>ConfirmModal</h4><p>Destructive-action confirmation with configurable labels.</p></div>
+  <div class="feature-item"><h4>CardSkeleton / Spinner</h4><p>Loading states that match final layout.</p></div>
+  <div class="feature-item"><h4>EmptyState</h4><p>Empty result with a suggested next action.</p></div>
+  <div class="feature-item"><h4>VerifiedBadge / Logo</h4><p>Trust marker and brand mark.</p></div>
 </div>
 
-<!-- Finding 7 -->
-<div class="card">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-low">LOW</span>
-    <strong>Missing security headers</strong>
-  </div>
-  <p><strong>Location:</strong> <code>server/index.js</code></p>
-  <p><strong>Issue:</strong> The API doesn't set security headers like <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>Strict-Transport-Security</code>, etc.</p>
-  <p><strong>Recommendation:</strong> Add the <code>helmet</code> middleware for automatic security headers.</p>
-  <pre>import helmet from 'helmet';
-app.use(helmet());</pre>
-</div>
+<h3>10.3 State management</h3>
+<p>Two contexts, no external state library. <code>AuthContext</code> owns the Firebase user, the Mongo profile, and the derived <code>isTutor</code> / <code>isSeeker</code> / <code>isAdmin</code> flags. <code>ThemeContext</code> owns dark mode. Everything else is local component state &mdash; appropriate at this size, and it keeps the data flow readable.</p>
 
-<!-- Finding 8 -->
-<div class="card">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <span class="badge badge-low">LOW</span>
-    <strong>No pagination on list endpoints</strong>
-  </div>
-  <p><strong>Location:</strong> All <code>GET</code> list endpoints</p>
-  <p><strong>Issue:</strong> Tutor/tuition list endpoints return all matching results without pagination. With a large dataset, this could lead to slow responses and high memory usage.</p>
-  <p><strong>Status:</strong> <span class="badge badge-low">FIXED</span> &mdash; Server-side pagination with <code>page</code>/<code>limit</code> query params has been added to tuition and tutor listing endpoints. See Section 4.12.</p>
-</div>
+<!-- ======================== 11. SECURITY ======================== -->
+<h2 id="security" class="page-break"><span class="num">11</span> Security Analysis &amp; Report</h2>
 
-<h3>9.3 Security Summary Table</h3>
+<h3>11.1 What the project does well</h3>
+<ul>
+  <li><strong>No password ever touches this system.</strong> Firebase owns credentials; there is no hash in this database to leak.</li>
+  <li><strong>Mass assignment is closed everywhere.</strong> Every write copies from an explicit whitelist, so <code>isVerified</code>, <code>restricted</code>, <code>ratingAvg</code>, <code>status</code> and <code>createdBy</code> cannot be set by a crafted body.</li>
+  <li><strong>Identity comes from the token.</strong> Email is read from the verified JWT and is not editable, which is what keeps <code>ADMIN_EMAILS</code> meaningful.</li>
+  <li><strong>NoSQL injection is systematically handled.</strong> <code>utils/sanitize.js</code> coerces every query value to a scalar, so <code>?area[$ne]=x</code> becomes an empty string instead of a Mongo operator.</li>
+  <li><strong>Regex search is escaped and capped</strong>, closing both a 500-on-<code>(</code> crash and a ReDoS vector.</li>
+  <li><strong>Ownership is re-checked on every mutating route</strong>, never inferred from the client.</li>
+  <li><strong>PII is deleted server-side</strong> rather than hidden in the UI.</li>
+  <li><strong>The imgbb key stays on the server.</strong> A <code>VITE_*</code> variable would have been inlined into the public bundle.</li>
+  <li><strong>Errors do not leak internals</strong> &mdash; <code>CastError</code> and <code>ValidationError</code> are translated, and 500 text is suppressed in production.</li>
+  <li><strong>CSRF is structurally absent.</strong> Auth rides in an <code>Authorization</code> header, not a cookie, so a third-party page cannot make an authenticated request on the user's behalf.</li>
+</ul>
+
+<h3>11.2 Findings from the security review, and their resolution</h3>
+
+<p>A full review was carried out across the API, the models and the client. Findings and outcomes:</p>
+
 <table>
   <tr><th>#</th><th>Finding</th><th>Severity</th><th>Status</th></tr>
-  <tr><td>1</td><td>Real credentials in local .env files</td><td><span class="badge badge-critical">CRITICAL</span></td><td>Mitigated (.gitignore)</td></tr>
-  <tr><td>2</td><td>Regex injection in name search</td><td><span class="badge badge-medium">MEDIUM</span></td><td>Open</td></tr>
-  <tr><td>3</td><td>Mass assignment on tuition creation</td><td><span class="badge badge-medium">MEDIUM</span></td><td>Open</td></tr>
-  <tr><td>4</td><td>No rate limiting</td><td><span class="badge badge-medium">MEDIUM</span></td><td>Open</td></tr>
-  <tr><td>5</td><td>No input sanitization</td><td><span class="badge badge-medium">MEDIUM</span></td><td>Partially mitigated (React)</td></tr>
-  <tr><td>6</td><td>No explicit body size limit</td><td><span class="badge badge-low">LOW</span></td><td>Open</td></tr>
-  <tr><td>7</td><td>Missing security headers</td><td><span class="badge badge-low">LOW</span></td><td>Open</td></tr>
-  <tr><td>8</td><td>No pagination</td><td><span class="badge badge-low">LOW</span></td><td>Fixed</td></tr>
+  <tr><td>1</td><td>Any seeker could rate any tutor with no prior interaction</td><td><span class="badge badge-high">High</span></td><td>Fixed &mdash; engagement rule (&sect;6.1)</td></tr>
+  <tr><td>2</td><td><code>emailVerified</code> was stored but never enforced</td><td><span class="badge badge-medium">Medium</span></td><td>Fixed &mdash; required for reviews and reports</td></tr>
+  <tr><td>3</td><td>Restricted users kept contact access via <code>optionalAuth</code></td><td><span class="badge badge-medium">Medium</span></td><td>Fixed &mdash; ban now applies on public routes</td></tr>
+  <tr><td>4</td><td><code>fast-xml-parser</code> DoS advisory (transitive)</td><td><span class="badge badge-low">Low</span></td><td>Patched 5.9.3 &rarr; 5.10.1</td></tr>
+  <tr><td>5</td><td>Admin report filter passed raw query input to Mongo</td><td><span class="badge badge-low">Low</span></td><td>Fixed &mdash; whitelisted via <code>asEnum</code></td></tr>
+  <tr><td>6</td><td>Unbounded free-text fields</td><td><span class="badge badge-low">Low</span></td><td>Fixed &mdash; caps on every field (&sect;6.8)</td></tr>
+  <tr><td>7</td><td><code>photo</code> accepted any URL scheme</td><td><span class="badge badge-low">Low</span></td><td>Fixed &mdash; <code>http(s)</code> only</td></tr>
+  <tr><td>8</td><td>Option values not validated server-side</td><td><span class="badge badge-low">Low</span></td><td>Fixed &mdash; enforced against the shared lists</td></tr>
+  <tr><td>9</td><td>Admin and review listings unbounded</td><td><span class="badge badge-low">Low</span></td><td>Fixed &mdash; paginated</td></tr>
+  <tr><td>10</td><td>CORS falls back to <code>*</code> if <code>CLIENT_URL</code> is unset</td><td><span class="badge badge-info">Info</span></td><td>Boot-time warning added</td></tr>
 </table>
 
-<!-- ======================== 10. DEPLOYMENT ======================== -->
-<h2 id="deployment" class="page-break"><span class="num">10</span> Deployment Guide</h2>
+<h3>11.3 Two findings assessed and deliberately not "fixed"</h3>
 
-<h3>10.1 Architecture</h3>
-<p>Tuitionify deploys as <strong>two separate Vercel projects</strong> from a single repository:</p>
+<div class="card">
+  <h4>The admin query filter was never exploitable</h4>
+  <p>It was reported first as a high-severity injection. On inspection it sits behind <code>requireAdmin</code>, and an admin can already list every report by omitting the filter &mdash; there is no privilege boundary to cross. It was corrected for consistency with the sanitizer discipline used everywhere else, not because it was a hole.</p>
+</div>
+
+<div class="card">
+  <h4>The <code>uuid</code> advisory is not reachable</h4>
+  <p><code>npm audit</code> reports a bounds-check issue in <code>uuid</code>, reached through <code>firebase-admin</code>. It only triggers when a <code>buf</code> argument is supplied, which <code>firebase-admin</code> never does. Fixing it requires a breaking major upgrade for no security gain, so it is knowingly left in place.</p>
+</div>
+
+<h3>11.4 Known, accepted limitations</h3>
+
+<div class="card card-amber">
+  <h4>A ban does not survive a new signup</h4>
+  <p><code>restricted</code> is a flag on a Mongo document, not on a person. A banned user can register a fresh email and return as a new account. This cannot be closed in application code &mdash; the address must also be disabled in the Firebase console. It is the one gap the review could not resolve.</p>
+</div>
+
+<div class="card card-amber">
+  <h4>Rate limits are per-instance</h4>
+  <p>The limiter holds counters in memory, so on Vercel each serverless instance counts separately. It stops a single client hammering an endpoint; it is not a strict global limit. A shared store such as Redis would be required for that.</p>
+</div>
+
+<div class="card card-amber">
+  <h4>Admin actions are not audited</h4>
+  <p>Restricting a user or dismissing a report leaves no record of who acted or when. With several addresses in <code>ADMIN_EMAILS</code> this is a real gap for a trust-and-safety surface, and it is the first thing worth building next.</p>
+</div>
+
+<h3>11.5 Overall assessment</h3>
+<div class="card card-green">
+  <p>The security model is sound and, importantly, <strong>defence-in-depth rather than perimeter-only</strong>: the client hides what a user should not act on, the API refuses what a user may not do, and the schema refuses what should never be stored. Each layer holds on its own.</p>
+  <p style="margin-top:8px">The highest-value fix was not a classic vulnerability at all &mdash; it was the review-engagement rule. No attacker tooling is needed to farm ratings with free accounts, and ratings are what the entire directory ranks on. That is the kind of flaw that matters most in a marketplace, and it is now closed and covered by tests.</p>
+</div>
+
+<!-- ======================== 12. TESTING ======================== -->
+<h2 id="testing" class="page-break"><span class="num">12</span> Testing</h2>
+
+<p><strong>72 tests across 5 files</strong>, run with Vitest. No database or network is required, so the suite finishes in roughly a second.</p>
+
+<pre><code>cd server
+npm test          # single run
+npm run test:watch</code></pre>
+
 <table>
-  <tr><th>Project</th><th>Root Directory</th><th>Framework</th><th>URL Pattern</th></tr>
-  <tr><td>API (server)</td><td><code>server/</code></td><td>Other (Node.js)</td><td><code>api.tuitionify.vercel.app</code></td></tr>
-  <tr><td>Client</td><td><code>client/</code></td><td>Vite</td><td><code>tuitionify.vercel.app</code></td></tr>
+  <tr><th>File</th><th>Tests</th><th>Covers</th></tr>
+  <tr><td><code>engagement.test.js</code></td><td>9</td><td>Who may review a tutor &mdash; including that a <em>pending</em> application or an <em>unapproved</em> request does not qualify, and that the check is scoped to the seeker's own tuitions</td></tr>
+  <tr><td><code>auth.test.js</code></td><td>16</td><td>All six guards, including that <code>optionalAuth</code> refuses to attach a restricted user</td></tr>
+  <tr><td><code>models.test.js</code></td><td>21</td><td>Photo scheme, phone normalisation, option whitelists, salary and day bounds, rating range, length caps</td></tr>
+  <tr><td><code>phone.test.js</code></td><td>14</td><td>Every BD operator prefix, all accepted spellings, and the rejections</td></tr>
+  <tr><td><code>sanitize.test.js</code></td><td>12</td><td>Injection shapes, numeric coercion, regex escaping and ReDoS</td></tr>
 </table>
 
-<h3>10.2 Server Deployment</h3>
-<div class="card">
-  <ol>
-    <li>Import the repository into Vercel</li>
-    <li>Set <strong>Root Directory</strong> to <code>server</code></li>
-    <li>Set <strong>Framework Preset</strong> to <code>Other</code></li>
-    <li>Add all environment variables from <code>server/.env.example</code></li>
-    <li>Set <code>CLIENT_URL</code> to the client's deployed URL</li>
-    <li>The <code>vercel.json</code> in <code>server/</code> configures the Node.js serverless function and rewrites all routes to <code>index.js</code></li>
-  </ol>
+<h3>12.1 The suite was checked against deliberate regressions</h3>
+
+<p>A passing test proves nothing unless it can fail. Both critical protections were removed on purpose to confirm the suite notices:</p>
+
+<table>
+  <tr><th>Protection removed</th><th>Result</th></tr>
+  <tr><td>The <code>restricted</code> check in <code>optionalAuth</code></td><td>1 test failed, naming the exact behaviour</td></tr>
+  <tr><td>Both <code>status</code> filters in <code>hasEngagement</code></td><td>2 tests failed &mdash; the pending and unapproved cases</td></tr>
+</table>
+
+<p>The source was restored and the suite returned to green. The engagement rule and the phone gate were additionally verified end-to-end against a live MongoDB: a stranger cannot review, a seeker who merely posted a tuition cannot, a pending application does not unlock it, an accepted one does and only for that seeker, and off-list subjects and malformed phones are rejected on save rather than merely in validation.</p>
+
+<div class="card card-blue">
+  <h4>What is not covered</h4>
+  <p>There are no HTTP-level route tests and no frontend tests. The suite deliberately targets the logic where a silent regression would do real damage &mdash; authorization and validation &mdash; rather than chasing a coverage percentage. Route-level tests with <code>supertest</code> and an in-memory MongoDB are the natural next step.</p>
+</div>
+<!-- ======================== 13. DEPLOYMENT ======================== -->
+<h2 id="deployment" class="page-break"><span class="num">13</span> Deployment Guide</h2>
+
+<h3>13.1 Architecture</h3>
+<p>One repository, two Vercel projects. The client builds as a static Vite site; the API runs as a serverless function. They are deployed separately and point at each other by URL.</p>
+
+<div class="arch-diagram">
+   GitHub repo (one)
+        |
+        +-- Vercel project #1 -- root: client/ -- Vite  --> tuitionify.vercel.app
+        |
+        +-- Vercel project #2 -- root: server/ -- Node  --> tuitionify-api.vercel.app
+                                                              |
+                                            MongoDB Atlas  <--+-->  Firebase Admin
 </div>
 
-<h3>10.3 Client Deployment</h3>
-<div class="card">
-  <ol>
-    <li>Import the repository again (or configure a second project)</li>
-    <li>Set <strong>Root Directory</strong> to <code>client</code></li>
-    <li>Set <strong>Framework Preset</strong> to <code>Vite</code></li>
-    <li>Add all <code>VITE_*</code> environment variables from <code>client/.env.example</code></li>
-    <li>Set <code>VITE_API_URL</code> to <code>https://&lt;your-api-url&gt;/api</code></li>
-    <li>The <code>vercel.json</code> in <code>client/</code> rewrites all routes to <code>index.html</code> for SPA routing</li>
-  </ol>
+<h3>13.2 API deployment</h3>
+<ol>
+  <li>Import the repository into Vercel; set <strong>Root Directory</strong> to <code>server</code> and the framework preset to <strong>Other</strong>.</li>
+  <li>Add every variable from <code>server/.env</code>. Paste <code>FIREBASE_PRIVATE_KEY</code> with its <code>\n</code> sequences intact &mdash; <code>config/firebase.js</code> converts them back to real newlines.</li>
+  <li>Deploy, then confirm <code>/api/health</code> returns <code>{ ok: true }</code>.</li>
+  <li>Once the client is live, set <code>CLIENT_URL</code> to its URL and redeploy so CORS narrows from the <code>*</code> fallback.</li>
+</ol>
+
+<table>
+  <tr><th>Variable</th><th>Purpose</th></tr>
+  <tr><td><code>MONGODB_URI</code></td><td>Atlas connection string</td></tr>
+  <tr><td><code>FIREBASE_PROJECT_ID</code></td><td>From the service-account JSON</td></tr>
+  <tr><td><code>FIREBASE_CLIENT_EMAIL</code></td><td>From the service-account JSON</td></tr>
+  <tr><td><code>FIREBASE_PRIVATE_KEY</code></td><td>From the service-account JSON, <code>\n</code> preserved</td></tr>
+  <tr><td><code>ADMIN_EMAILS</code></td><td>Comma-separated admin addresses</td></tr>
+  <tr><td><code>IMGBB_API_KEY</code></td><td>Image host key &mdash; <strong>server-side only</strong></td></tr>
+  <tr><td><code>CLIENT_URL</code></td><td>CORS origin; falls back to <code>*</code> with a warning if unset</td></tr>
+</table>
+
+<h3>13.3 Client deployment</h3>
+<ol>
+  <li>Import the same repository again; set <strong>Root Directory</strong> to <code>client</code>, preset <strong>Vite</strong>.</li>
+  <li>Add the six <code>VITE_FIREBASE_*</code> values plus <code>VITE_API_URL</code> pointing at <code>&lt;your-api-url&gt;/api</code>.</li>
+  <li><code>client/vercel.json</code> already rewrites all paths to <code>index.html</code> so client-side routing survives a page refresh.</li>
+</ol>
+
+<div class="card card-amber">
+  <h4>What belongs in a <code>VITE_*</code> variable &mdash; and what never does</h4>
+  <p>Anything prefixed <code>VITE_</code> is <strong>compiled into the public JavaScript bundle</strong> and is readable by any visitor. The Firebase web config belongs there: it is public by design, and Firebase security rules plus authorised domains are what actually protect the project. The imgbb key does <strong>not</strong> belong there, which is exactly why uploads are proxied through the API.</p>
 </div>
 
-<h3>10.4 Firebase Configuration</h3>
-<div class="card">
-  <ul>
-    <li>Add the client's deployed domain to <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong></li>
-    <li>If using custom domain, add it as well</li>
-    <li>Ensure Email/Password and Google sign-in providers are enabled</li>
-  </ul>
+<h3>13.4 Firebase configuration</h3>
+<ol>
+  <li>Authentication &rarr; enable <strong>Email/Password</strong> and <strong>Google</strong>.</li>
+  <li>Project settings &rarr; register a Web app and copy the config into the client variables.</li>
+  <li>Service accounts &rarr; generate a private key for the three server variables.</li>
+  <li><strong>Add the deployed client domain under Authentication &rarr; Settings &rarr; Authorized domains</strong>, or Google sign-in fails in production while working locally.</li>
+</ol>
+
+<h3>13.5 MongoDB Atlas</h3>
+<ol>
+  <li>Create a free cluster and a database user.</li>
+  <li>Network Access: allow <code>0.0.0.0/0</code>, since Vercel's serverless IPs are not fixed.</li>
+  <li>Copy the driver connection string into <code>MONGODB_URI</code>.</li>
+</ol>
+<p>The connection is cached across invocations in <code>config/db.js</code>, and the cache is cleared on failure so a transient outage does not poison every later request.</p>
+
+<h3>13.6 Local development</h3>
+<pre><code># install both halves
+npm run install:all
+
+# configure
+cp server/.env.example server/.env     # fill in
+cp client/.env.example client/.env     # fill in
+
+# optional demo data
+npm run seed
+
+# two terminals
+npm run dev:server    # http://localhost:5000
+npm run dev:client    # http://localhost:5173
+
+# before committing
+cd server &amp;&amp; npm test</code></pre>
+
+<p>Seed data uses <code>seed_</code>-prefixed fake UIDs, so those accounts cannot sign in &mdash; they exist to make listings look populated for a demo. Real accounts come from the signup page.</p>
+
+<!-- ======================== 14. ROADMAP ======================== -->
+<h2 id="recommendations" class="page-break"><span class="num">14</span> Known Limitations &amp; Roadmap</h2>
+
+<h3>14.1 Highest value next</h3>
+
+<table>
+  <tr><th>Item</th><th>Why it matters</th></tr>
+  <tr><td><strong>Admin audit log</strong></td><td>Restrictions and report decisions currently leave no record of who acted. With multiple admins this is the clearest remaining trust-and-safety gap.</td></tr>
+  <tr><td><strong>Route-level tests</strong></td><td>The suite covers logic thoroughly but never exercises a real HTTP request. <code>supertest</code> with an in-memory MongoDB would close that.</td></tr>
+  <tr><td><strong>Firebase-side bans</strong></td><td>Pair a restriction with disabling the Firebase account, so a ban survives a re-signup.</td></tr>
+  <tr><td><strong>Shared-store rate limiting</strong></td><td>Redis or Upstash would make limits global rather than per-instance.</td></tr>
+</table>
+
+<h3>14.2 Product features not yet built</h3>
+<ul>
+  <li><strong>In-app messaging</strong> &mdash; deliberately out of scope; the contact-request flow substitutes for it, and the schema leaves room.</li>
+  <li><strong>Notifications</strong> &mdash; email or in-app alerts when an application is decided or a contact request arrives.</li>
+  <li><strong>Tutor availability calendar</strong> &mdash; days and time slots, so a guardian can match a schedule before applying.</li>
+  <li><strong>Multi-city support</strong> &mdash; the area list is Chittagong-only today; a city dimension would generalise it.</li>
+  <li><strong>Saved searches</strong> &mdash; store a filter set and alert on new matches.</li>
+  <li><strong>Tuition expiry</strong> &mdash; auto-close stale posts so the listing stays current.</li>
+</ul>
+
+<h3>14.3 Engineering improvements</h3>
+<ul>
+  <li><strong>Remove the options duplication</strong> &mdash; a shared workspace package would let both halves import one list, replacing the sync warning in &sect;2.2.</li>
+  <li><strong>Compound indexes</strong> &mdash; the listing sorts (<code>status</code> + <code>createdAt</code>, <code>isVerified</code> + <code>ratingAvg</code> + <code>createdAt</code>) are unindexed and sort in memory. Irrelevant at current scale, worth adding before it is not.</li>
+  <li><strong>Schema validation at the edge</strong> &mdash; Zod or Joi on request bodies would move validation ahead of Mongoose and yield more precise errors.</li>
+  <li><strong>TypeScript</strong> &mdash; would have caught the response-shape change that pagination introduced, at compile time rather than by inspection.</li>
+  <li><strong>Error boundaries</strong> &mdash; a render error currently blanks the page rather than degrading gracefully.</li>
+</ul>
+
+<div class="card card-green">
+  <h4>Closing note</h4>
+  <p>Tuitionify is a complete, working marketplace: two roles, a full hiring loop from post to applicant to accepted tutor to earned review, privacy-gated contact sharing, an admin trust-and-safety surface, and a test suite over the rules that matter. The parts that remain open are documented above rather than left to be discovered &mdash; including the one gap, ban evasion by re-signup, that application code alone cannot close.</p>
 </div>
 
-<h3>10.5 MongoDB Atlas Configuration</h3>
-<div class="card">
-  <ul>
-    <li>Allow Vercel's IP ranges in <strong>Network Access</strong> (or <code>0.0.0.0/0</code> for serverless)</li>
-    <li>The server uses connection caching for serverless (Vercel reuses the process between requests)</li>
-  </ul>
-</div>
-
-<h3>10.6 Local Development</h3>
-<pre>
-# Terminal 1 - Backend
-cd server && npm install && npm run dev    # http://localhost:5000
-
-# Terminal 2 - Frontend
-cd client && npm install && npm run dev    # http://localhost:5173
-
-# Optional: Seed demo data
-cd server && npm run seed
-</pre>
-
-<!-- ======================== 11. RECOMMENDATIONS ======================== -->
-<h2 id="recommendations" class="page-break"><span class="num">11</span> Recommendations & Future Improvements</h2>
-
-<h3>11.1 Security Improvements (Priority)</h3>
-<div class="feature-grid">
-  <div class="feature-item">
-    <h4>Add rate limiting</h4>
-    <p>Use <code>express-rate-limit</code> to prevent brute-force and abuse. Apply stricter limits on auth and write endpoints.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Add helmet</h4>
-    <p>Add <code>helmet</code> middleware for security headers (HSTS, X-Frame-Options, CSP, etc.).</p>
-  </div>
-  <div class="feature-item">
-    <h4>Fix regex injection</h4>
-    <p>Escape user input before using in MongoDB <code>$regex</code> queries. Consider MongoDB text indexes instead.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Sanitize tuition creation</h4>
-    <p>Destructure only expected fields from <code>req.body</code> instead of spreading the entire body.</p>
-  </div>
-</div>
-
-<h3>11.2 Feature Enhancements</h3>
-<div class="feature-grid">
-  <div class="feature-item">
-    <h4>In-app messaging</h4>
-    <p>Add real-time chat between seekers and tutors (WebSocket or Firebase Realtime Database).</p>
-  </div>
-  <div class="feature-item">
-    <h4>Pagination</h4>
-    <p><span class="badge badge-low">DONE</span> Server-side pagination with page/limit params added to tuitions and tutors. See Section 4.12.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Image upload</h4>
-    <p><span class="badge badge-low">DONE</span> Profile photo upload via Firebase Storage replaces the old URL text input. See Section 4.15.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Notifications</h4>
-    <p>Email or push notifications for new applications, contact requests, and accepted applications.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Edit/Delete tuitions</h4>
-    <p><span class="badge badge-low">DONE</span> Seekers can edit tuition details and delete posts with cascade cleanup. See Section 4.16.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Search history & saved tutors</h4>
-    <p><span class="badge badge-low">DONE</span> Bookmark/save tuitions (Section 4.14) and saved tutors (Section 4.18) both implemented. Search filter presets are future work.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Tutor availability calendar</h4>
-    <p>Allow tutors to show available time slots for better scheduling.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Multi-city support</h4>
-    <p>Add a city selector to expand beyond Chittagong to Dhaka, Sylhet, etc.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Analytics Dashboard</h4>
-    <p><span class="badge badge-low">DONE</span> Admin analytics tab with charts, stat cards, top subjects/areas, and CSV export. See Section 4.17.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Tuition Recommendations</h4>
-    <p><span class="badge badge-low">DONE</span> Matching algorithm suggests open tuitions to tutors based on subjects, areas, and class levels. See Section 4.19.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Review Replies</h4>
-    <p><span class="badge badge-low">DONE</span> Tutors can reply to reviews on their profile with a single response per review. See Section 4.20.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Application Tracking Timeline</h4>
-    <p><span class="badge badge-low">DONE</span> Visual timeline showing Applied &rarr; Viewed &rarr; Decision with timestamps for each application. See Section 4.21.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Guardian Management &amp; User Restriction</h4>
-    <p><span class="badge badge-low">DONE</span> Admin can view all guardians and restrict/unrestrict both tutors and guardians. See Section 4.22.</p>
-  </div>
-</div>
-
-<h3>11.3 Code Quality</h3>
-<div class="feature-grid">
-  <div class="feature-item">
-    <h4>Add testing</h4>
-    <p>Unit tests for API routes (Jest + Supertest) and component tests (React Testing Library).</p>
-  </div>
-  <div class="feature-item">
-    <h4>TypeScript migration</h4>
-    <p>Add TypeScript for better developer experience and catch type errors at build time.</p>
-  </div>
-  <div class="feature-item">
-    <h4>API validation</h4>
-    <p>Add request body validation with Joi or Zod for all POST/PUT/PATCH endpoints.</p>
-  </div>
-  <div class="feature-item">
-    <h4>Error boundaries</h4>
-    <p>Add React Error Boundaries to catch rendering errors gracefully.</p>
-  </div>
-</div>
-
-<!-- Footer -->
 <div class="footer">
-  <p><strong>Tuitionify</strong> &mdash; Comprehensive Project Guide & Security Report</p>
-  <p>Generated on July 11, 2026 | Version 1.1.0</p>
-  <p>Made with care for the IIUC community</p>
+  <p><strong>Tuitionify</strong> &mdash; Comprehensive Project Guide &amp; Security Report</p>
+  <p>Version 1.1.0 &middot; August 2026 &middot; Iftaher Sayem</p>
+  <p>Built for the International Islamic University Chittagong community &middot; Made in Bangladesh</p>
 </div>
 
 </div><!-- /container -->
