@@ -165,7 +165,7 @@ export default function TuitionDetails() {
         <div className="card mt-6 p-6">
           <h3 className="font-semibold text-slate-900 dark:text-white">Apply for this tuition</h3>
           <textarea
-            rows={3} className="input mt-3" placeholder="Write a short message to the guardian (optional)…"
+            rows={3} className="input mt-3" maxLength={2000} placeholder="Write a short message to the guardian (optional)…"
             value={message} onChange={(e) => setMessage(e.target.value)}
           />
           <button onClick={apply} disabled={applying} className="btn-primary mt-3">

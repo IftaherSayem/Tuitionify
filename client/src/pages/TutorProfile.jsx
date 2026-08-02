@@ -19,6 +19,7 @@ export default function TutorProfile() {
   const [tutor, setTutor] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [requestStatus, setRequestStatus] = useState(null);
+  const [canReview, setCanReview] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [rating, setRating] = useState(0);
@@ -39,6 +40,7 @@ export default function TutorProfile() {
       setTutor(data.tutor);
       setReviews(data.reviews);
       setRequestStatus(data.requestStatus);
+      setCanReview(Boolean(data.canReview));
     } catch {
       toast.error('Could not load tutor');
     } finally {
@@ -146,22 +148,29 @@ export default function TutorProfile() {
         />
       )}
 
-      {isSeeker && !alreadyReviewed && (
-        <div className="card mt-6 p-6">
-          <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-            <MessageSquarePlus size={18} /> Leave a review
-          </h3>
-          <div className="mt-3">
-            <StarInput value={rating} onChange={setRating} />
+      {isSeeker && !alreadyReviewed && !isOwnProfile && (
+        canReview ? (
+          <div className="card mt-6 p-6">
+            <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+              <MessageSquarePlus size={18} /> Leave a review
+            </h3>
+            <div className="mt-3">
+              <StarInput value={rating} onChange={setRating} />
+            </div>
+            <textarea
+              rows={3} className="input mt-3" maxLength={2000} placeholder="Share your experience with this tutor…"
+              value={comment} onChange={(e) => setComment(e.target.value)}
+            />
+            <button onClick={submitReview} disabled={posting} className="btn-primary mt-3">
+              {posting ? 'Posting…' : 'Post Review'}
+            </button>
           </div>
-          <textarea
-            rows={3} className="input mt-3" placeholder="Share your experience with this tutor…"
-            value={comment} onChange={(e) => setComment(e.target.value)}
-          />
-          <button onClick={submitReview} disabled={posting} className="btn-primary mt-3">
-            {posting ? 'Posting…' : 'Post Review'}
-          </button>
-        </div>
+        ) : (
+          <div className="card mt-6 p-6 text-sm text-slate-500 dark:text-slate-400">
+            You can review this tutor once you have hired them for one of your
+            tuitions, or once they have approved your contact request.
+          </div>
+        )
       )}
 
       <div className="mt-6">
@@ -238,7 +247,7 @@ function ContactSection({ tutor, isSeeker, loggedIn, requestStatus, contactMsg, 
   return (
     <LockedCard>
       <textarea
-        rows={2} className="input mt-3" placeholder="Optional: introduce yourself and your tuition need…"
+        rows={2} className="input mt-3" maxLength={1000} placeholder="Optional: introduce yourself and your tuition need…"
         value={contactMsg} onChange={(e) => setContactMsg(e.target.value)}
       />
       <button onClick={onRequest} disabled={requesting} className="btn-primary mt-3">
@@ -309,7 +318,7 @@ function ReviewCard({ review, isOwnProfile, onReplyPosted }) {
       {showReplyForm && (
         <div className="mt-3">
           <textarea
-            rows={2} className="input text-sm" placeholder="Write your reply…"
+            rows={2} className="input text-sm" maxLength={2000} placeholder="Write your reply…"
             value={replyText} onChange={(e) => setReplyText(e.target.value)}
           />
           <div className="mt-2 flex gap-2">

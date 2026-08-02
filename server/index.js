@@ -22,6 +22,9 @@ const app = express();
 initFirebase();
 
 const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
+if (clientUrl === '*' && process.env.NODE_ENV === 'production') {
+  console.warn('⚠ CLIENT_URL is not set — CORS is open to every origin. Set it to your client domain.');
+}
 app.use(cors({ origin: clientUrl }));
 
 // Base64 photo uploads need a large body, but only on that one route —
@@ -67,7 +70,14 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ message: 'Invalid id' });
   }
   if (err.name === 'ValidationError') {
-    return res.status(400).json({ message: 'Invalid request data' });
+    // Name the offending fields — with length/range caps on the models, a bare
+    // "Invalid request data" leaves the user with no idea what to shorten.
+    const fields = Object.keys(err.errors || {});
+    return res.status(400).json({
+      message: fields.length
+        ? `Invalid request data: ${fields.join(', ')}`
+        : 'Invalid request data',
+    });
   }
   // Body larger than the configured limit.
   if (err.type === 'entity.too.large') {

@@ -9,8 +9,8 @@ const reportSchema = new Schema(
     // What is being reported — a user profile or a tuition post.
     targetType: { type: String, enum: ['user', 'tuition'], required: true },
     targetId: { type: Schema.Types.ObjectId, required: true, index: true },
-    reason: { type: String, required: true },     // short category
-    details: { type: String, default: '' },       // free text
+    reason: { type: String, required: true, maxlength: 100 },     // short category
+    details: { type: String, default: '', maxlength: 2000 },      // free text
     status: { type: String, enum: ['open', 'reviewed', 'dismissed'], default: 'open' },
   },
   { timestamps: true }

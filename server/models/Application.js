@@ -7,7 +7,7 @@ const applicationSchema = new Schema(
   {
     tuition: { type: Schema.Types.ObjectId, ref: 'Tuition', required: true, index: true },
     tutor: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    message: { type: String, default: '' },
+    message: { type: String, default: '', maxlength: 2000 },
     status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
     viewedAt: { type: Date, default: null },
     decidedAt: { type: Date, default: null },

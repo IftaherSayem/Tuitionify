@@ -132,13 +132,24 @@ Base URL: `http://localhost:5000/api`
 | GET  | `/tuitions/mine/posted` | Seeker | My posts |
 | PATCH| `/tuitions/:id/status` | Owner | Open/close |
 | GET  | `/tuitions/:id/applications` | Owner | Applicants |
-| POST | `/applications` | Tutor | Apply to a tuition |
+| POST | `/applications` | Tutor | Apply to a tuition (requires a saved mobile number) |
 | GET  | `/applications/mine` | Tutor | My applications |
 | PATCH| `/applications/:id` | Owner | Accept/reject |
-| POST | `/reviews` | Seeker | Review a tutor |
-| GET  | `/reviews/tutor/:id` | — | Tutor reviews |
+| DELETE| `/applications/:id` | Tutor | Withdraw own application (while pending) |
+| POST | `/reviews` | Seeker | Review a tutor you hired or who approved your contact request |
+| GET  | `/reviews/tutor/:id` | — | Tutor reviews (paginated) |
 
 Protected routes expect a `Authorization: Bearer <firebase-id-token>` header (the frontend attaches this automatically).
+
+List endpoints return `{ data, page, totalPages, total }` and accept `?page=` and `?limit=`.
+
+### Trust & safety rules enforced by the API
+
+- **Reviews require a real engagement** — a seeker may only rate a tutor they accepted on their own tuition, or who approved their contact request. Both need an action by the tutor, so ratings cannot be farmed with throwaway accounts.
+- **Reviews and reports require a confirmed email address.**
+- **Applying requires a valid BD mobile number** (`01XXXXXXXXX`), since hiring here ends on a phone call.
+- **Restricted users are treated as logged-out** everywhere, including on public pages that show extra data to signed-in visitors.
+- **Contact details are removed server-side**, not merely hidden in the UI.
 
 ---
 
@@ -154,8 +165,23 @@ Protected routes expect a `Authorization: Bearer <firebase-id-token>` header (th
 ## 🎨 Customising for your university
 
 - **Areas / thanas** and **subjects / class levels** live in `client/src/data/options.js` — edit these lists to match your city and curriculum.
+  > ⚠ The API validates against the same lists in `server/utils/options.js`. The two files are deliberate duplicates (client and API deploy as separate Vercel projects, so there is no shared import). **Edit both**, or the API will reject values the UI offers.
 - Branding colors are in `client/tailwind.config.js` (`brand` palette).
-- Replace “Your University” placeholders with your institution's name.
+- Replace "Your University" placeholders with your institution's name.
+
+---
+
+## ✅ Tests
+
+The API has a Vitest suite covering the rules that protect the marketplace —
+who may review a tutor, the auth guards, BD phone handling, and the query
+sanitizers. No database required.
+
+```bash
+cd server
+npm test          # single run
+npm run test:watch
+```
 
 ---
 

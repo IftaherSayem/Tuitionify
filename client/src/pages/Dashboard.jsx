@@ -102,6 +102,8 @@ function TutorDashboard() {
   const [requests, setRequests] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [withdrawTarget, setWithdrawTarget] = useState(null);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -122,6 +124,21 @@ function TutorDashboard() {
   }
 
   const pendingCount = requests.filter((r) => r.status === 'pending').length;
+
+  async function withdraw() {
+    if (!withdrawTarget) return;
+    setWithdrawing(true);
+    try {
+      await api.delete(`/applications/${withdrawTarget._id}`);
+      setApps((list) => list.filter((a) => a._id !== withdrawTarget._id));
+      toast.success('Application withdrawn');
+      setWithdrawTarget(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Could not withdraw');
+    } finally {
+      setWithdrawing(false);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -146,6 +163,11 @@ function TutorDashboard() {
         {(!profile.subjects?.length || !profile.preferredAreas?.length) && (
           <p className="mt-4 rounded-lg bg-amber-50 px-4 py-2.5 text-sm text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
             Complete your profile (subjects, areas, salary) so guardians can find you.
+          </p>
+        )}
+        {!profile.phone && (
+          <p className="mt-3 rounded-lg bg-amber-50 px-4 py-2.5 text-sm text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+            Add your mobile number before applying to tuitions — guardians contact tutors by phone.
           </p>
         )}
         {!profile.isVerified && (
@@ -247,6 +269,14 @@ function TutorDashboard() {
                     )}
                   </div>
                   <StatusBadge status={a.status} />
+                  {a.status === 'pending' && (
+                    <button
+                      onClick={() => setWithdrawTarget(a)}
+                      className="text-xs font-medium text-slate-500 underline hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400"
+                    >
+                      Withdraw
+                    </button>
+                  )}
                 </div>
                 <ApplicationTimeline app={a} />
               </div>
@@ -254,6 +284,21 @@ function TutorDashboard() {
           </div>
         )}
       </section>
+
+      <ConfirmModal
+        open={!!withdrawTarget}
+        title="Withdraw application?"
+        message={
+          withdrawTarget?.tuition
+            ? `Your application to "${withdrawTarget.tuition.title}" will be removed. You can apply again while the tuition stays open.`
+            : 'This application will be removed.'
+        }
+        confirmText="Withdraw"
+        busyText="Withdrawing…"
+        busy={withdrawing}
+        onConfirm={withdraw}
+        onClose={() => setWithdrawTarget(null)}
+      />
     </div>
   );
 }

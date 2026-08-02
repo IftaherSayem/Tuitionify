@@ -1,6 +1,6 @@
 import { AlertTriangle, X } from 'lucide-react';
 
-export default function ConfirmModal({ open, onClose, onConfirm, title, message, confirmText = 'Delete', busy }) {
+export default function ConfirmModal({ open, onClose, onConfirm, title, message, confirmText = 'Delete', busyText = 'Deleting…', busy }) {
   if (!open) return null;
 
   return (
@@ -20,7 +20,7 @@ export default function ConfirmModal({ open, onClose, onConfirm, title, message,
         <div className="mt-5 flex justify-end gap-2">
           <button onClick={onClose} className="btn-outline">Cancel</button>
           <button onClick={onConfirm} disabled={busy} className="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-500">
-            {busy ? 'Deleting…' : confirmText}
+            {busy ? busyText : confirmText}
           </button>
         </div>
       </div>

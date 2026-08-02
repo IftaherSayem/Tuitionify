@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import Review from '../models/Review.js';
 import User from '../models/User.js';
-import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { verifyToken, loadUser, requireRole, requireVerifiedEmail } from '../middleware/auth.js';
+import { hasEngagement } from '../utils/engagement.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
@@ -19,12 +20,18 @@ async function recomputeRating(tutorId) {
   });
 }
 
-// POST /api/reviews — seeker reviews a tutor
-router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }), async (req, res, next) => {
+// POST /api/reviews — seeker reviews a tutor they have engaged
+router.post('/', verifyToken, loadUser, requireRole('seeker'), requireVerifiedEmail, rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }), async (req, res, next) => {
   try {
     const { tutorId, rating, comment } = req.body;
     const tutor = await User.findOne({ _id: tutorId, role: 'tutor' });
     if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
+
+    if (!(await hasEngagement(req.dbUser._id, tutor._id))) {
+      return res.status(403).json({
+        message: 'You can only review a tutor you have hired or whose contact request you had approved.',
+      });
+    }
 
     // Guard the rating range here as well as in the schema, so a bad value
     // produces a 400 rather than a 500 from the model validator.
@@ -50,11 +57,18 @@ router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windo
   }
 });
 
-// GET /api/reviews/tutor/:id — reviews for a tutor
+// GET /api/reviews/tutor/:id — reviews for a tutor, newest first.
+// Paginated so a heavily-reviewed tutor cannot return an unbounded response.
 router.get('/tutor/:id', async (req, res, next) => {
   try {
-    const reviews = await Review.find({ tutor: req.params.id }).sort({ createdAt: -1 });
-    res.json(reviews);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const filter = { tutor: req.params.id };
+    const [reviews, total] = await Promise.all([
+      Review.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
+      Review.countDocuments(filter),
+    ]);
+    res.json({ data: reviews, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }

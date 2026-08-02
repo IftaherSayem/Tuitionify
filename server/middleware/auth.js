@@ -51,9 +51,29 @@ export async function optionalAuth(req, res, next) {
   try {
     const decoded = await admin.auth().verifyIdToken(token);
     req.firebaseUser = decoded;
-    req.dbUser = await User.findOne({ firebaseUid: decoded.uid });
+    const user = await User.findOne({ firebaseUid: decoded.uid });
+    // A restricted user is treated as an anonymous visitor here. loadUser
+    // rejects them outright; leaving req.dbUser set on these routes would
+    // still hand them the extra data a logged-in viewer sees — including a
+    // tutor's phone/email via an earlier approved contact request.
+    if (user && !user.restricted) req.dbUser = user;
   } catch {
     // ignore bad/expired tokens — treat as anonymous
+  }
+  next();
+}
+
+// Requires a confirmed email address. Applied to the actions where an
+// unconfirmed throwaway account does the most damage (posting reviews and
+// filing reports), so those cost an attacker a real mailbox each.
+// The live token is authoritative; req.dbUser.emailVerified is only a mirror
+// synced on GET /users/me, so it can lag a just-confirmed address.
+export function requireVerifiedEmail(req, res, next) {
+  const verified = Boolean(req.firebaseUser?.email_verified) || Boolean(req.dbUser?.emailVerified);
+  if (!verified) {
+    return res.status(403).json({
+      message: 'Please confirm your email address first. Check your inbox for the verification link.',
+    });
   }
   next();
 }

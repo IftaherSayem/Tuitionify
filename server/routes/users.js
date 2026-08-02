@@ -4,6 +4,7 @@ import Review from '../models/Review.js';
 import ContactRequest from '../models/ContactRequest.js';
 import { verifyToken, loadUser, optionalAuth } from '../middleware/auth.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
+import { hasEngagement } from '../utils/engagement.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
@@ -179,6 +180,7 @@ router.get('/tutors/:id', optionalAuth, async (req, res, next) => {
     // Decide whether this viewer may see contact info.
     let revealContact = false;
     let requestStatus = null; // 'none' | 'pending' | 'approved' | 'declined'
+    let canReview = false;    // may this viewer post a review for this tutor?
     if (req.dbUser) {
       if (String(req.dbUser._id) === String(tutor._id)) {
         revealContact = true; // tutor viewing themselves
@@ -186,11 +188,27 @@ router.get('/tutors/:id', optionalAuth, async (req, res, next) => {
         const cr = await ContactRequest.findOne({ tutor: tutor._id, seeker: req.dbUser._id });
         requestStatus = cr ? cr.status : 'none';
         revealContact = cr?.status === 'approved';
+        // Mirrors the rule POST /api/reviews enforces, so the client can hide
+        // the review form instead of letting the user write one and be
+        // rejected on submit.
+        canReview = await hasEngagement(req.dbUser._id, tutor._id);
       }
     }
 
-    const reviews = await Review.find({ tutor: tutor._id }).sort({ createdAt: -1 });
-    res.json({ tutor: publicTutor(tutor, { revealContact }), reviews, requestStatus });
+    // Newest 20 inline; reviewTotal lets the client say "showing 20 of N"
+    // and fall back to GET /api/reviews/tutor/:id for the rest.
+    const REVIEW_PREVIEW = 20;
+    const [reviews, reviewTotal] = await Promise.all([
+      Review.find({ tutor: tutor._id }).sort({ createdAt: -1 }).limit(REVIEW_PREVIEW),
+      Review.countDocuments({ tutor: tutor._id }),
+    ]);
+    res.json({
+      tutor: publicTutor(tutor, { revealContact }),
+      reviews,
+      reviewTotal,
+      requestStatus,
+      canReview,
+    });
   } catch (err) {
     next(err);
   }

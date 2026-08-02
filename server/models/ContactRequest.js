@@ -8,7 +8,7 @@ const contactRequestSchema = new Schema(
   {
     tutor: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     seeker: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    message: { type: String, default: '' },
+    message: { type: String, default: '', maxlength: 1000 },
     status: { type: String, enum: ['pending', 'approved', 'declined'], default: 'pending' },
   },
   { timestamps: true }

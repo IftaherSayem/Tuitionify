@@ -71,7 +71,7 @@ export default function PostTuition() {
         <div>
           <label className="label">Title</label>
           <input
-            required className="input" placeholder="e.g. Math tutor needed for Class 9"
+            required className="input" maxLength={150} placeholder="e.g. Math tutor needed for Class 9"
             value={form.title} onChange={(e) => set('title', e.target.value)}
           />
         </div>
@@ -128,7 +128,7 @@ export default function PostTuition() {
         <div>
           <label className="label">Details (optional)</label>
           <textarea
-            rows={4} className="input" placeholder="Timing, expectations, any specific requirements…"
+            rows={4} className="input" maxLength={3000} placeholder="Timing, expectations, any specific requirements…"
             value={form.description} onChange={(e) => set('description', e.target.value)}
           />
         </div>

@@ -150,7 +150,22 @@ router.patch('/:id/status', verifyToken, loadUser, async (req, res, next) => {
     if (String(tuition.createdBy) !== String(req.dbUser._id)) {
       return res.status(403).json({ message: 'Not your tuition' });
     }
-    tuition.status = req.body.status === 'closed' ? 'closed' : 'open';
+    const nextStatus = req.body.status === 'closed' ? 'closed' : 'open';
+
+    // Reopening a post that already has an accepted tutor would leave that
+    // tutor holding an "accepted" application for a live listing, and invite
+    // a second acceptance for the same slot. Make the seeker reject the
+    // standing applicant first, so the tutor sees the decision.
+    if (nextStatus === 'open' && tuition.status === 'closed') {
+      const accepted = await Application.exists({ tuition: tuition._id, status: 'accepted' });
+      if (accepted) {
+        return res.status(409).json({
+          message: 'You already accepted a tutor for this tuition. Reject that applicant first if you want to reopen it.',
+        });
+      }
+    }
+
+    tuition.status = nextStatus;
     await tuition.save();
     res.json(tuition);
   } catch (err) {

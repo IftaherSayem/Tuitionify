@@ -192,7 +192,10 @@ function TutorsTab() {
   const [busy, setBusy] = useState('');
 
   useEffect(() => {
-    api.get('/admin/tutors').then(({ data }) => setTutors(data)).catch(() => toast.error('Failed to load tutors'));
+    // The endpoint is paginated and returns { data, page, totalPages, total }.
+    api.get('/admin/tutors', { params: { limit: 100 } })
+      .then(({ data }) => setTutors(data.data))
+      .catch(() => toast.error('Failed to load tutors'));
   }, []);
 
   async function toggleVerify(t) {
@@ -267,7 +270,9 @@ function GuardiansTab() {
   const [busy, setBusy] = useState('');
 
   useEffect(() => {
-    api.get('/admin/guardians').then(({ data }) => setGuardians(data)).catch(() => toast.error('Failed to load guardians'));
+    api.get('/admin/guardians', { params: { limit: 100 } })
+      .then(({ data }) => setGuardians(data.data))
+      .catch(() => toast.error('Failed to load guardians'));
   }, []);
 
   async function toggleRestrict(g) {
@@ -321,7 +326,9 @@ function ReportsTab() {
   const [busy, setBusy] = useState('');
 
   useEffect(() => {
-    api.get('/admin/reports').then(({ data }) => setReports(data)).catch(() => toast.error('Failed to load reports'));
+    api.get('/admin/reports', { params: { limit: 100 } })
+      .then(({ data }) => setReports(data.data))
+      .catch(() => toast.error('Failed to load reports'));
   }, []);
 
   async function setStatus(r, status) {

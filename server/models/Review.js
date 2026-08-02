@@ -7,10 +7,10 @@ const reviewSchema = new Schema(
   {
     tutor: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    authorName: { type: String, required: true }, // snapshot for display
+    authorName: { type: String, required: true, maxlength: 100 }, // snapshot for display
     rating: { type: Number, required: true, min: 1, max: 5 },
-    comment: { type: String, default: '' },
-    reply: { type: String, default: '' },
+    comment: { type: String, default: '', maxlength: 2000 },
+    reply: { type: String, default: '', maxlength: 2000 },
     replyAt: { type: Date, default: null },
   },
   { timestamps: true }

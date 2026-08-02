@@ -4,19 +4,34 @@ import Tuition from '../models/Tuition.js';
 import Application from '../models/Application.js';
 import Report from '../models/Report.js';
 import { verifyToken, loadUser, requireAdmin } from '../middleware/auth.js';
+import { asEnum } from '../utils/sanitize.js';
 
 const router = Router();
 
 // All routes here require an admin (email listed in ADMIN_EMAILS).
 router.use(verifyToken, loadUser, requireAdmin);
 
+// Shared paging for the admin tables. Same shape the public listings return,
+// so the client can reuse its Pagination component.
+function paging(req, { defaultLimit = 25, maxLimit = 100 } = {}) {
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(maxLimit, Math.max(1, parseInt(req.query.limit) || defaultLimit));
+  return { page, limit, skip: (page - 1) * limit };
+}
+
 // GET /api/admin/tutors — list tutors with verification and restriction status
 router.get('/tutors', async (req, res, next) => {
   try {
-    const tutors = await User.find({ role: 'tutor' })
-      .select('name email university department isVerified restricted ratingAvg createdAt')
-      .sort({ isVerified: 1, createdAt: -1 });
-    res.json(tutors);
+    const { page, limit, skip } = paging(req);
+    const [tutors, total] = await Promise.all([
+      User.find({ role: 'tutor' })
+        .select('name email university department isVerified restricted ratingAvg createdAt')
+        .sort({ isVerified: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments({ role: 'tutor' }),
+    ]);
+    res.json({ data: tutors, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }
@@ -25,10 +40,16 @@ router.get('/tutors', async (req, res, next) => {
 // GET /api/admin/guardians — list seekers (guardians)
 router.get('/guardians', async (req, res, next) => {
   try {
-    const guardians = await User.find({ role: 'seeker' })
-      .select('name email phone restricted createdAt')
-      .sort({ createdAt: -1 });
-    res.json(guardians);
+    const { page, limit, skip } = paging(req);
+    const [guardians, total] = await Promise.all([
+      User.find({ role: 'seeker' })
+        .select('name email phone restricted createdAt')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments({ role: 'seeker' }),
+    ]);
+    res.json({ data: guardians, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }
@@ -63,10 +84,20 @@ router.patch('/tutors/:id/verify', async (req, res, next) => {
 // GET /api/admin/reports — list open reports
 router.get('/reports', async (req, res, next) => {
   try {
-    const reports = await Report.find(req.query.status ? { status: req.query.status } : {})
-      .populate('reporter', 'name email')
-      .sort({ createdAt: -1 });
-    res.json(reports);
+    // Whitelisted rather than passed through: `?status[$ne]=open` would
+    // otherwise reach Mongo as an operator instead of a value.
+    const status = asEnum(req.query.status, ['open', 'reviewed', 'dismissed']);
+    const filter = status ? { status } : {};
+    const { page, limit, skip } = paging(req);
+    const [reports, total] = await Promise.all([
+      Report.find(filter)
+        .populate('reporter', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Report.countDocuments(filter),
+    ]);
+    res.json({ data: reports, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }

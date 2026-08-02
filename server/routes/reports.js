@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import Report from '../models/Report.js';
-import { verifyToken, loadUser } from '../middleware/auth.js';
+import { verifyToken, loadUser, requireVerifiedEmail } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
 // POST /api/reports — any logged-in user flags a profile or tuition
-router.post('/', verifyToken, loadUser, rateLimit({ windowMs: 3_600_000, max: 10, name: 'report' }), async (req, res, next) => {
+router.post('/', verifyToken, loadUser, requireVerifiedEmail, rateLimit({ windowMs: 3_600_000, max: 10, name: 'report' }), async (req, res, next) => {
   try {
     const { targetType, targetId, reason, details } = req.body;
     if (!['user', 'tuition'].includes(targetType)) {

@@ -12,7 +12,7 @@ import Review from './models/Review.js';
 const tutors = [
   {
     firebaseUid: 'seed_tutor_1', name: 'Tanvir Ahmed', email: 'tanvir@example.com', role: 'tutor',
-    gender: 'male', phone: '017xxxxxxxx', university: 'International Islamic University Chittagong',
+    gender: 'male', phone: '01712345671', university: 'International Islamic University Chittagong',
     department: 'Computer Science & Engineering', subjects: ['Math', 'Physics', 'ICT'],
     classLevels: ['Class 9-10', 'HSC'], preferredAreas: ['Kumira', 'GEC'],
     expectedSalary: 6000, mode: 'both', ratingAvg: 4.8, ratingCount: 2, isVerified: true, emailVerified: true,
@@ -21,7 +21,7 @@ const tutors = [
   },
   {
     firebaseUid: 'seed_tutor_2', name: 'Sadia Rahman', email: 'sadia@example.com', role: 'tutor',
-    gender: 'female', phone: '018xxxxxxxx', university: 'International Islamic University Chittagong',
+    gender: 'female', phone: '01812345672', university: 'International Islamic University Chittagong',
     department: 'English', subjects: ['English', 'Bangla'], classLevels: ['Class 6-8', 'Class 9-10'],
     preferredAreas: ['Agrabad', 'Halishahar'], expectedSalary: 5000, mode: 'home', ratingAvg: 4.9, ratingCount: 3, isVerified: true, emailVerified: true,
     bio: 'English literature major. I make grammar and writing simple and fun for school students.',
@@ -29,7 +29,7 @@ const tutors = [
   },
   {
     firebaseUid: 'seed_tutor_3', name: 'Rakib Hasan', email: 'rakib@example.com', role: 'tutor',
-    gender: 'male', phone: '019xxxxxxxx', university: 'International Islamic University Chittagong',
+    gender: 'male', phone: '01912345673', university: 'International Islamic University Chittagong',
     department: 'Electrical & Electronic Engineering', subjects: ['Math', 'Higher Math', 'Physics'],
     classLevels: ['HSC', 'Admission'], preferredAreas: ['Nasirabad', 'Muradpur'],
     expectedSalary: 8000, mode: 'both', ratingAvg: 4.6, ratingCount: 1,
@@ -38,7 +38,7 @@ const tutors = [
   },
   {
     firebaseUid: 'seed_tutor_4', name: 'Nusrat Jahan', email: 'nusrat@example.com', role: 'tutor',
-    gender: 'female', phone: '016xxxxxxxx', university: 'International Islamic University Chittagong',
+    gender: 'female', phone: '01612345674', university: 'International Islamic University Chittagong',
     department: 'Chemistry', subjects: ['Chemistry', 'Biology', 'Science'],
     classLevels: ['Class 9-10', 'HSC'], preferredAreas: ['Khulshi', 'Panchlaish'],
     expectedSalary: 6500, mode: 'home', ratingAvg: 4.7, ratingCount: 2,
@@ -50,11 +50,11 @@ const tutors = [
 const seekers = [
   {
     firebaseUid: 'seed_seeker_1', name: 'Kamal Uddin (Guardian)', email: 'kamal@example.com',
-    role: 'seeker', gender: 'male', phone: '015xxxxxxxx', photo: 'https://i.pravatar.cc/150?img=60',
+    role: 'seeker', gender: 'male', phone: '01512345675', photo: 'https://i.pravatar.cc/150?img=60',
   },
   {
     firebaseUid: 'seed_seeker_2', name: 'Fatema Begum (Guardian)', email: 'fatema@example.com',
-    role: 'seeker', gender: 'female', phone: '013xxxxxxxx', photo: 'https://i.pravatar.cc/150?img=32',
+    role: 'seeker', gender: 'female', phone: '01312345676', photo: 'https://i.pravatar.cc/150?img=32',
   },
 ];
 

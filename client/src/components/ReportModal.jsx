@@ -55,7 +55,7 @@ export default function ReportModal({ open, onClose, targetType, targetId }) {
           <div>
             <label className="label">Details (optional)</label>
             <textarea
-              rows={3} className="input" placeholder="Add anything that helps us review this…"
+              rows={3} className="input" maxLength={2000} placeholder="Add anything that helps us review this…"
               value={details} onChange={(e) => setDetails(e.target.value)}
             />
           </div>

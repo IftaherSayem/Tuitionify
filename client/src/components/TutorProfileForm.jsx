@@ -83,19 +83,19 @@ export default function TutorProfileForm({ onDone }) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="label">Full name</label>
-          <input className="input" value={form.name} onChange={(e) => set('name', e.target.value)} />
+          <input className="input" maxLength={100} value={form.name} onChange={(e) => set('name', e.target.value)} />
         </div>
         <div>
           <label className="label">Phone</label>
-          <input className="input" placeholder="01XXXXXXXXX" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
+          <input className="input" maxLength={30} placeholder="01XXXXXXXXX" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
         </div>
         <div>
           <label className="label">University</label>
-          <input className="input" value={form.university} onChange={(e) => set('university', e.target.value)} />
+          <input className="input" maxLength={150} value={form.university} onChange={(e) => set('university', e.target.value)} />
         </div>
         <div>
           <label className="label">Department</label>
-          <input className="input" value={form.department} onChange={(e) => set('department', e.target.value)} />
+          <input className="input" maxLength={150} value={form.department} onChange={(e) => set('department', e.target.value)} />
         </div>
         <div>
           <label className="label">Gender</label>
@@ -126,7 +126,7 @@ export default function TutorProfileForm({ onDone }) {
       <div>
         <label className="label">Bio</label>
         <textarea
-          rows={4} className="input" placeholder="Tell guardians about your teaching style and experience…"
+          rows={4} className="input" maxLength={2000} placeholder="Tell guardians about your teaching style and experience…"
           value={form.bio} onChange={(e) => set('bio', e.target.value)}
         />
       </div>
