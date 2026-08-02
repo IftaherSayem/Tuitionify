@@ -1,6 +1,6 @@
 # 🎓 Tuitionify
 
-A university-based **tuition marketplace** built for **International Islamic University Chittagong (IIUC)** and the Bangladeshi context. University-student **tutors** offer tuition, while **guardians and students** post tuition requests and hire them.
+A university-based **tuition marketplace** built for **International Islamic University Chittagong (IIUC)**. University-student **tutors** offer tuition, while **guardians and students** post tuition requests and hire them.
 
 Built as a full-stack course project with a professional, responsive UI.
 
