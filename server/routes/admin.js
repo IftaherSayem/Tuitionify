@@ -60,6 +60,12 @@ router.patch('/users/:id/restrict', async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
+    // Every admin route runs loadUser, which 403s a restricted account — so an
+    // admin who restricted themselves would lock themselves out of the panel
+    // permanently, with no way back short of editing the database by hand.
+    if (String(user._id) === String(req.dbUser._id) && Boolean(req.body.restricted)) {
+      return res.status(400).json({ message: 'You cannot restrict your own account.' });
+    }
     user.restricted = Boolean(req.body.restricted);
     await user.save();
     res.json({ _id: user._id, restricted: user.restricted });

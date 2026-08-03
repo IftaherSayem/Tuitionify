@@ -21,10 +21,16 @@ router.post('/', verifyToken, loadUser, requireRole('tutor'), rateLimit({ window
     }
 
     const { tuitionId, message } = req.body;
-    const tuition = await Tuition.findById(tuitionId);
+    const tuition = await Tuition.findById(tuitionId).populate('createdBy', 'restricted');
     if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
     if (tuition.status !== 'open') {
       return res.status(400).json({ message: 'This tuition is closed' });
+    }
+    // Hiding the post from the listings is not enough on its own — this is the
+    // route that actually costs the tutor something, since a restricted
+    // guardian can never log in to read or accept the application.
+    if (tuition.createdBy?.restricted) {
+      return res.status(403).json({ message: 'This tuition is no longer accepting applications' });
     }
 
     const application = await Application.create({

@@ -1,6 +1,11 @@
 import { admin } from '../config/firebase.js';
 import User from '../models/User.js';
 
+// Mongo filter fragment shared by the public listing queries (tutor
+// directory, tuition lists, reviews) so restricted users disappear from
+// public results instead of merely being blocked from acting.
+export const NOT_RESTRICTED = { restricted: { $ne: true } };
+
 // Verifies the Firebase ID token from the Authorization header and
 // attaches the decoded token to req.firebaseUser.
 export async function verifyToken(req, res, next) {

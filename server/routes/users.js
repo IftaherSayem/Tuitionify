@@ -2,7 +2,7 @@ import { Router } from 'express';
 import User from '../models/User.js';
 import Review from '../models/Review.js';
 import ContactRequest from '../models/ContactRequest.js';
-import { verifyToken, loadUser, optionalAuth } from '../middleware/auth.js';
+import { verifyToken, loadUser, optionalAuth, NOT_RESTRICTED } from '../middleware/auth.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { hasEngagement } from '../utils/engagement.js';
 import { rateLimit } from '../middleware/rateLimit.js';
@@ -33,6 +33,13 @@ router.post('/register', verifyToken, async (req, res, next) => {
     const { uid, email, name: tokenName, email_verified } = req.firebaseUser;
     let user = await User.findOne({ firebaseUid: uid });
 
+    // This is the only authenticated route that skips loadUser (the profile
+    // may not exist yet), so the ban has to be repeated here. Without it a
+    // restricted user re-runs signup, gets their profile back in the response,
+    // and lands in a dashboard where every panel 403s.
+    if (user?.restricted) {
+      return res.status(403).json({ message: 'Your account has been restricted by an administrator.' });
+    }
     if (user) return res.json(user); // already registered
 
     const { name, role, phone, photo, gender } = req.body;
@@ -117,7 +124,9 @@ router.put('/me', verifyToken, loadUser, async (req, res, next) => {
 router.get('/tutors', async (req, res, next) => {
   try {
     const { subject, subjects, classLevel, area, gender, mode, minSalary, maxSalary, minRating, q } = req.query;
-    const filter = { role: 'tutor' };
+    // Restricted tutors are hidden from the directory outright — a ban should
+    // remove them from the marketplace, not just stop them from acting.
+    const filter = { role: 'tutor', ...NOT_RESTRICTED };
 
     // All values forced to scalars — `?area[$ne]=x` would otherwise inject
     // a Mongo operator into the filter.
@@ -176,6 +185,14 @@ router.get('/tutors/:id', optionalAuth, async (req, res, next) => {
   try {
     const tutor = await User.findOne({ _id: req.params.id, role: 'tutor' });
     if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
+    // A restricted tutor's profile reads as gone to everyone but themselves,
+    // so old links and bookmarks stop resolving to a banned account.
+    // Keyed off the token's uid, not req.dbUser: optionalAuth deliberately
+    // leaves req.dbUser unset for restricted users, so comparing that would
+    // hide the profile from its own owner too.
+    if (tutor.restricted && req.firebaseUser?.uid !== tutor.firebaseUid) {
+      return res.status(404).json({ message: 'Tutor not found' });
+    }
 
     // Decide whether this viewer may see contact info.
     let revealContact = false;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import TutorBookmark from '../models/TutorBookmark.js';
-import { verifyToken, loadUser } from '../middleware/auth.js';
+import { verifyToken, loadUser, NOT_RESTRICTED } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -22,8 +22,15 @@ router.post('/:tutorId', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
+    // `match` leaves a restricted tutor's bookmark with tutor: null rather than
+    // dropping the row, which is what the dashboard already skips. Otherwise a
+    // saved card would render and then 404 on click.
     const bookmarks = await TutorBookmark.find({ user: req.dbUser._id })
-      .populate('tutor', 'name photo university department subjects preferredAreas expectedSalary ratingAvg ratingCount isVerified')
+      .populate({
+        path: 'tutor',
+        select: 'name photo university department subjects preferredAreas expectedSalary ratingAvg ratingCount isVerified',
+        match: NOT_RESTRICTED,
+      })
       .sort({ createdAt: -1 });
     res.json(bookmarks);
   } catch (err) {

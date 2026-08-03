@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import ContactRequest from '../models/ContactRequest.js';
 import User from '../models/User.js';
-import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
+import { verifyToken, loadUser, requireRole, NOT_RESTRICTED } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
@@ -10,7 +10,9 @@ const router = Router();
 router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windowMs: 3_600_000, max: 20, name: 'contact-req' }), async (req, res, next) => {
   try {
     const { tutorId, message } = req.body;
-    const tutor = await User.findOne({ _id: tutorId, role: 'tutor' });
+    // A restricted tutor can never log in to approve this, so the request would
+    // sit pending forever. Matches the 404 GET /users/tutors/:id now returns.
+    const tutor = await User.findOne({ _id: tutorId, role: 'tutor', ...NOT_RESTRICTED });
     if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
 
     const request = await ContactRequest.create({

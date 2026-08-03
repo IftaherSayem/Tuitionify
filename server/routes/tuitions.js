@@ -3,11 +3,21 @@ import Tuition from '../models/Tuition.js';
 import Application from '../models/Application.js';
 import Bookmark from '../models/Bookmark.js';
 import Report from '../models/Report.js';
+import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole, optionalAuth } from '../middleware/auth.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
+
+// `restricted` lives on User, not Tuition, so a public tuition query cannot
+// filter on it directly. Looking the ids up per request (rather than caching or
+// denormalising a flag onto Tuition) keeps restrict/unrestrict effective
+// immediately with no backfill.
+async function restrictedOwnerIds() {
+  const users = await User.find({ restricted: true }).select('_id').lean();
+  return users.map((u) => u._id);
+}
 
 // GET /api/tuitions — public, filterable list of open tuitions
 router.get('/', async (req, res, next) => {
@@ -43,6 +53,11 @@ router.get('/', async (req, res, next) => {
     if (search) {
       filter.$or = [{ title: search }, { description: search }, { subjects: search }];
     }
+
+    // Posts by a restricted guardian drop out of the public list, so a ban
+    // removes their listings instead of leaving them open to applications.
+    const banned = await restrictedOwnerIds();
+    if (banned.length) filter.createdBy = { $nin: banned };
 
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 12));
@@ -84,6 +99,9 @@ router.get('/recommended', verifyToken, loadUser, async (req, res, next) => {
     if (preferredAreas.length) filter.$or.push({ area: { $in: preferredAreas } });
     if (classLevels.length) filter.$or.push({ classLevel: { $in: classLevels } });
 
+    const banned = await restrictedOwnerIds();
+    if (banned.length) filter.createdBy = { $nin: banned };
+
     const tuitions = await Tuition.find(filter)
       .populate('createdBy', 'name photo')
       .sort({ createdAt: -1 })
@@ -106,14 +124,26 @@ router.get('/recommended', verifyToken, loadUser, async (req, res, next) => {
 // GET /api/tuitions/:id — single tuition
 router.get('/:id', optionalAuth, async (req, res, next) => {
   try {
-    const tuition = await Tuition.findById(req.params.id).populate('createdBy', 'name photo phone');
+    const tuition = await Tuition.findById(req.params.id).populate('createdBy', 'name photo phone restricted firebaseUid');
     if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
 
+    const obj = tuition.toObject();
     // The poster's phone is private — only the owner may see it. The client
     // also hides it, but that check is cosmetic; this is the real guard.
-    const obj = tuition.toObject();
     const isOwner = req.dbUser && String(tuition.createdBy?._id) === String(req.dbUser._id);
-    if (!isOwner && obj.createdBy) delete obj.createdBy.phone;
+    // Separate from isOwner above: optionalAuth leaves req.dbUser unset for a
+    // restricted user, so a banned poster needs the token's uid to still reach
+    // their own post. Filtering the list alone would leave direct links live.
+    const isSelf = Boolean(req.firebaseUser?.uid) && obj.createdBy?.firebaseUid === req.firebaseUser.uid;
+    if (obj.createdBy?.restricted && !isSelf) {
+      return res.status(404).json({ message: 'Tuition not found' });
+    }
+
+    if (obj.createdBy) {
+      delete obj.createdBy.restricted;
+      delete obj.createdBy.firebaseUid;
+      if (!isOwner) delete obj.createdBy.phone;
+    }
 
     res.json(obj);
   } catch (err) {

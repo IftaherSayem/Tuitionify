@@ -17,16 +17,22 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [firebaseUser, setFirebaseUser] = useState(null); // Firebase auth user
   const [profile, setProfile] = useState(null);           // Mongo profile (has role)
+  const [restricted, setRestricted] = useState(false);    // banned by an admin
   const [loading, setLoading] = useState(true);
 
   // Try to load the Mongo profile for the logged-in Firebase user.
+  // A 403 means the account is restricted; anything else means there is no
+  // profile yet. The two look identical from the caller's side (profile stays
+  // null) but lead to very different screens, so they are tracked apart.
   async function fetchProfile() {
     try {
       const { data } = await api.get('/users/me');
       setProfile(data);
+      setRestricted(false);
       return data;
-    } catch {
-      setProfile(null); // not registered yet
+    } catch (err) {
+      setProfile(null);
+      setRestricted(err?.response?.status === 403);
       return null;
     }
   }
@@ -38,6 +44,7 @@ export function AuthProvider({ children }) {
         await fetchProfile();
       } else {
         setProfile(null);
+        setRestricted(false);
       }
       setLoading(false);
     });
@@ -75,14 +82,21 @@ export function AuthProvider({ children }) {
 
   function logout() {
     setProfile(null);
+    setRestricted(false);
     return signOut(auth);
   }
 
   // Create the Mongo profile (called after signup with chosen role).
   async function registerProfile(payload) {
-    const { data } = await api.post('/users/register', payload);
-    setProfile(data);
-    return data;
+    try {
+      const { data } = await api.post('/users/register', payload);
+      setProfile(data);
+      return data;
+    } catch (err) {
+      // The server repeats the ban check here, so surface it the same way.
+      if (err?.response?.status === 403) setRestricted(true);
+      throw err;
+    }
   }
 
   async function refreshProfile() {
@@ -92,6 +106,7 @@ export function AuthProvider({ children }) {
   const value = {
     firebaseUser,
     profile,
+    restricted,
     loading,
     isTutor: profile?.role === 'tutor',
     isSeeker: profile?.role === 'seeker',

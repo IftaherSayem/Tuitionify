@@ -4,15 +4,19 @@ import { GraduationCap, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
+import Restricted from './Restricted';
 
 export default function CompleteProfile() {
-  const { firebaseUser, profile, loading, registerProfile } = useAuth();
+  const { firebaseUser, profile, restricted, loading, registerProfile } = useAuth();
   const navigate = useNavigate();
   const [role, setRole] = useState('');
   const [busy, setBusy] = useState(false);
 
   if (loading) return <Spinner full />;
   if (!firebaseUser) return <Navigate to="/login" replace />;
+  // The route is reachable directly, so the ban is repeated here rather than
+  // relying on ProtectedRoute (this page is deliberately outside it).
+  if (restricted) return <Restricted />;
   if (profile) return <Navigate to="/dashboard" replace />;
 
   async function handleSubmit() {

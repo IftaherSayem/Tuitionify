@@ -7,7 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
-  const { firebaseUser, profile, logout, isAdmin } = useAuth();
+  const { firebaseUser, profile, restricted, logout, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -50,7 +50,14 @@ export default function Navbar() {
           <button onClick={toggleTheme} className="btn-ghost p-2" aria-label="Toggle theme">
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          {firebaseUser && profile ? (
+          {firebaseUser && restricted ? (
+            // Restricted accounts have no profile, so without this branch the
+            // navbar offered "Login / Get Started" to someone already signed
+            // in — leaving them no way to sign out.
+            <button onClick={handleLogout} className="btn-outline">
+              <LogOut size={16} /> Logout
+            </button>
+          ) : firebaseUser && profile ? (
             <>
               {isAdmin && (
                 <NavLink to="/admin" className="btn-ghost">
@@ -93,7 +100,11 @@ export default function Navbar() {
               </NavLink>
             ))}
             <hr className="my-2 dark:border-slate-700" />
-            {firebaseUser && profile ? (
+            {firebaseUser && restricted ? (
+              <button onClick={() => { setOpen(false); handleLogout(); }} className="btn-outline mt-1">
+                <LogOut size={16} /> Logout
+              </button>
+            ) : firebaseUser && profile ? (
               <>
                 {isAdmin && (
                   <NavLink to="/admin" className={linkClass} onClick={() => setOpen(false)}>
