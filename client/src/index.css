@@ -49,3 +49,14 @@
     @apply animate-pulse rounded-lg bg-slate-200 dark:bg-slate-700;
   }
 }
+
+@layer utilities {
+  /* Horizontal tab strips stay swipeable on phones without a visible bar. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

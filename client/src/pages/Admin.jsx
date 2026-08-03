@@ -6,6 +6,7 @@ import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
 import VerifiedBadge from '../components/VerifiedBadge';
+import { useTheme } from '../context/ThemeContext';
 
 const TABS = [
   { key: 'tutors', label: 'Tutors', icon: Users },
@@ -20,21 +21,21 @@ export default function Admin() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white">
           <ShieldCheck size={22} />
         </span>
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Admin panel</h1>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">Admin panel</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Verify tutors, review reports, and view analytics.</p>
         </div>
       </div>
 
-      <div className="mt-8 flex gap-1 border-b border-slate-200 dark:border-slate-700">
+      <div className="no-scrollbar mt-8 flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-700">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+            className={`flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition sm:px-4 ${
               tab === t.key
                 ? 'border-brand-600 text-brand-700 dark:text-brand-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
@@ -107,7 +108,7 @@ function AnalyticsTab() {
         </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Total Users" value={counts.users.total} sub={`${counts.users.tutors} tutors · ${counts.users.seekers} seekers`} />
         <StatCard label="Tuitions" value={counts.tuitions.total} sub={`${counts.tuitions.open} open · ${counts.tuitions.closed} closed`} />
         <StatCard label="Applications" value={counts.applications.total} sub={`${counts.applications.pending} pending · ${counts.applications.accepted} accepted`} />
@@ -137,13 +138,15 @@ function StatCard({ label, value, sub }) {
 }
 
 function ChartCard({ title, data, dataKey, nameKey, color }) {
+  const { theme } = useTheme();
+  const dark = theme === 'dark';
   const gradientId = `spark-${title.replace(/\s/g, '')}`;
   const latest = data.length ? data[data.length - 1][dataKey] : 0;
   return (
     <div className="card p-5">
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-baseline justify-between gap-3">
         <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
-        <span className="text-2xl font-bold text-slate-900 dark:text-white">{latest}</span>
+        <span className="shrink-0 text-2xl font-bold text-slate-900 dark:text-white">{latest}</span>
       </div>
       <ResponsiveContainer width="100%" height={80}>
         <AreaChart data={data} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
@@ -154,7 +157,23 @@ function ChartCard({ title, data, dataKey, nameKey, color }) {
             </linearGradient>
           </defs>
           <XAxis dataKey={nameKey} hide />
-          <Tooltip labelFormatter={(v) => `Week: ${v}`} formatter={(v) => [v, '']} />
+          {/* Recharts' default tooltip sets a white background but no text
+              colour, so the week label inherited the near-white body colour in
+              dark mode and vanished. Both colours are set explicitly here. */}
+          <Tooltip
+            labelFormatter={(v) => `Week: ${v}`}
+            formatter={(v) => [v, '']}
+            contentStyle={{
+              backgroundColor: dark ? '#1e293b' : '#ffffff',
+              border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
+              borderRadius: '0.5rem',
+              fontSize: '12px',
+              padding: '6px 10px',
+              boxShadow: '0 4px 12px rgb(0 0 0 / 0.08)',
+            }}
+            labelStyle={{ color: dark ? '#f1f5f9' : '#0f172a', fontWeight: 600 }}
+            itemStyle={{ color: dark ? '#cbd5e1' : '#334155' }}
+          />
           <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#${gradientId})`} dot={false} />
         </AreaChart>
       </ResponsiveContainer>
@@ -231,9 +250,9 @@ function TutorsTab() {
   return (
     <div className="space-y-3">
       {tutors.map((t) => (
-        <div key={t._id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
-          <div>
-            <div className="flex items-center gap-2">
+        <div key={t._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-slate-900 dark:text-white">{t.name}</span>
               {t.isVerified && <VerifiedBadge size={15} />}
               {t.restricted && (
@@ -242,19 +261,23 @@ function TutorsTab() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
+            <p className="break-all text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">
               {[t.department, t.university].filter(Boolean).join(' · ') || 'No academic info'}
             </p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => toggleVerify(t)} disabled={busy === t._id} className={t.isVerified ? 'btn-outline' : 'btn-primary'}>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => toggleVerify(t)}
+              disabled={busy === t._id}
+              className={`flex-1 whitespace-nowrap sm:flex-none ${t.isVerified ? 'btn-outline' : 'btn-primary'}`}
+            >
               {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
             </button>
             <button
               onClick={() => toggleRestrict(t)}
               disabled={busy === t._id + '-r'}
-              className={t.restricted ? 'btn-outline text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/30' : 'btn-outline text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/30'}
+              className={`btn-outline flex-1 whitespace-nowrap sm:flex-none ${t.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
             >
               {t.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
             </button>
@@ -295,9 +318,9 @@ function GuardiansTab() {
   return (
     <div className="space-y-3">
       {guardians.map((g) => (
-        <div key={g._id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
-          <div>
-            <div className="flex items-center gap-2">
+        <div key={g._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-slate-900 dark:text-white">{g.name}</span>
               {g.restricted && (
                 <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
@@ -305,13 +328,13 @@ function GuardiansTab() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{g.email}</p>
+            <p className="break-all text-sm text-slate-500 dark:text-slate-400">{g.email}</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">{g.phone || 'No phone'} · Joined {new Date(g.createdAt).toLocaleDateString()}</p>
           </div>
           <button
             onClick={() => toggleRestrict(g)}
             disabled={busy === g._id}
-            className={g.restricted ? 'btn-outline text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/30' : 'btn-outline text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/30'}
+            className={`btn-outline w-full whitespace-nowrap sm:w-auto ${g.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
           >
             {g.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
           </button>
@@ -358,9 +381,9 @@ function ReportsTab() {
     <div className="space-y-3">
       {reports.map((r) => (
         <div key={r._id} className="card p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="chip capitalize">{r.targetType}</span>
                 <span className="font-semibold text-slate-900 dark:text-white">{r.reason}</span>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusStyle[r.status]}`}>
@@ -368,16 +391,16 @@ function ReportsTab() {
                 </span>
               </div>
               {r.details && <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{r.details}</p>}
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+              <p className="mt-1 break-all text-xs text-slate-400 dark:text-slate-500">
                 Reported by {r.reporter?.name || 'Unknown'} ({r.reporter?.email || '—'})
               </p>
             </div>
             {r.status === 'open' && (
-              <div className="flex gap-2">
-                <button onClick={() => setStatus(r, 'reviewed')} disabled={busy === r._id} className="btn-primary">
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => setStatus(r, 'reviewed')} disabled={busy === r._id} className="btn-primary flex-1 whitespace-nowrap sm:flex-none">
                   <Check size={16} /> Reviewed
                 </button>
-                <button onClick={() => setStatus(r, 'dismissed')} disabled={busy === r._id} className="btn-outline">
+                <button onClick={() => setStatus(r, 'dismissed')} disabled={busy === r._id} className="btn-outline flex-1 whitespace-nowrap sm:flex-none">
                   <X size={16} /> Dismiss
                 </button>
               </div>

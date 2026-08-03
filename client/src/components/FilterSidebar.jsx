@@ -1,4 +1,5 @@
-import { SlidersHorizontal, X } from 'lucide-react';
+import { useState } from 'react';
+import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { CLASS_LEVELS, SUBJECTS, AREAS, MODES, GENDER_PREF } from '../data/options';
 
 const RATINGS = [
@@ -7,7 +8,14 @@ const RATINGS = [
   { value: '2', label: '2★ & up' },
 ];
 
+// Single-value filter keys, counted for the badge on the collapsed mobile header.
+const SCALAR_KEYS = ['classLevel', 'area', 'mode', 'gender', 'minRating', 'minSalary', 'maxSalary'];
+
 export default function FilterSidebar({ filters, onChange, onReset, genderLabel = 'Gender', showRating = false }) {
+  // On phones/tablets the panel would otherwise push every result below the
+  // fold, so it starts collapsed. The lg: classes keep it always open on desktop.
+  const [open, setOpen] = useState(false);
+
   const field = (label, key, options, withEmpty = 'All') => (
     <div>
       <label className="label">{label}</label>
@@ -30,18 +38,34 @@ export default function FilterSidebar({ filters, onChange, onReset, genderLabel 
       ? selectedSubjects.filter((x) => x !== s)
       : [...selectedSubjects, s]);
 
+  const activeCount = selectedSubjects.length + SCALAR_KEYS.filter((k) => filters[k]).length;
+
   return (
-    <aside className="card sticky top-20 h-fit p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+    <aside className="card h-fit p-5 lg:sticky lg:top-20">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="filter-panel"
+          className="flex flex-1 items-center gap-2 font-semibold text-slate-900 dark:text-white lg:pointer-events-none"
+        >
           <SlidersHorizontal size={18} /> Filters
-        </h3>
-        <button onClick={onReset} className="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400">
+          {activeCount > 0 && <span className="badge">{activeCount}</span>}
+          <ChevronDown
+            size={18}
+            className={`ml-auto text-slate-400 transition-transform lg:hidden ${open ? 'rotate-180' : ''}`}
+          />
+        </button>
+        <button
+          onClick={onReset}
+          className="hidden shrink-0 items-center gap-1 text-xs text-slate-500 hover:text-brand-700 lg:flex dark:text-slate-400 dark:hover:text-brand-400"
+        >
           <X size={13} /> Reset
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div id="filter-panel" className={`space-y-4 ${open ? 'mt-5' : 'hidden'} lg:mt-5 lg:block`}>
         <div>
           <label className="label">Subjects</label>
           <div className="flex flex-wrap gap-2">
@@ -83,6 +107,10 @@ export default function FilterSidebar({ filters, onChange, onReset, genderLabel 
             />
           </div>
         </div>
+
+        <button onClick={onReset} className="btn-outline w-full lg:hidden">
+          <X size={14} /> Reset filters
+        </button>
       </div>
     </aside>
   );
