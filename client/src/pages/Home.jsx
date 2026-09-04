@@ -5,12 +5,12 @@ import {
 } from 'lucide-react';
 import { SUBJECTS } from '../data/options';
 
-function Stat({ value, label }) {
+function Fact({ children }) {
   return (
-    <div className="text-center">
-      <div className="text-3xl font-extrabold text-brand-700 dark:text-brand-400">{value}</div>
-      <div className="text-sm text-slate-500 dark:text-slate-400">{label}</div>
-    </div>
+    <li className="flex gap-2 text-sm text-slate-600 dark:text-slate-400">
+      <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-400" />
+      <span>{children}</span>
+    </li>
   );
 }
 
@@ -34,14 +34,16 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 to-slate-50 dark:from-slate-800 dark:to-slate-900">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24">
           <div>
-            <span className="badge">🎓 Built for the IIUC community</span>
+            <span className="badge">
+              <GraduationCap size={14} className="mr-1" /> Built at IIUC, Chittagong
+            </span>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl dark:text-white">
-              Find the right <span className="text-brand-600 dark:text-brand-400">tutor</span>, or your next{' '}
+              Find a <span className="text-brand-600 dark:text-brand-400">tutor</span> nearby, or your next{' '}
               <span className="text-brand-600 dark:text-brand-400">tuition</span>.
             </h1>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
-              Tuitionify connects talented university-student tutors with school &amp; college students
-              and guardians across Bangladesh — simple, trusted, and local.
+              Guardians post what they need. University students apply to whatever fits around
+              their class routine, and the two of you sort out the rest by phone.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/tuitions" className="btn-primary">
@@ -52,18 +54,21 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
-              <Stat value="500+" label="Active tutors" />
-              <Stat value="1.2k+" label="Tuitions posted" />
-              <Stat value="4.8★" label="Avg. rating" />
-            </div>
+            <ul className="mt-10 max-w-md space-y-2.5">
+              <Fact>Nothing to pay. We don&apos;t take a cut of anyone&apos;s salary.</Fact>
+              <Fact>Phone numbers stay hidden until a guardian accepts a tutor.</Fact>
+              <Fact>Tutor profiles get checked against a university student ID.</Fact>
+            </ul>
           </div>
 
           {/* Hero card mock */}
           <div className="relative">
             <div className="card space-y-4 p-6 shadow-lg">
               <div className="flex items-center gap-3">
-                <img src="https://i.pravatar.cc/150?img=12" alt="" className="h-12 w-12 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-800" />
+                <img
+                  src="https://ui-avatars.com/api/?name=Tanvir+Ahmed&background=0f8f62&color=fff"
+                  alt="" className="h-12 w-12 rounded-full object-cover ring-2 ring-brand-100 dark:ring-brand-800"
+                />
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white">Tanvir Ahmed</p>
                   <p className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
@@ -80,14 +85,14 @@ export default function Home() {
                 ))}
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
-                <span className="flex items-center gap-1"><MapPin size={15} className="text-slate-400 dark:text-slate-500" /> Mirpur, Dhaka</span>
+                <span className="flex items-center gap-1"><MapPin size={15} className="text-slate-400 dark:text-slate-500" /> Khulshi, Chittagong</span>
                 <span className="font-semibold text-brand-700 dark:text-brand-400">৳6,000/mo</span>
               </div>
               <button className="btn-primary w-full">View Profile</button>
             </div>
             <div className="absolute -bottom-5 -left-5 hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-md sm:block dark:border-slate-700 dark:bg-slate-800">
               <p className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                <CheckCircle2 size={16} className="text-brand-600" /> Verified university tutors
+                <CheckCircle2 size={16} className="text-brand-600" /> ID-checked university tutors
               </p>
             </div>
           </div>
@@ -97,16 +102,18 @@ export default function Home() {
       {/* How it works */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">How Tuitionify works</h2>
-          <p className="mt-2 text-slate-500 dark:text-slate-400">Three simple steps for both tutors and guardians.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">How it works</h2>
+          <p className="mt-2 text-slate-500 dark:text-slate-400">
+            Much the same from either side, with one difference: guardians post, tutors apply.
+          </p>
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Step n="1" icon={UserPlus} title="Create your profile"
-            text="Sign up as a tutor or a guardian/student in seconds with email or Google." />
-          <Step n="2" icon={Search} title="Post or browse"
-            text="Guardians post a tuition; tutors browse and apply. Filter by subject, area & budget." />
-          <Step n="3" icon={ShieldCheck} title="Connect & learn"
-            text="Review applicants, pick the best tutor, and leave a rating after your tuition." />
+          <Step n="1" icon={UserPlus} title="Make a profile"
+            text="Email or Google. Tutors fill in their university, subjects, and which areas they can actually travel to." />
+          <Step n="2" icon={Search} title="Post, or apply"
+            text="A tuition post says the class, subjects, salary and days per week. Tutors filter the board and send an application." />
+          <Step n="3" icon={ShieldCheck} title="Pick someone, then talk"
+            text="Accepting an applicant swaps phone numbers and closes the post. Leave a rating afterwards so the next guardian has something to go on." />
         </div>
       </section>
 
@@ -116,7 +123,7 @@ export default function Home() {
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Popular subjects</h2>
-              <p className="mt-2 text-slate-500 dark:text-slate-400">From primary school to admission coaching.</p>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">Class 1 up to HSC, O and A Level, and admission prep.</p>
             </div>
             <Link to="/tutors" className="hidden items-center gap-1 text-sm font-semibold text-brand-700 hover:gap-2 sm:flex dark:text-brand-400">
               Browse tutors <ArrowRight size={16} />
@@ -144,7 +151,8 @@ export default function Home() {
               <Users size={32} />
               <h3 className="mt-4 text-2xl font-bold">For Guardians &amp; Students</h3>
               <p className="mt-2 text-brand-50">
-                Post your tuition need and get applications from verified university tutors near you.
+                Write down what you need once. The applications come to you, each one showing the
+                tutor&apos;s university, subjects and rating before you decide who to call.
               </p>
             </div>
             <Link to="/post-tuition" className="btn mt-6 w-fit bg-white text-brand-700 hover:bg-brand-50">
@@ -156,7 +164,8 @@ export default function Home() {
               <GraduationCap size={32} className="text-brand-600" />
               <h3 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">For Tutors</h3>
               <p className="mt-2 text-slate-500 dark:text-slate-400">
-                Earn while you study. Build a profile, apply to tuitions, and grow your rating &amp; reputation.
+                Tuition money without going through a coaching centre. Set the areas you can reach
+                and the salary you expect, then apply to the posts that fit between classes.
               </p>
             </div>
             <Link to="/register" className="btn-primary mt-6 w-fit">
