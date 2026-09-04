@@ -9,8 +9,11 @@ import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
 
-// Fields that are private and must never appear in public listings.
-const PRIVATE_FIELDS = '-phone -email';
+// Fields that must never appear in public listings. firebaseUid is the
+// identifier the API keys auth off — not a credential on its own, but internal,
+// and routes/tuitions.js already strips it from a populated poster, so these
+// endpoints match that instead of disagreeing with it.
+const PRIVATE_FIELDS = '-phone -email -firebaseUid -emailVerified -__v';
 
 // Returns a plain tutor object with contact fields removed unless the
 // viewer is allowed to see them (the tutor themselves, or a seeker whose
@@ -21,6 +24,12 @@ function publicTutor(tutorDoc, { revealContact = false } = {}) {
     delete obj.phone;
     delete obj.email;
   }
+  // Same set as PRIVATE_FIELDS. Dropped here rather than left out of the query
+  // because the caller still needs firebaseUid on the document to work out
+  // whether the viewer is the tutor themselves.
+  delete obj.firebaseUid;
+  delete obj.emailVerified;
+  delete obj.__v;
   obj.contactVisible = revealContact;
   return obj;
 }

@@ -3,6 +3,7 @@ import Application from '../models/Application.js';
 import Tuition from '../models/Tuition.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
 import { isValidBdPhone } from '../utils/phone.js';
+import { hasAcceptedApplicant } from '../utils/acceptance.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
@@ -74,6 +75,17 @@ router.patch('/:id', verifyToken, loadUser, async (req, res, next) => {
     if (!['accepted', 'rejected'].includes(status)) {
       return res.status(400).json({ message: 'status must be accepted or rejected' });
     }
+
+    // Only one applicant may hold the slot — see utils/acceptance.js for what
+    // a second acceptance breaks. Scoped to the accept path deliberately:
+    // rejecting has to keep working on a closed tuition, since that is how a
+    // post becomes reopenable again.
+    if (status === 'accepted' && (await hasAcceptedApplicant(app.tuition._id, { exceptId: app._id }))) {
+      return res.status(409).json({
+        message: 'You already accepted a tutor for this tuition. Reject that applicant first to choose someone else.',
+      });
+    }
+
     app.status = status;
     app.decidedAt = new Date();
     await app.save();

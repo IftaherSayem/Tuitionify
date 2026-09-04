@@ -25,6 +25,11 @@ export default function TuitionDetails() {
   const [deleting, setDeleting] = useState(false);
 
   const isOwner = profile && tuition && String(tuition.createdBy?._id) === String(profile._id);
+  // Only one applicant can hold the slot — the API refuses a second acceptance,
+  // so don't offer a button that is going to 409. Recomputed from the list, not
+  // from tuition.status, because a seeker may also close a post by hand and
+  // should still be able to accept someone from it.
+  const hasAccepted = applications.some((a) => a.status === 'accepted');
 
   useEffect(() => {
     (async () => {
@@ -183,6 +188,11 @@ export default function TuitionDetails() {
           <h3 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
             Applicants ({applications.length})
           </h3>
+          {hasAccepted && (
+            <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+              You have accepted a tutor for this tuition. Reject them first if you want to choose someone else or reopen the post.
+            </p>
+          )}
           {applications.length === 0 ? (
             <div className="card p-6 text-center text-sm text-slate-500 dark:text-slate-400">No applications yet.</div>
           ) : (
@@ -208,7 +218,9 @@ export default function TuitionDetails() {
                   </div>
                   {a.status === 'pending' ? (
                     <div className="flex gap-2">
-                      <button onClick={() => decide(a._id, 'accepted')} className="btn-primary px-3 py-1.5 text-xs">Accept</button>
+                      {!hasAccepted && (
+                        <button onClick={() => decide(a._id, 'accepted')} className="btn-primary px-3 py-1.5 text-xs">Accept</button>
+                      )}
                       <button onClick={() => decide(a._id, 'rejected')} className="btn-outline px-3 py-1.5 text-xs">Reject</button>
                     </div>
                   ) : (
