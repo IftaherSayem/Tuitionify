@@ -34,9 +34,8 @@ export default function Footer() {
         <div>
           <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">About</h4>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
-            Built by students at International Islamic University Chittagong, mostly to fix
-            something that annoyed us: finding tuition here still runs on coaching-centre
-            notice boards and whoever your cousin happens to know.
+            A student project from International Islamic University Chittagong (IIUC).
+            We built it because finding a tutor here still means notice boards and word of mouth.
           </p>
         </div>
       </div>
