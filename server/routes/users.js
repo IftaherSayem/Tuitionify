@@ -3,8 +3,10 @@ import User from '../models/User.js';
 import Review from '../models/Review.js';
 import ContactRequest from '../models/ContactRequest.js';
 import { verifyToken, loadUser, optionalAuth, NOT_RESTRICTED } from '../middleware/auth.js';
+import { admin } from '../config/firebase.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { hasEngagement } from '../utils/engagement.js';
+import { purgeUserData } from '../utils/accountDeletion.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
@@ -128,6 +130,57 @@ router.put('/me', verifyToken, loadUser, async (req, res, next) => {
     next(err);
   }
 });
+
+// DELETE /api/users/me — close own account and erase everything attached to it.
+//
+// Sits behind loadUser, which refuses restricted accounts, and that is
+// deliberate: a banned user must not be able to delete the reports that got
+// them banned. Someone in that position has to be un-restricted by an admin
+// first, so the record is settled before the data goes.
+router.delete(
+  '/me',
+  verifyToken,
+  loadUser,
+  rateLimit({ windowMs: 3_600_000, max: 5, name: 'deleteAccount' }),
+  async (req, res, next) => {
+    try {
+      // A typed confirmation, not just an authenticated DELETE. This endpoint is
+      // irreversible and unrecoverable, and it would otherwise be one mis-wired
+      // client button away from firing on page load.
+      if (req.body?.confirm !== 'DELETE') {
+        return res.status(400).json({
+          message: "Account deletion must be confirmed — send { confirm: 'DELETE' }.",
+        });
+      }
+
+      const removed = await purgeUserData(req.dbUser._id);
+
+      // Mongo first, Firebase last. Reversed, a Firebase success followed by a
+      // Mongo failure would lock the user out of data that is still there —
+      // strictly worse than this order, where a Firebase failure leaves the
+      // credential alive but every row already gone, and a later login just
+      // starts a fresh empty profile.
+      let authRemoved = true;
+      try {
+        await admin.auth().deleteUser(req.dbUser.firebaseUid);
+      } catch (err) {
+        // Already absent is the outcome we wanted.
+        if (err?.code !== 'auth/user-not-found') {
+          authRemoved = false;
+          console.error(
+            '✗ Account data purged but the Firebase login remains — delete it by hand:',
+            req.dbUser.firebaseUid,
+            err?.code || err?.message,
+          );
+        }
+      }
+
+      res.json({ message: 'Account deleted', authRemoved, removed });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // GET /api/users/tutors — public, filterable tutor directory
 router.get('/tutors', async (req, res, next) => {

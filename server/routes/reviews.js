@@ -3,22 +3,10 @@ import Review from '../models/Review.js';
 import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole, requireVerifiedEmail } from '../middleware/auth.js';
 import { hasEngagement } from '../utils/engagement.js';
+import { recomputeRating } from '../utils/rating.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const router = Router();
-
-// Recompute a tutor's rating aggregates after any review change.
-async function recomputeRating(tutorId) {
-  const agg = await Review.aggregate([
-    { $match: { tutor: tutorId } },
-    { $group: { _id: '$tutor', avg: { $avg: '$rating' }, count: { $sum: 1 } } },
-  ]);
-  const { avg = 0, count = 0 } = agg[0] || {};
-  await User.findByIdAndUpdate(tutorId, {
-    ratingAvg: Math.round(avg * 10) / 10,
-    ratingCount: count,
-  });
-}
 
 // POST /api/reviews — seeker reviews a tutor they have engaged
 router.post('/', verifyToken, loadUser, requireRole('seeker'), requireVerifiedEmail, rateLimit({ windowMs: 3_600_000, max: 15, name: 'review' }), async (req, res, next) => {

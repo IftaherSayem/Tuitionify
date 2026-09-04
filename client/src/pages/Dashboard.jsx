@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import {
-  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark, Trash2, Heart, Sparkles,
+  Plus, FileText, Send, Pencil, ExternalLink, ToggleLeft, ToggleRight, Mail, MailWarning, Bookmark, Trash2, Heart, Sparkles, UserX,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
@@ -59,6 +59,7 @@ export default function Dashboard() {
 
       <SavedTuitions />
       <SavedTutors />
+      <DangerZone />
     </div>
   );
 }
@@ -550,6 +551,71 @@ function SavedTutors() {
           )}
         </div>
       )}
+    </section>
+  );
+}
+
+function DangerZone() {
+  const { profile, isTutor, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  if (!profile) return null;
+
+  async function handleDelete() {
+    setBusy(true);
+    try {
+      // The confirmation word is required by the API too, so a stray call from
+      // a mis-wired button can never delete somebody's account.
+      await api.delete('/users/me', { data: { confirm: 'DELETE' } });
+      // Log out before navigating: the profile the app is holding no longer
+      // exists, and every authenticated panel would 404 against it.
+      await logout();
+      navigate('/');
+      toast.success('Your account has been deleted.');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Could not delete your account');
+      setBusy(false);
+      setOpen(false);
+    }
+  }
+
+  // Spell out what leaves with the account rather than saying "all your data".
+  // These are the rows the server actually removes, and a guardian's list is
+  // not a tutor's — someone deciding whether to click deserves the real one.
+  const losses = isTutor
+    ? 'your profile, reviews and ratings, every application you sent, your contact requests, and your saved tuitions and tutors'
+    : 'your profile, every tuition you posted along with its applicants, your contact requests, the reviews you wrote, and your saved tuitions and tutors';
+
+  return (
+    <section className="mt-12 border-t border-slate-200 pt-8 dark:border-slate-700">
+      <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+        <UserX size={18} className="text-red-500" /> Delete Account
+      </h3>
+      <div className="rounded-xl border border-red-200 bg-red-50/60 p-5 dark:border-red-900/60 dark:bg-red-900/15">
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          Deleting your account removes {losses}. It happens immediately, cannot be undone,
+          and there is no backup to restore from.
+        </p>
+        <button
+          onClick={() => setOpen(true)}
+          className="btn-outline mt-4 border-red-300 text-red-600 hover:bg-red-100 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/40"
+        >
+          <Trash2 size={15} /> Delete my account
+        </button>
+      </div>
+
+      <ConfirmModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Account"
+        message={`This permanently deletes ${losses}. You will be signed out and this cannot be undone.`}
+        confirmText="Delete account"
+        requireText="DELETE"
+        busy={busy}
+      />
     </section>
   );
 }
