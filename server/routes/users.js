@@ -2,7 +2,7 @@ import { Router } from 'express';
 import User from '../models/User.js';
 import Review from '../models/Review.js';
 import ContactRequest from '../models/ContactRequest.js';
-import { verifyToken, loadUser, optionalAuth, NOT_RESTRICTED } from '../middleware/auth.js';
+import { verifyToken, loadUser, optionalAuth, NOT_RESTRICTED, isAdminEmail, hasVerifiedEmail } from '../middleware/auth.js';
 import { admin } from '../config/firebase.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { hasEngagement } from '../utils/engagement.js';
@@ -103,11 +103,7 @@ router.get('/me', verifyToken, loadUser, async (req, res, next) => {
       req.dbUser.emailVerified = verified;
       await req.dbUser.save();
     }
-    const admins = (process.env.ADMIN_EMAILS || '')
-      .split(',')
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-    const isAdmin = admins.includes(req.dbUser.email.toLowerCase());
+    const isAdmin = isAdminEmail(req.dbUser.email) && hasVerifiedEmail(req);
     res.json({ ...req.dbUser.toObject(), isAdmin });
   } catch (err) {
     next(err);

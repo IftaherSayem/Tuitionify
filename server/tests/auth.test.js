@@ -145,10 +145,13 @@ describe('requireRole', () => {
 });
 
 describe('requireAdmin', () => {
+  // Admin access needs a confirmed email as well as a listed one, so the
+  // baseline request here carries a verified token. Cases that care about the
+  // email check on its own stay readable; the unverified cases override it.
   const withAdmins = (list, req) => {
     const prev = process.env.ADMIN_EMAILS;
     process.env.ADMIN_EMAILS = list;
-    const c = ctx(req);
+    const c = ctx({ firebaseUser: { email_verified: true }, ...req });
     requireAdmin(c.req, c.res, c.next);
     process.env.ADMIN_EMAILS = prev;
     return c;
@@ -173,5 +176,44 @@ describe('requireAdmin', () => {
   it('blocks everyone when ADMIN_EMAILS is empty', () => {
     const { res } = withAdmins('', { dbUser: { email: 'anyone@x.com' } });
     expect(res.statusCode).toBe(403);
+  });
+
+  it('blocks when there is no user', () => {
+    const { res, next } = withAdmins('boss@iiuc.ac.bd', {});
+    expect(res.statusCode).toBe(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  // Firebase email/password signup does not prove the signer owns the address.
+  // Without this, anyone could register as an ADMIN_EMAILS address that its
+  // real owner had not signed up with yet and take the panel.
+  it('blocks a listed email whose address is unconfirmed', () => {
+    const { res, next } = withAdmins('boss@iiuc.ac.bd', {
+      firebaseUser: { email_verified: false },
+      dbUser: { email: 'boss@iiuc.ac.bd', emailVerified: false },
+    });
+    expect(res.statusCode).toBe(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('gives an unconfirmed admin the same 403 as an outsider, so the list stays unprobeable', () => {
+    const unconfirmed = withAdmins('boss@iiuc.ac.bd', {
+      firebaseUser: { email_verified: false },
+      dbUser: { email: 'boss@iiuc.ac.bd' },
+    });
+    const outsider = withAdmins('boss@iiuc.ac.bd', { dbUser: { email: 'random@x.com' } });
+    expect(unconfirmed.res.statusCode).toBe(outsider.res.statusCode);
+    expect(unconfirmed.res.body).toEqual(outsider.res.body);
+  });
+
+  // The mirror is only ever written from a verified token, so trusting it is
+  // safe — and it keeps a stale cached token from locking an admin out of the
+  // panel for the hour after they confirm their address.
+  it('accepts the stored emailVerified mirror when the token has not caught up', () => {
+    const { next } = withAdmins('boss@iiuc.ac.bd', {
+      firebaseUser: { email_verified: false },
+      dbUser: { email: 'boss@iiuc.ac.bd', emailVerified: true },
+    });
+    expect(next).toHaveBeenCalled();
   });
 });

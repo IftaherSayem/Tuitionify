@@ -68,14 +68,33 @@ export async function optionalAuth(req, res, next) {
   next();
 }
 
+// Has Firebase confirmed this account's email address?
+//
+// The live token is authoritative; req.dbUser.emailVerified is only a mirror
+// synced on GET /users/me, so it can lag a just-confirmed address — hence the
+// fallback. The mirror is only ever written from a verified token (on register
+// and on GET /users/me) and is not client-editable, so it can never read true
+// for an address Firebase has not confirmed.
+export function hasVerifiedEmail(req) {
+  return Boolean(req.firebaseUser?.email_verified) || Boolean(req.dbUser?.emailVerified);
+}
+
+// Is this address listed in ADMIN_EMAILS? Shared with GET /users/me, which
+// reports isAdmin to the client: the two must agree, or the client renders an
+// admin panel whose every request 403s.
+export function isAdminEmail(email) {
+  const admins = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return Boolean(email) && admins.includes(email.toLowerCase());
+}
+
 // Requires a confirmed email address. Applied to the actions where an
 // unconfirmed throwaway account does the most damage (posting reviews and
 // filing reports), so those cost an attacker a real mailbox each.
-// The live token is authoritative; req.dbUser.emailVerified is only a mirror
-// synced on GET /users/me, so it can lag a just-confirmed address.
 export function requireVerifiedEmail(req, res, next) {
-  const verified = Boolean(req.firebaseUser?.email_verified) || Boolean(req.dbUser?.emailVerified);
-  if (!verified) {
+  if (!hasVerifiedEmail(req)) {
     return res.status(403).json({
       message: 'Please confirm your email address first. Check your inbox for the verification link.',
     });
@@ -96,11 +115,18 @@ export function requireRole(role) {
 // Guards admin-only routes. Admins are listed by email in ADMIN_EMAILS
 // (comma-separated) in the server .env. Requires verifyToken + loadUser.
 export function requireAdmin(req, res, next) {
-  const admins = (process.env.ADMIN_EMAILS || '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (!req.dbUser || !admins.includes(req.dbUser.email.toLowerCase())) {
+  // The email check alone is not enough. Admin rights key off an address, but
+  // Firebase email/password signup does not prove the signer owns it — so
+  // until the real admin has registered and taken the address, anyone could
+  // sign up as it and claim the panel, which grants restricting any account,
+  // handing out verified badges, and reading every guardian's phone number.
+  // Demanding a confirmed address closes that window: the mailbox has to be
+  // theirs.
+  //
+  // Both failures answer with the same 403 on purpose — a distinct "confirm
+  // your email" here would tell an attacker probing addresses which ones are
+  // on the admin list.
+  if (!req.dbUser || !isAdminEmail(req.dbUser.email) || !hasVerifiedEmail(req)) {
     return res.status(403).json({ message: 'Admin access only' });
   }
   next();
