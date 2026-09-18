@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff } from 'lucide-react';
+import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
 import VerifiedBadge from '../components/VerifiedBadge';
+import ConfirmModal from '../components/ConfirmModal';
 import { useTheme } from '../context/ThemeContext';
 
 const TABS = [
@@ -209,6 +210,8 @@ function RankList({ title, items }) {
 function TutorsTab() {
   const [tutors, setTutors] = useState(null);
   const [busy, setBusy] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   function loadTutors() {
     // The endpoint is paginated and returns { data, page, totalPages, total }.
@@ -250,54 +253,90 @@ function TutorsTab() {
     }
   }
 
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/users/${deleteTarget._id}`);
+      setTutors((list) => list.filter((x) => x._id !== deleteTarget._id));
+      toast.success('Tutor account deleted permanently');
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (!tutors) return <Spinner />;
   if (!tutors.length)
     return <EmptyState title="No tutors yet" message="Tutors will appear here once they register." icon={Users} />;
 
   return (
-    <div className="space-y-3">
-      {tutors.map((t) => (
-        <div key={t._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-slate-900 dark:text-white">{t.name}</span>
-              {t.isVerified && <VerifiedBadge size={15} />}
-              {t.restricted && (
-                <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                  Restricted
-                </span>
-              )}
+    <>
+      <div className="space-y-3">
+        {tutors.map((t) => (
+          <div key={t._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-900 dark:text-white">{t.name}</span>
+                {t.isVerified && <VerifiedBadge size={15} />}
+                {t.restricted && (
+                  <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                    Restricted
+                  </span>
+                )}
+              </div>
+              <p className="break-all text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                {[t.department, t.university].filter(Boolean).join(' · ') || 'No academic info'}
+              </p>
             </div>
-            <p className="break-all text-sm text-slate-500 dark:text-slate-400">{t.email}</p>
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              {[t.department, t.university].filter(Boolean).join(' · ') || 'No academic info'}
-            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => toggleVerify(t)}
+                disabled={busy === t._id}
+                className={`flex-1 whitespace-nowrap sm:flex-none ${t.isVerified ? 'btn-outline' : 'btn-primary'}`}
+              >
+                {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
+              </button>
+              <button
+                onClick={() => toggleRestrict(t)}
+                disabled={busy === t._id + '-r'}
+                className={`btn-outline flex-1 whitespace-nowrap sm:flex-none ${t.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
+              >
+                {t.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
+              </button>
+              <button
+                onClick={() => setDeleteTarget(t)}
+                className="btn-outline flex-1 whitespace-nowrap border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 sm:flex-none"
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => toggleVerify(t)}
-              disabled={busy === t._id}
-              className={`flex-1 whitespace-nowrap sm:flex-none ${t.isVerified ? 'btn-outline' : 'btn-primary'}`}
-            >
-              {t.isVerified ? <><X size={16} /> Revoke</> : <><BadgeCheck size={16} /> Verify</>}
-            </button>
-            <button
-              onClick={() => toggleRestrict(t)}
-              disabled={busy === t._id + '-r'}
-              className={`btn-outline flex-1 whitespace-nowrap sm:flex-none ${t.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
-            >
-              {t.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete tutor account?"
+        message={deleteTarget ? `This will permanently delete ${deleteTarget.name}'s account (${deleteTarget.email}), all their reviews, applications, bookmarks, and contact requests. This action cannot be undone.` : ''}
+        confirmText="Delete Permanently"
+        busyText="Deleting..."
+        busy={deleting}
+      />
+    </>
   );
 }
 
 function GuardiansTab() {
   const [guardians, setGuardians] = useState(null);
   const [busy, setBusy] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   function loadGuardians() {
     api.get('/admin/guardians', { params: { limit: 100 } })
@@ -325,42 +364,80 @@ function GuardiansTab() {
     }
   }
 
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/users/${deleteTarget._id}`);
+      setGuardians((list) => list.filter((x) => x._id !== deleteTarget._id));
+      toast.success('Guardian account deleted permanently');
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (!guardians) return <Spinner />;
   if (!guardians.length)
     return <EmptyState title="No guardians yet" message="Guardians will appear here once they register." icon={UserCheck} />;
 
   return (
-    <div className="space-y-3">
-      {guardians.map((g) => (
-        <div key={g._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-slate-900 dark:text-white">{g.name}</span>
-              {g.restricted && (
-                <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                  Restricted
-                </span>
-              )}
+    <>
+      <div className="space-y-3">
+        {guardians.map((g) => (
+          <div key={g._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-900 dark:text-white">{g.name}</span>
+                {g.restricted && (
+                  <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                    Restricted
+                  </span>
+                )}
+              </div>
+              <p className="break-all text-sm text-slate-500 dark:text-slate-400">{g.email}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{g.phone || 'No phone'} · Joined {new Date(g.createdAt).toLocaleDateString()}</p>
             </div>
-            <p className="break-all text-sm text-slate-500 dark:text-slate-400">{g.email}</p>
-            <p className="text-xs text-slate-400 dark:text-slate-500">{g.phone || 'No phone'} · Joined {new Date(g.createdAt).toLocaleDateString()}</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => toggleRestrict(g)}
+                disabled={busy === g._id}
+                className={`btn-outline flex-1 whitespace-nowrap sm:flex-none ${g.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
+              >
+                {g.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
+              </button>
+              <button
+                onClick={() => setDeleteTarget(g)}
+                className="btn-outline flex-1 whitespace-nowrap border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 sm:flex-none"
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => toggleRestrict(g)}
-            disabled={busy === g._id}
-            className={`btn-outline w-full whitespace-nowrap sm:w-auto ${g.restricted ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900/30' : 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30'}`}
-          >
-            {g.restricted ? <><ShieldOff size={16} /> Unrestrict</> : <><ShieldBan size={16} /> Restrict</>}
-          </button>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete guardian account?"
+        message={deleteTarget ? `This will permanently delete ${deleteTarget.name}'s account (${deleteTarget.email}), all their tuition posts, applications received, bookmarks, and contact requests. This action cannot be undone.` : ''}
+        confirmText="Delete Permanently"
+        busyText="Deleting..."
+        busy={deleting}
+      />
+    </>
   );
 }
 
 function ReportsTab() {
   const [reports, setReports] = useState(null);
   const [busy, setBusy] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     api.get('/admin/reports', { params: { limit: 100 } })
@@ -381,6 +458,23 @@ function ReportsTab() {
     }
   }
 
+  async function confirmDeleteTuition() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/tuitions/${deleteTarget.targetId}`);
+      // Also mark the report as reviewed
+      await api.patch(`/admin/reports/${deleteTarget._id}`, { status: 'reviewed' });
+      setReports((list) => list.map((x) => (x._id === deleteTarget._id ? { ...x, status: 'reviewed' } : x)));
+      toast.success('Tuition deleted permanently');
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (!reports) return <Spinner />;
   if (!reports.length)
     return <EmptyState title="No reports" message="Reported profiles and posts will show up here." icon={Flag} />;
@@ -392,36 +486,62 @@ function ReportsTab() {
   };
 
   return (
-    <div className="space-y-3">
-      {reports.map((r) => (
-        <div key={r._id} className="card p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="chip capitalize">{r.targetType}</span>
-                <span className="font-semibold text-slate-900 dark:text-white">{r.reason}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusStyle[r.status]}`}>
-                  {r.status}
-                </span>
+    <>
+      <div className="space-y-3">
+        {reports.map((r) => (
+          <div key={r._id} className="card p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="chip capitalize">{r.targetType}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">{r.reason}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusStyle[r.status]}`}>
+                    {r.status}
+                  </span>
+                </div>
+                {r.details && <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{r.details}</p>}
+                <p className="mt-1 break-all text-xs text-slate-400 dark:text-slate-500">
+                  Reported by {r.reporter?.name || 'Unknown'} ({r.reporter?.email || '—'})
+                </p>
+                {r.targetId && (
+                  <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                    Target ID: {r.targetId}
+                  </p>
+                )}
               </div>
-              {r.details && <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{r.details}</p>}
-              <p className="mt-1 break-all text-xs text-slate-400 dark:text-slate-500">
-                Reported by {r.reporter?.name || 'Unknown'} ({r.reporter?.email || '—'})
-              </p>
+              {r.status === 'open' && (
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => setStatus(r, 'reviewed')} disabled={busy === r._id} className="btn-primary flex-1 whitespace-nowrap sm:flex-none">
+                    <Check size={16} /> Reviewed
+                  </button>
+                  <button onClick={() => setStatus(r, 'dismissed')} disabled={busy === r._id} className="btn-outline flex-1 whitespace-nowrap sm:flex-none">
+                    <X size={16} /> Dismiss
+                  </button>
+                  {r.targetType === 'tuition' && r.targetId && (
+                    <button
+                      onClick={() => setDeleteTarget(r)}
+                      className="btn-outline flex-1 whitespace-nowrap border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 sm:flex-none"
+                    >
+                      <Trash2 size={16} /> Delete Tuition
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-            {r.status === 'open' && (
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => setStatus(r, 'reviewed')} disabled={busy === r._id} className="btn-primary flex-1 whitespace-nowrap sm:flex-none">
-                  <Check size={16} /> Reviewed
-                </button>
-                <button onClick={() => setStatus(r, 'dismissed')} disabled={busy === r._id} className="btn-outline flex-1 whitespace-nowrap sm:flex-none">
-                  <X size={16} /> Dismiss
-                </button>
-              </div>
-            )}
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDeleteTuition}
+        title="Delete reported tuition?"
+        message={deleteTarget ? `This will permanently delete the tuition post (ID: ${deleteTarget.targetId}), along with all its applications and bookmarks. The report will be marked as reviewed. This action cannot be undone.` : ''}
+        confirmText="Delete Tuition"
+        busyText="Deleting..."
+        busy={deleting}
+      />
+    </>
   );
 }
