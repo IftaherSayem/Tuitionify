@@ -26,19 +26,10 @@ router.post('/:tuitionId', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
-    const skip = (page - 1) * limit;
-    const filter = { user: req.dbUser._id };
-    const [bookmarks, total] = await Promise.all([
-      Bookmark.find(filter)
-        .populate({ path: 'tuition', populate: { path: 'createdBy', select: 'name photo' } })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      Bookmark.countDocuments(filter),
-    ]);
-    res.json({ data: bookmarks, page, totalPages: Math.ceil(total / limit), total });
+    const bookmarks = await Bookmark.find({ user: req.dbUser._id })
+      .populate({ path: 'tuition', populate: { path: 'createdBy', select: 'name photo' } })
+      .sort({ createdAt: -1 });
+    res.json(bookmarks);
   } catch (err) {
     next(err);
   }
