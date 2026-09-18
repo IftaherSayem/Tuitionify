@@ -2,9 +2,14 @@ import { Router } from 'express';
 import User from '../models/User.js';
 import Tuition from '../models/Tuition.js';
 import Application from '../models/Application.js';
+import Bookmark from '../models/Bookmark.js';
 import Report from '../models/Report.js';
+import Review from '../models/Review.js';
 import { verifyToken, loadUser, requireAdmin } from '../middleware/auth.js';
 import { asEnum } from '../utils/sanitize.js';
+import { purgeUserData } from '../utils/accountDeletion.js';
+import { admin } from '../config/firebase.js';
+import { recomputeRating } from '../utils/rating.js';
 
 const router = Router();
 
@@ -119,6 +124,57 @@ router.patch('/reports/:id', async (req, res, next) => {
       await report.save();
     }
     res.json(report);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/tuitions/:id — admin removes a tuition and its children
+router.delete('/tuitions/:id', async (req, res, next) => {
+  try {
+    const tuition = await Tuition.findById(req.params.id);
+    if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
+
+    // Same cascade as DELETE /api/tuitions/:id but available to admins
+    // regardless of ownership.
+    await Promise.all([
+      Application.deleteMany({ tuition: tuition._id }),
+      Bookmark.deleteMany({ tuition: tuition._id }),
+      Report.deleteMany({ targetType: 'tuition', targetId: tuition._id }),
+    ]);
+    await tuition.deleteOne();
+    res.json({ message: 'Tuition deleted by admin' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/users/:id — admin deletes a user account and all data
+router.delete('/users/:id', async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (String(user._id) === String(req.dbUser._id)) {
+      return res.status(400).json({ message: 'You cannot delete your own account from the admin panel.' });
+    }
+
+    const removed = await purgeUserData(user._id);
+
+    let authRemoved = true;
+    try {
+      await admin.auth().deleteUser(user.firebaseUid);
+    } catch (err) {
+      if (err?.code !== 'auth/user-not-found') {
+        authRemoved = false;
+        console.error(
+          '✗ Admin-initiated account purge: Firebase login remains —',
+          user.firebaseUid,
+          err?.code || err?.message,
+        );
+      }
+    }
+
+    res.json({ message: 'User account deleted by admin', authRemoved, removed });
   } catch (err) {
     next(err);
   }
