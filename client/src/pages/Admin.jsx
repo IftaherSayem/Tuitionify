@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
@@ -20,7 +20,16 @@ const TABS = [
 ];
 
 export default function Admin() {
-  const [tab, setTab] = useState('tutors');
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Keep the active tab in the URL so "back" from a linked page can land on the
+  // right tab (e.g. an admin opening a tuition then returning to the Tuitions tab).
+  const tab = TABS.some((t) => t.key === searchParams.get('tab'))
+    ? searchParams.get('tab')
+    : 'tutors';
+
+  function selectTab(key) {
+    setSearchParams({ tab: key });
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -38,7 +47,7 @@ export default function Admin() {
         {TABS.map((t) => (
           <button
             key={t.key}
-            onClick={() => setTab(t.key)}
+            onClick={() => selectTab(t.key)}
             className={`flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition sm:px-4 ${
               tab === t.key
                 ? 'border-brand-600 text-brand-700 dark:text-brand-400'
@@ -529,7 +538,7 @@ function TuitionsTab() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      to={`/tuitions/${t._id}`}
+                      to={`/tuitions/${t._id}?from=admin`}
                       className="font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-400"
                     >
                       {t.title}
@@ -577,7 +586,7 @@ function TuitionsTab() {
 
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    to={`/tuitions/${t._id}`}
+                    to={`/tuitions/${t._id}?from=admin`}
                     className="btn-outline flex-1 whitespace-nowrap text-sm sm:flex-none"
                   >
                     View Details

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   MapPin, Wallet, CalendarDays, BookOpen, Monitor, Home, User, Phone, Send, ArrowLeft, Flag, Pencil, Trash2,
 } from 'lucide-react';
@@ -14,6 +14,10 @@ import { CURRENCY } from '../data/options';
 export default function TuitionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // An admin who opened this page from the admin panel should return to the
+  // admin Tuitions tab, not the public tuition listing.
+  const fromAdmin = searchParams.get('from') === 'admin';
   const { profile, isTutor, isSeeker } = useAuth();
   const [tuition, setTuition] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -99,8 +103,11 @@ export default function TuitionDetails() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <div className="mb-6 flex items-center justify-between">
-        <Link to="/tuitions" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400">
-          <ArrowLeft size={16} /> Back to tuitions
+        <Link
+          to={fromAdmin ? '/admin?tab=tuitions' : '/tuitions'}
+          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400"
+        >
+          <ArrowLeft size={16} /> {fromAdmin ? 'Back to admin panel' : 'Back to tuitions'}
         </Link>
         <div className="flex items-center gap-2">
           {isOwner && (
