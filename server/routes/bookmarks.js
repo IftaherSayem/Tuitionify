@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Bookmark from '../models/Bookmark.js';
+import Tuition from '../models/Tuition.js';
 import { verifyToken, loadUser } from '../middleware/auth.js';
 
 const router = Router();
@@ -13,6 +14,9 @@ router.post('/:tuitionId', async (req, res, next) => {
       await existing.deleteOne();
       return res.json({ bookmarked: false });
     }
+    // Verify the tuition exists before creating a dangling bookmark.
+    const tuition = await Tuition.findById(req.params.tuitionId);
+    if (!tuition) return res.status(404).json({ message: 'Tuition not found' });
     await Bookmark.create({ user: req.dbUser._id, tuition: req.params.tuitionId });
     res.json({ bookmarked: true });
   } catch (err) {

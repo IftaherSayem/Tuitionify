@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import TutorBookmark from '../models/TutorBookmark.js';
+import User from '../models/User.js';
 import { verifyToken, loadUser, NOT_RESTRICTED } from '../middleware/auth.js';
 
 const router = Router();
@@ -13,6 +14,9 @@ router.post('/:tutorId', async (req, res, next) => {
       await existing.deleteOne();
       return res.json({ bookmarked: false });
     }
+    // Verify the tutor exists and is not restricted before creating a bookmark.
+    const tutor = await User.findOne({ _id: req.params.tutorId, role: 'tutor', ...NOT_RESTRICTED });
+    if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
     await TutorBookmark.create({ user: req.dbUser._id, tutor: req.params.tutorId });
     res.json({ bookmarked: true });
   } catch (err) {
