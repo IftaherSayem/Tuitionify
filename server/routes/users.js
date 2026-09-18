@@ -36,6 +36,17 @@ function publicTutor(tutorDoc, { revealContact = false } = {}) {
   return obj;
 }
 
+// Strips internal fields from a user document for API responses.
+// Matches the same set as PRIVATE_FIELDS but works on a full document
+// (e.g. after .create() where .select() was not available).
+function safeUser(doc) {
+  const obj = doc.toObject ? doc.toObject() : { ...doc };
+  delete obj.firebaseUid;
+  delete obj.emailVerified;
+  delete obj.__v;
+  return obj;
+}
+
 // POST /api/users/register
 // Called right after Firebase signup/login to create or fetch the
 // Mongo profile. Picks up name/email/uid from the verified token.
@@ -51,7 +62,7 @@ router.post('/register', verifyToken, async (req, res, next) => {
     if (user?.restricted) {
       return res.status(403).json({ message: 'Your account has been restricted by an administrator.' });
     }
-    if (user) return res.json(user); // already registered
+    if (user) return res.json(safeUser(user)); // already registered
 
     const { name, role, phone, photo, gender } = req.body;
     if (!role || !['tutor', 'seeker'].includes(role)) {
@@ -88,7 +99,7 @@ router.post('/register', verifyToken, async (req, res, next) => {
       ...tutorFields,
     });
 
-    res.status(201).json(user);
+    res.status(201).json(safeUser(user));
   } catch (err) {
     next(err);
   }
