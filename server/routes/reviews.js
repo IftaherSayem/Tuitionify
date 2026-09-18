@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Review from '../models/Review.js';
 import User from '../models/User.js';
-import { verifyToken, loadUser, requireRole, requireVerifiedEmail } from '../middleware/auth.js';
+import { verifyToken, loadUser, requireRole, requireVerifiedEmail, isAdminEmail, hasVerifiedEmail } from '../middleware/auth.js';
 import { hasEngagement } from '../utils/engagement.js';
 import { recomputeRating } from '../utils/rating.js';
 import { rateLimit } from '../middleware/rateLimit.js';
@@ -74,6 +74,29 @@ router.patch('/:id/reply', verifyToken, loadUser, async (req, res, next) => {
     review.replyAt = new Date();
     await review.save();
     res.json(review);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/reviews/:id — author or admin deletes a review.
+// Admins can remove abusive/defamatory reviews; authors can retract
+// their own. Recomputes the tutor's rating after deletion.
+router.delete('/:id', verifyToken, loadUser, async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+
+    const isAuthor = String(review.author) === String(req.dbUser._id);
+    const isAdmin = isAdminEmail(req.dbUser.email) && hasVerifiedEmail(req);
+    if (!isAuthor && !isAdmin) {
+      return res.status(403).json({ message: 'Only the review author or an admin can delete this review' });
+    }
+
+    const tutorId = review.tutor;
+    await review.deleteOne();
+    await recomputeRating(tutorId);
+    res.json({ message: 'Review deleted' });
   } catch (err) {
     next(err);
   }
