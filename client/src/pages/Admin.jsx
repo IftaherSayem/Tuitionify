@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2, FileText } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2, FileText, Search, ScrollText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -17,7 +17,38 @@ const TABS = [
   { key: 'tuitions', label: 'Tuitions', icon: FileText },
   { key: 'reports', label: 'Reports', icon: Flag },
   { key: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { key: 'logs', label: 'Activity Log', icon: ScrollText },
 ];
+
+// Reusable debounced search input for admin tabs.
+function AdminSearch({ value, onChange, placeholder = 'Search…' }) {
+  const [local, setLocal] = useState(value);
+  const timer = useRef(null);
+
+  function handleChange(e) {
+    const v = e.target.value;
+    setLocal(v);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => onChange(v), 350);
+  }
+
+  // Sync from parent when they clear programmatically.
+  useEffect(() => { setLocal(value); }, [value]);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  return (
+    <div className="relative w-full sm:w-64">
+      <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      <input
+        type="text"
+        value={local}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500"
+      />
+    </div>
+  );
+}
 
 export default function Admin() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,6 +96,7 @@ export default function Admin() {
         {tab === 'tuitions' && <TuitionsTab />}
         {tab === 'reports' && <ReportsTab />}
         {tab === 'analytics' && <AnalyticsTab />}
+        {tab === 'logs' && <ActivityLogTab />}
       </div>
     </div>
   );
@@ -225,20 +257,21 @@ function TutorsTab() {
   const [busy, setBusy] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState('');
 
-  function loadTutors() {
-    // The endpoint is paginated and returns { data, page, totalPages, total }.
-    api.get('/admin/tutors', { params: { limit: 100 } })
+  const loadTutors = useCallback(() => {
+    const params = { limit: 100 };
+    if (search) params.q = search;
+    api.get('/admin/tutors', { params })
       .then(({ data }) => setTutors(data.data))
       .catch(() => toast.error('Failed to load tutors'));
-  }
+  }, [search]);
 
   useEffect(() => {
     loadTutors();
-    // Auto-refresh every 30 seconds to catch external changes (user self-deletions, etc.)
     const interval = setInterval(loadTutors, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadTutors]);
 
   async function toggleVerify(t) {
     setBusy(t._id);
@@ -282,11 +315,14 @@ function TutorsTab() {
   }
 
   if (!tutors) return <Spinner />;
-  if (!tutors.length)
+  if (!tutors.length && !search)
     return <EmptyState title="No tutors yet" message="Tutors will appear here once they register." icon={Users} />;
 
   return (
     <>
+      <div className="mb-4">
+        <AdminSearch value={search} onChange={setSearch} placeholder="Search by name, email, university…" />
+      </div>
       <div className="space-y-3">
         {tutors.map((t) => (
           <div key={t._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -350,19 +386,21 @@ function GuardiansTab() {
   const [busy, setBusy] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState('');
 
-  function loadGuardians() {
-    api.get('/admin/guardians', { params: { limit: 100 } })
+  const loadGuardians = useCallback(() => {
+    const params = { limit: 100 };
+    if (search) params.q = search;
+    api.get('/admin/guardians', { params })
       .then(({ data }) => setGuardians(data.data))
       .catch(() => toast.error('Failed to load guardians'));
-  }
+  }, [search]);
 
   useEffect(() => {
     loadGuardians();
-    // Auto-refresh every 30 seconds to catch external changes (user self-deletions, etc.)
     const interval = setInterval(loadGuardians, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadGuardians]);
 
   async function toggleRestrict(g) {
     setBusy(g._id);
@@ -393,11 +431,14 @@ function GuardiansTab() {
   }
 
   if (!guardians) return <Spinner />;
-  if (!guardians.length)
+  if (!guardians.length && !search)
     return <EmptyState title="No guardians yet" message="Guardians will appear here once they register." icon={UserCheck} />;
 
   return (
     <>
+      <div className="mb-4">
+        <AdminSearch value={search} onChange={setSearch} placeholder="Search by name, email, phone…" />
+      </div>
       <div className="space-y-3">
         {guardians.map((g) => (
           <div key={g._id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -451,21 +492,23 @@ function TuitionsTab() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState('');
 
-  function loadTuitions() {
+  const loadTuitions = useCallback(() => {
     const params = { limit: 100 };
     if (statusFilter !== 'all') params.status = statusFilter;
+    if (search) params.q = search;
 
     api.get('/admin/tuitions', { params })
       .then(({ data }) => setTuitions(data.data))
       .catch(() => toast.error('Failed to load tuitions'));
-  }
+  }, [statusFilter, search]);
 
   useEffect(() => {
     loadTuitions();
     const interval = setInterval(loadTuitions, 30000);
     return () => clearInterval(interval);
-  }, [statusFilter]);
+  }, [loadTuitions]);
 
   async function confirmDelete() {
     if (!deleteTarget) return;
@@ -486,42 +529,45 @@ function TuitionsTab() {
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setStatusFilter('all')}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              statusFilter === 'all'
-                ? 'bg-brand-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setStatusFilter('open')}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              statusFilter === 'open'
-                ? 'bg-brand-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-            }`}
-          >
-            Open
-          </button>
-          <button
-            onClick={() => setStatusFilter('closed')}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              statusFilter === 'closed'
-                ? 'bg-brand-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-            }`}
-          >
-            Closed
-          </button>
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setStatusFilter('all')}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                statusFilter === 'all'
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setStatusFilter('open')}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                statusFilter === 'open'
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+              }`}
+            >
+              Open
+            </button>
+            <button
+              onClick={() => setStatusFilter('closed')}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                statusFilter === 'closed'
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+              }`}
+            >
+              Closed
+            </button>
+          </div>
+          <span className="text-sm text-slate-500 dark:text-slate-400">
+            {tuitions.length} tuition(s)
+          </span>
         </div>
-        <span className="text-sm text-slate-500 dark:text-slate-400">
-          {tuitions.length} tuition(s)
-        </span>
+        <AdminSearch value={search} onChange={setSearch} placeholder="Search by title, area…" />
       </div>
 
       {tuitions.length === 0 ? (
@@ -732,5 +778,77 @@ function ReportsTab() {
         busy={deleting}
       />
     </>
+  );
+}
+
+function ActivityLogTab() {
+  const [logs, setLogs] = useState(null);
+
+  const loadLogs = useCallback(() => {
+    api.get('/admin/logs', { params: { limit: 100 } })
+      .then(({ data }) => setLogs(data.data))
+      .catch(() => toast.error('Failed to load logs'));
+  }, []);
+
+  useEffect(() => {
+    loadLogs();
+    const interval = setInterval(loadLogs, 30000);
+    return () => clearInterval(interval);
+  }, [loadLogs]);
+
+  if (!logs) return <Spinner />;
+  if (!logs.length)
+    return <EmptyState title="No activity yet" message="Admin actions will be logged here." icon={ScrollText} />;
+
+  const actionLabels = {
+    restrict_user: 'Restricted User',
+    unrestrict_user: 'Unrestricted User',
+    verify_tutor: 'Verified Tutor',
+    unverify_tutor: 'Unverified Tutor',
+    update_report_status: 'Updated Report',
+    delete_tuition: 'Deleted Tuition',
+    delete_user: 'Deleted User',
+  };
+
+  return (
+    <div className="space-y-3">
+      {logs.map((log) => (
+        <div key={log._id} className="card p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {actionLabels[log.action] || log.action}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  by {log.actorEmail}
+                </span>
+              </div>
+
+              <div className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                {log.targetEmail && (
+                  <span className="mr-3">Target: <span className="font-medium text-slate-700 dark:text-slate-300">{log.targetEmail}</span></span>
+                )}
+                {log.details?.tuitionTitle && (
+                  <span className="mr-3">Tuition: <span className="font-medium text-slate-700 dark:text-slate-300">{log.details.tuitionTitle}</span></span>
+                )}
+              </div>
+
+              {log.action === 'update_report_status' && log.details && (
+                <p className="mt-1 text-xs text-slate-500">
+                  Status changed from <span className="font-mono">{log.details.previousStatus}</span> to <span className="font-mono">{log.details.newStatus}</span>
+                </p>
+              )}
+
+              <div className="mt-2 text-xs text-slate-400">
+                {new Date(log.createdAt).toLocaleString()}
+                <span className="mx-2">•</span>
+                <span className="font-mono text-[10px]">ID: {log.targetId}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

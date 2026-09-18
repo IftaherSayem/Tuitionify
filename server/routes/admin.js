@@ -5,8 +5,9 @@ import Application from '../models/Application.js';
 import Bookmark from '../models/Bookmark.js';
 import Report from '../models/Report.js';
 import Review from '../models/Review.js';
+import AdminLog from '../models/AdminLog.js';
 import { verifyToken, loadUser, requireAdmin } from '../middleware/auth.js';
-import { asEnum } from '../utils/sanitize.js';
+import { asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { purgeUserData } from '../utils/accountDeletion.js';
 import { admin } from '../config/firebase.js';
 import { recomputeRating } from '../utils/rating.js';
@@ -29,13 +30,19 @@ function paging(req, { defaultLimit = 25, maxLimit = 100 } = {}) {
 router.get('/tutors', async (req, res, next) => {
   try {
     const { page, limit, skip } = paging(req);
+    // Optional text search across name/email/university/department.
+    const filter = { role: 'tutor' };
+    const search = safeSearchRegex(req.query.q);
+    if (search) {
+      filter.$or = [{ name: search }, { email: search }, { university: search }, { department: search }];
+    }
     const [tutors, total] = await Promise.all([
-      User.find({ role: 'tutor' })
+      User.find(filter)
         .select('name email university department isVerified restricted ratingAvg createdAt')
         .sort({ isVerified: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit),
-      User.countDocuments({ role: 'tutor' }),
+      User.countDocuments(filter),
     ]);
     res.json({ data: tutors, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
@@ -47,15 +54,38 @@ router.get('/tutors', async (req, res, next) => {
 router.get('/guardians', async (req, res, next) => {
   try {
     const { page, limit, skip } = paging(req);
+    // Optional text search across name/email/phone.
+    const filter = { role: 'seeker' };
+    const search = safeSearchRegex(req.query.q);
+    if (search) {
+      filter.$or = [{ name: search }, { email: search }, { phone: search }];
+    }
     const [guardians, total] = await Promise.all([
-      User.find({ role: 'seeker' })
+      User.find(filter)
         .select('name email phone restricted createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
-      User.countDocuments({ role: 'seeker' }),
+      User.countDocuments(filter),
     ]);
     res.json({ data: guardians, page, totalPages: Math.ceil(total / limit), total });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/logs — audit trail of admin actions, newest first
+router.get('/logs', async (req, res, next) => {
+  try {
+    const { page, limit, skip } = paging(req, { defaultLimit: 50, maxLimit: 200 });
+    const [logs, total] = await Promise.all([
+      AdminLog.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      AdminLog.countDocuments(),
+    ]);
+    res.json({ data: logs, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }
@@ -66,6 +96,11 @@ router.get('/tuitions', async (req, res, next) => {
   try {
     const { page, limit, skip } = paging(req);
     const filter = {};
+
+    const search = safeSearchRegex(req.query.q);
+    if (search) {
+      filter.$or = [{ title: search }, { area: search }];
+    }
 
     // Filter by status
     if (req.query.status === 'open' || req.query.status === 'closed') {

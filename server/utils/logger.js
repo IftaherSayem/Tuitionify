@@ -1,4 +1,5 @@
 import winston from 'winston';
+import AdminLog from '../models/AdminLog.js';
 
 // Structured logging with Winston — JSON in production, colored console locally.
 // Logs to console (captured by Vercel) and optionally to files in local dev.
@@ -42,6 +43,25 @@ export function logAdminAction(action, actor, target, details = {}) {
     ...details,
     timestamp: new Date().toISOString(),
   });
+
+  // Also persist to Mongo so the audit trail is queryable from the admin panel.
+  // Fire-and-forget: a logging failure must never fail the admin action itself,
+  // so swallow errors and rely on the Winston console/file log as the fallback.
+  try {
+    AdminLog.create({
+      action,
+      actorId: actor._id,
+      actorEmail: actor.email,
+      targetId: target || undefined,
+      targetEmail: details.targetEmail || '',
+      targetRole: details.targetRole || '',
+      details,
+    }).catch((err) => {
+      logger.error('Failed to persist admin log', { action, error: err.message });
+    });
+  } catch (err) {
+    logger.error('Failed to persist admin log', { action, error: err.message });
+  }
 }
 
 export default logger;
