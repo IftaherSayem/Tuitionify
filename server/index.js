@@ -17,6 +17,7 @@ import adminRoutes from './routes/admin.js';
 import bookmarkRoutes from './routes/bookmarks.js';
 import tutorBookmarkRoutes from './routes/tutorBookmarks.js';
 import uploadRoutes from './routes/uploads.js';
+import { CLASS_LEVELS, SUBJECTS, AREAS, SALARY_MIN, SALARY_MAX } from './utils/options.js';
 import { rateLimit } from './middleware/rateLimit.js';
 
 const app = express();
@@ -58,6 +59,12 @@ app.use(async (req, res, next) => {
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'tuitionify-api' }));
+
+// Public options — single source of truth for dropdowns/selects.
+// The client can fetch this instead of maintaining a separate copy.
+app.get('/api/options', (req, res) => {
+  res.json({ classLevels: CLASS_LEVELS, subjects: SUBJECTS, areas: AREAS, salaryMin: SALARY_MIN, salaryMax: SALARY_MAX });
+});
 
 app.use('/api/users', userRoutes);
 app.use('/api/tuitions', tuitionRoutes);
