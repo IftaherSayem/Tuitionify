@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2 } from 'lucide-react';
+import { ShieldCheck, Users, UserCheck, Flag, BadgeCheck, X, Check, BarChart3, Download, ShieldBan, ShieldOff, Trash2, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Link } from 'react-router-dom';
 import api from '../api/client';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
 import VerifiedBadge from '../components/VerifiedBadge';
 import ConfirmModal from '../components/ConfirmModal';
 import { useTheme } from '../context/ThemeContext';
+import { CURRENCY } from '../data/options';
 
 const TABS = [
   { key: 'tutors', label: 'Tutors', icon: Users },
   { key: 'guardians', label: 'Guardians', icon: UserCheck },
+  { key: 'tuitions', label: 'Tuitions', icon: FileText },
   { key: 'reports', label: 'Reports', icon: Flag },
   { key: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
@@ -50,6 +53,7 @@ export default function Admin() {
       <div className="mt-6">
         {tab === 'tutors' && <TutorsTab />}
         {tab === 'guardians' && <GuardiansTab />}
+        {tab === 'tuitions' && <TuitionsTab />}
         {tab === 'reports' && <ReportsTab />}
         {tab === 'analytics' && <AnalyticsTab />}
       </div>
@@ -425,6 +429,182 @@ function GuardiansTab() {
         onConfirm={confirmDelete}
         title="Delete guardian account?"
         message={deleteTarget ? `This will permanently delete ${deleteTarget.name}'s account (${deleteTarget.email}), all their tuition posts, applications received, bookmarks, and contact requests. This action cannot be undone.` : ''}
+        confirmText="Delete Permanently"
+        busyText="Deleting..."
+        busy={deleting}
+      />
+    </>
+  );
+}
+
+function TuitionsTab() {
+  const [tuitions, setTuitions] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  function loadTuitions() {
+    const params = { limit: 100 };
+    if (statusFilter !== 'all') params.status = statusFilter;
+
+    api.get('/admin/tuitions', { params })
+      .then(({ data }) => setTuitions(data.data))
+      .catch(() => toast.error('Failed to load tuitions'));
+  }
+
+  useEffect(() => {
+    loadTuitions();
+    const interval = setInterval(loadTuitions, 30000);
+    return () => clearInterval(interval);
+  }, [statusFilter]);
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/tuitions/${deleteTarget._id}`);
+      setTuitions((list) => list.filter((x) => x._id !== deleteTarget._id));
+      toast.success('Tuition deleted permanently');
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  if (!tuitions) return <Spinner />;
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              statusFilter === 'all'
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setStatusFilter('open')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              statusFilter === 'open'
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+            }`}
+          >
+            Open
+          </button>
+          <button
+            onClick={() => setStatusFilter('closed')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              statusFilter === 'closed'
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+            }`}
+          >
+            Closed
+          </button>
+        </div>
+        <span className="text-sm text-slate-500 dark:text-slate-400">
+          {tuitions.length} tuition(s)
+        </span>
+      </div>
+
+      {tuitions.length === 0 ? (
+        <EmptyState
+          title="No tuitions found"
+          message={statusFilter === 'all' ? 'No tuitions have been posted yet.' : `No ${statusFilter} tuitions found.`}
+          icon={FileText}
+        />
+      ) : (
+        <div className="space-y-3">
+          {tuitions.map((t) => (
+            <div key={t._id} className="card p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      to={`/tuitions/${t._id}`}
+                      className="font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-400"
+                    >
+                      {t.title}
+                    </Link>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                        t.status === 'open'
+                          ? 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                      }`}
+                    >
+                      {t.status}
+                    </span>
+                    {t.createdBy?.restricted && (
+                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                        Owner Restricted
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {t.subjects?.slice(0, 3).map((s) => (
+                      <span key={s} className="chip text-xs">
+                        {s}
+                      </span>
+                    ))}
+                    {t.subjects?.length > 3 && (
+                      <span className="chip text-xs">+{t.subjects.length - 3}</span>
+                    )}
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span>📍 {t.area}</span>
+                    <span>💰 {CURRENCY}{t.salary?.toLocaleString()}/mo</span>
+                    <span>📚 {t.classLevel}</span>
+                  </div>
+
+                  <p className="mt-2 break-all text-xs text-slate-400 dark:text-slate-500">
+                    Posted by: {t.createdBy?.name || 'Unknown'} ({t.createdBy?.email || '—'})
+                  </p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                    Posted: {new Date(t.createdAt).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    to={`/tuitions/${t._id}`}
+                    className="btn-outline flex-1 whitespace-nowrap text-sm sm:flex-none"
+                  >
+                    View Details
+                  </Link>
+                  <button
+                    onClick={() => setDeleteTarget(t)}
+                    className="btn-outline flex-1 whitespace-nowrap border-red-300 text-sm text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 sm:flex-none"
+                  >
+                    <Trash2 size={16} /> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete tuition post?"
+        message={
+          deleteTarget
+            ? `This will permanently delete "${deleteTarget.title}" posted by ${deleteTarget.createdBy?.name || 'Unknown'}, along with all applications and bookmarks. This action cannot be undone.`
+            : ''
+        }
         confirmText="Delete Permanently"
         busyText="Deleting..."
         busy={deleting}

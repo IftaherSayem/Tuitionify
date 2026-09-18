@@ -61,6 +61,31 @@ router.get('/guardians', async (req, res, next) => {
   }
 });
 
+// GET /api/admin/tuitions — list all tuitions with filters
+router.get('/tuitions', async (req, res, next) => {
+  try {
+    const { page, limit, skip } = paging(req);
+    const filter = {};
+
+    // Filter by status
+    if (req.query.status === 'open' || req.query.status === 'closed') {
+      filter.status = req.query.status;
+    }
+
+    const [tuitions, total] = await Promise.all([
+      Tuition.find(filter)
+        .populate('createdBy', 'name email restricted')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Tuition.countDocuments(filter),
+    ]);
+    res.json({ data: tuitions, page, totalPages: Math.ceil(total / limit), total });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH /api/admin/users/:id/restrict — restrict or unrestrict any user
 router.patch('/users/:id/restrict', async (req, res, next) => {
   try {
