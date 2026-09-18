@@ -1,9 +1,15 @@
 // Minimal in-memory rate limiter — no external dependency.
 //
-// Note on serverless: each Vercel instance keeps its own counters, so limits
-// are per-instance rather than global. That is enough to stop a single client
-// hammering an endpoint in a loop; a shared store (Redis) would be needed for
-// strict global limits.
+// ⚠ SERVERLESS LIMITATION: Each Vercel function instance keeps its own counters,
+// so these limits are per-instance NOT global. Cold starts reset the map. This
+// protects against accidental loops and basic abuse, but a determined attacker
+// can bypass limits by triggering fresh instances.
+//
+// For production-grade rate limiting on Vercel serverless, use:
+// - Vercel Edge Config + KV for shared state across instances
+// - Upstash Redis (serverless-native)
+// - Vercel's built-in rate limiting (if available on your plan)
+// - A dedicated rate-limit service (e.g., Unkey, Arcjet)
 
 const buckets = new Map();
 
