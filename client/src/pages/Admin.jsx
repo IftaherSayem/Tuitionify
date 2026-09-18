@@ -210,11 +210,18 @@ function TutorsTab() {
   const [tutors, setTutors] = useState(null);
   const [busy, setBusy] = useState('');
 
-  useEffect(() => {
+  function loadTutors() {
     // The endpoint is paginated and returns { data, page, totalPages, total }.
     api.get('/admin/tutors', { params: { limit: 100 } })
       .then(({ data }) => setTutors(data.data))
       .catch(() => toast.error('Failed to load tutors'));
+  }
+
+  useEffect(() => {
+    loadTutors();
+    // Auto-refresh every 30 seconds to catch external changes (user self-deletions, etc.)
+    const interval = setInterval(loadTutors, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   async function toggleVerify(t) {
@@ -292,10 +299,17 @@ function GuardiansTab() {
   const [guardians, setGuardians] = useState(null);
   const [busy, setBusy] = useState('');
 
-  useEffect(() => {
+  function loadGuardians() {
     api.get('/admin/guardians', { params: { limit: 100 } })
       .then(({ data }) => setGuardians(data.data))
       .catch(() => toast.error('Failed to load guardians'));
+  }
+
+  useEffect(() => {
+    loadGuardians();
+    // Auto-refresh every 30 seconds to catch external changes (user self-deletions, etc.)
+    const interval = setInterval(loadGuardians, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   async function toggleRestrict(g) {
