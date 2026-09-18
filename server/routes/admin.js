@@ -10,6 +10,7 @@ import { asEnum } from '../utils/sanitize.js';
 import { purgeUserData } from '../utils/accountDeletion.js';
 import { admin } from '../config/firebase.js';
 import { recomputeRating } from '../utils/rating.js';
+import { logAdminAction } from '../utils/logger.js';
 
 const router = Router();
 
@@ -71,8 +72,17 @@ router.patch('/users/:id/restrict', async (req, res, next) => {
     if (String(user._id) === String(req.dbUser._id) && Boolean(req.body.restricted)) {
       return res.status(400).json({ message: 'You cannot restrict your own account.' });
     }
+    const wasRestricted = user.restricted;
     user.restricted = Boolean(req.body.restricted);
     await user.save();
+
+    logAdminAction(
+      user.restricted ? 'restrict_user' : 'unrestrict_user',
+      req.dbUser,
+      user._id,
+      { targetEmail: user.email, targetRole: user.role, previousState: wasRestricted }
+    );
+
     res.json({ _id: user._id, restricted: user.restricted });
   } catch (err) {
     next(err);
@@ -84,8 +94,17 @@ router.patch('/tutors/:id/verify', async (req, res, next) => {
   try {
     const tutor = await User.findOne({ _id: req.params.id, role: 'tutor' });
     if (!tutor) return res.status(404).json({ message: 'Tutor not found' });
+    const wasVerified = tutor.isVerified;
     tutor.isVerified = Boolean(req.body.isVerified);
     await tutor.save();
+
+    logAdminAction(
+      tutor.isVerified ? 'verify_tutor' : 'unverify_tutor',
+      req.dbUser,
+      tutor._id,
+      { tutorEmail: tutor.email, tutorName: tutor.name, previousState: wasVerified }
+    );
+
     res.json({ _id: tutor._id, isVerified: tutor.isVerified });
   } catch (err) {
     next(err);
@@ -120,8 +139,13 @@ router.patch('/reports/:id', async (req, res, next) => {
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ message: 'Report not found' });
     if (['open', 'reviewed', 'dismissed'].includes(req.body.status)) {
+      const previousStatus = report.status;
       report.status = req.body.status;
       await report.save();
+      logAdminAction('update_report_status', req.dbUser, report._id, {
+        previousStatus,
+        newStatus: report.status,
+      });
     }
     res.json(report);
   } catch (err) {
@@ -142,6 +166,12 @@ router.delete('/tuitions/:id', async (req, res, next) => {
       Bookmark.deleteMany({ tuition: tuition._id }),
       Report.deleteMany({ targetType: 'tuition', targetId: tuition._id }),
     ]);
+
+    logAdminAction('delete_tuition', req.dbUser, tuition._id, {
+      tuitionTitle: tuition.title,
+      tuitionOwner: tuition.createdBy,
+    });
+
     await tuition.deleteOne();
     res.json({ message: 'Tuition deleted by admin' });
   } catch (err) {
@@ -157,6 +187,11 @@ router.delete('/users/:id', async (req, res, next) => {
     if (String(user._id) === String(req.dbUser._id)) {
       return res.status(400).json({ message: 'You cannot delete your own account from the admin panel.' });
     }
+
+    logAdminAction('delete_user', req.dbUser, user._id, {
+      targetEmail: user.email,
+      targetRole: user.role,
+    });
 
     const removed = await purgeUserData(user._id);
 

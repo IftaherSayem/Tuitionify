@@ -18,7 +18,8 @@ import bookmarkRoutes from './routes/bookmarks.js';
 import tutorBookmarkRoutes from './routes/tutorBookmarks.js';
 import uploadRoutes from './routes/uploads.js';
 import { CLASS_LEVELS, SUBJECTS, AREAS, SALARY_MIN, SALARY_MAX } from './utils/options.js';
-import { rateLimit } from './middleware/rateLimit.js';
+import { rateLimit } from './middleware/rateLimitProd.js';
+import logger from './utils/logger.js';
 
 const app = express();
 
@@ -79,7 +80,13 @@ app.use('/api/uploads', uploadRoutes);
 
 // Central error handler
 app.use((err, req, res, next) => {
-  console.error(err);
+  logger.error('Request error', {
+    error: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    ip: req.ip,
+  });
 
   // A malformed :id reaches Mongoose as a CastError — that's a bad request,
   // not a server fault, and the raw message leaks schema internals.

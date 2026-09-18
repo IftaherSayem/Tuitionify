@@ -4,7 +4,7 @@ import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole, requireVerifiedEmail, isAdminEmail, hasVerifiedEmail } from '../middleware/auth.js';
 import { hasEngagement } from '../utils/engagement.js';
 import { recomputeRating } from '../utils/rating.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 
@@ -73,6 +73,37 @@ router.patch('/:id/reply', verifyToken, loadUser, async (req, res, next) => {
     review.reply = req.body.reply || '';
     review.replyAt = new Date();
     await review.save();
+    res.json(review);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /api/reviews/:id — author edits their own review.
+// Only the rating and comment can be changed. Recomputes tutor rating.
+router.put('/:id', verifyToken, loadUser, requireRole('seeker'), async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+
+    if (String(review.author) !== String(req.dbUser._id)) {
+      return res.status(403).json({ message: 'You can only edit your own reviews' });
+    }
+
+    // Allow updating rating and comment only
+    if (req.body.rating !== undefined) {
+      const score = Number(req.body.rating);
+      if (!Number.isFinite(score) || score < 1 || score > 5) {
+        return res.status(400).json({ message: 'rating must be a number between 1 and 5' });
+      }
+      review.rating = score;
+    }
+    if (req.body.comment !== undefined) {
+      review.comment = req.body.comment || '';
+    }
+
+    await review.save();
+    await recomputeRating(review.tutor);
     res.json(review);
   } catch (err) {
     next(err);

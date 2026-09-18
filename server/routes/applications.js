@@ -4,7 +4,7 @@ import Tuition from '../models/Tuition.js';
 import { verifyToken, loadUser, requireRole } from '../middleware/auth.js';
 import { isValidBdPhone } from '../utils/phone.js';
 import { hasAcceptedApplicant } from '../utils/acceptance.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 

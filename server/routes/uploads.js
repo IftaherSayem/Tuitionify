@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verifyToken, loadUser } from '../middleware/auth.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 

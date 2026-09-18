@@ -2,7 +2,7 @@ import { Router } from 'express';
 import ContactRequest from '../models/ContactRequest.js';
 import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole, NOT_RESTRICTED } from '../middleware/auth.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 

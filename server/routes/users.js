@@ -7,7 +7,7 @@ import { admin } from '../config/firebase.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
 import { hasEngagement } from '../utils/engagement.js';
 import { purgeUserData } from '../utils/accountDeletion.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 

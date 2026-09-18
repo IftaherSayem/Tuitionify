@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Report from '../models/Report.js';
 import { verifyToken, loadUser, requireVerifiedEmail } from '../middleware/auth.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 

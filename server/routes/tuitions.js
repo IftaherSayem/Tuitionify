@@ -6,7 +6,7 @@ import Report from '../models/Report.js';
 import User from '../models/User.js';
 import { verifyToken, loadUser, requireRole, optionalAuth } from '../middleware/auth.js';
 import { asString, asNumber, asEnum, safeSearchRegex } from '../utils/sanitize.js';
-import { rateLimit } from '../middleware/rateLimit.js';
+import { rateLimit } from '../middleware/rateLimitProd.js';
 
 const router = Router();
 
