@@ -124,10 +124,15 @@ router.get('/me', verifyToken, loadUser, async (req, res, next) => {
 // PUT /api/users/me — update own profile
 router.put('/me', verifyToken, loadUser, async (req, res, next) => {
   try {
-    const editable = [
-      'name', 'phone', 'photo', 'gender', 'university', 'department',
-      'subjects', 'classLevels', 'preferredAreas', 'expectedSalary', 'mode', 'bio',
-    ];
+    // Common fields any role may update.
+    const editable = ['name', 'phone', 'photo', 'gender'];
+    // Tutor-specific fields — seekers must not be able to set these.
+    if (req.dbUser.role === 'tutor') {
+      editable.push(
+        'university', 'department', 'subjects', 'classLevels',
+        'preferredAreas', 'expectedSalary', 'mode', 'bio',
+      );
+    }
     for (const key of editable) {
       if (key in req.body) req.dbUser[key] = req.body[key];
     }
