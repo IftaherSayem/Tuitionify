@@ -25,11 +25,12 @@ initFirebase();
 // Security headers — X-Content-Type-Options, X-Frame-Options, HSTS, etc.
 app.use(helmet());
 
-const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
-if (clientUrl === '*' && process.env.NODE_ENV === 'production') {
-  console.warn('⚠ CLIENT_URL is not set — CORS is open to every origin. Set it to your client domain.');
+const clientUrl = (process.env.CLIENT_URL || '').replace(/\/+$/, '');
+if (!clientUrl && process.env.NODE_ENV === 'production') {
+  // Hard-fail in production — a wildcard origin lets any site call the API.
+  throw new Error('CLIENT_URL must be set in production. CORS cannot default to wildcard.');
 }
-app.use(cors({ origin: clientUrl }));
+app.use(cors({ origin: clientUrl || '*' }));
 
 // Base64 photo uploads need a large body, but only on that one route —
 // every other endpoint keeps a small limit so a single request cannot
