@@ -51,13 +51,22 @@ router.post('/', verifyToken, loadUser, requireRole('tutor'), rateLimit({ window
 // GET /api/applications/mine — tutor's own applications
 router.get('/mine', verifyToken, loadUser, requireRole('tutor'), async (req, res, next) => {
   try {
-    const apps = await Application.find({ tutor: req.dbUser._id })
-      .populate({
-        path: 'tuition',
-        populate: { path: 'createdBy', select: 'name photo' },
-      })
-      .sort({ createdAt: -1 });
-    res.json(apps);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const filter = { tutor: req.dbUser._id };
+    const [apps, total] = await Promise.all([
+      Application.find(filter)
+        .populate({
+          path: 'tuition',
+          populate: { path: 'createdBy', select: 'name photo' },
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Application.countDocuments(filter),
+    ]);
+    res.json({ data: apps, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }

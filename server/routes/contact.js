@@ -32,10 +32,19 @@ router.post('/', verifyToken, loadUser, requireRole('seeker'), rateLimit({ windo
 // GET /api/contact-requests/incoming — tutor sees requests sent to them
 router.get('/incoming', verifyToken, loadUser, requireRole('tutor'), async (req, res, next) => {
   try {
-    const requests = await ContactRequest.find({ tutor: req.dbUser._id })
-      .populate('seeker', 'name photo')
-      .sort({ createdAt: -1 });
-    res.json(requests);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const filter = { tutor: req.dbUser._id };
+    const [requests, total] = await Promise.all([
+      ContactRequest.find(filter)
+        .populate('seeker', 'name photo')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      ContactRequest.countDocuments(filter),
+    ]);
+    res.json({ data: requests, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }
@@ -44,9 +53,18 @@ router.get('/incoming', verifyToken, loadUser, requireRole('tutor'), async (req,
 // GET /api/contact-requests/mine — seeker sees their own requests
 router.get('/mine', verifyToken, loadUser, requireRole('seeker'), async (req, res, next) => {
   try {
-    const requests = await ContactRequest.find({ seeker: req.dbUser._id })
-      .populate('tutor', 'name photo phone email')
-      .sort({ createdAt: -1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const filter = { seeker: req.dbUser._id };
+    const [requests, total] = await Promise.all([
+      ContactRequest.find(filter)
+        .populate('tutor', 'name photo phone email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      ContactRequest.countDocuments(filter),
+    ]);
 
     // Hide the tutor's contact unless that specific request was approved.
     const shaped = requests.map((r) => {
@@ -57,7 +75,7 @@ router.get('/mine', verifyToken, loadUser, requireRole('seeker'), async (req, re
       }
       return obj;
     });
-    res.json(shaped);
+    res.json({ data: shaped, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
     next(err);
   }
