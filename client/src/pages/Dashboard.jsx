@@ -108,8 +108,8 @@ function TutorDashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/applications/mine').then(({ data }) => setApps(data)).catch(() => setApps([])),
-      api.get('/contact-requests/incoming').then(({ data }) => setRequests(data)).catch(() => setRequests([])),
+      api.get('/applications/mine').then(({ data }) => setApps(data.data || data)).catch(() => setApps([])),
+      api.get('/contact-requests/incoming').then(({ data }) => setRequests(data.data || data)).catch(() => setRequests([])),
       api.get('/tuitions/recommended').then(({ data }) => setRecommended(data)).catch(() => setRecommended([])),
     ]).finally(() => setLoading(false));
   }, []);
@@ -413,7 +413,7 @@ function SavedTuitions() {
   useEffect(() => {
     if (!firebaseUser) { setLoading(false); return; }
     api.get('/bookmarks')
-      .then(({ data }) => setBookmarks(data))
+      .then(({ data }) => setBookmarks(data.data || data))
       .catch(() => setBookmarks([]))
       .finally(() => setLoading(false));
   }, [firebaseUser]);
@@ -507,7 +507,7 @@ function SavedTutors() {
   useEffect(() => {
     if (!firebaseUser) { setLoading(false); return; }
     api.get('/tutor-bookmarks')
-      .then(({ data }) => setBookmarks(data))
+      .then(({ data }) => setBookmarks(data.data || data))
       .catch(() => setBookmarks([]))
       .finally(() => setLoading(false));
   }, [firebaseUser]);
