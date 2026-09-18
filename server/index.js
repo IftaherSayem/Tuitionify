@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import morgan from 'morgan';
 
 import { connectDB } from './config/db.js';
 import { initFirebase } from './config/firebase.js';
@@ -24,6 +25,10 @@ initFirebase();
 
 // Security headers — X-Content-Type-Options, X-Frame-Options, HSTS, etc.
 app.use(helmet());
+
+// HTTP request logging — 'combined' in production for full details (IP,
+// user-agent, referrer), 'dev' locally for compact colored output.
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 const clientUrl = (process.env.CLIENT_URL || '').replace(/\/+$/, '');
 if (!clientUrl && process.env.NODE_ENV === 'production') {
