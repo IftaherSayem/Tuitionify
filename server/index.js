@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 
 import { connectDB } from './config/db.js';
 import { initFirebase } from './config/firebase.js';
@@ -20,6 +21,9 @@ import { rateLimit } from './middleware/rateLimit.js';
 const app = express();
 
 initFirebase();
+
+// Security headers — X-Content-Type-Options, X-Frame-Options, HSTS, etc.
+app.use(helmet());
 
 const clientUrl = (process.env.CLIENT_URL || '*').replace(/\/+$/, '');
 if (clientUrl === '*' && process.env.NODE_ENV === 'production') {
