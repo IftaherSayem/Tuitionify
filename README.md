@@ -80,6 +80,9 @@ cp .env.example .env
 | `FIREBASE_PROJECT_ID` | service-account JSON → `project_id` |
 | `FIREBASE_CLIENT_EMAIL` | service-account JSON → `client_email` |
 | `FIREBASE_PRIVATE_KEY` | service-account JSON → `private_key` (keep the `\n`, wrap in quotes) |
+| `CLIENT_URL` | Frontend URL (e.g. `http://localhost:5173` or `https://iiuc-tuitionify.vercel.app`) |
+| `RESEND_API_KEY` | Resend Dashboard → API Keys (`re_...`) |
+| `RESEND_FROM` | Verified sender (e.g. `Tuitionify <noreply@tuitionify.publicvm.com>`) |
 
 **Client** — copy `client/.env.example` to `client/.env` and paste your Firebase **web app** config:
 
@@ -121,6 +124,8 @@ Base URL: `http://localhost:5000/api`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
+| POST | `/auth/send-verification` | Firebase | Generate & send custom verification email via Resend (1/min) |
+| POST | `/auth/send-password-reset` | — | Generate & send custom password reset email via Resend (anti-enumeration) |
 | POST | `/users/register` | Firebase | Create Mongo profile after signup |
 | GET  | `/users/me` | Firebase | Current profile |
 | PUT  | `/users/me` | Firebase | Update profile |
@@ -142,6 +147,37 @@ Base URL: `http://localhost:5000/api`
 Protected routes expect a `Authorization: Bearer <firebase-id-token>` header (the frontend attaches this automatically).
 
 List endpoints return `{ data, page, totalPages, total }` and accept `?page=` and `?limit=`.
+
+---
+
+## ✉️ Custom Authentication & Email Flow (Resend + Firebase)
+
+Tuitionify uses **Firebase Authentication** for account management alongside **Firebase Admin SDK** and **Resend** to deliver branded, responsive emails with high deliverability.
+
+### 1. Email Verification Flow
+1. **Signup**: User registers with Email & Password in React (`Register.jsx`).
+2. **Account & Profile Creation**: Firebase user created via `createUserWithEmailAndPassword`; Mongo profile created via `POST /api/users/register`.
+3. **Link Generation**: Client calls `POST /api/auth/send-verification` with Firebase ID token.
+4. **Firebase Admin Link**: Backend validates token, calls `admin.auth().generateEmailVerificationLink(email, { url: '${CLIENT_URL}/auth/action' })`.
+5. **Resend Delivery**: Branded HTML template is sent via Resend from `Tuitionify <noreply@tuitionify.publicvm.com>`.
+6. **Confirmation**: Clicking the link opens `https://iiuc-tuitionify.vercel.app/auth/action?mode=verifyEmail&oobCode=...`, calling `applyActionCode(auth, oobCode)`.
+7. **Protection**: `ProtectedRoute.jsx` blocks unverified email users from accessing protected sections (`/dashboard`, `/post-tuition`, etc.) and redirects them to `/verify-email`. Google sign-in accounts are automatically verified by Firebase.
+
+### 2. Password Reset Flow
+1. **Request**: User enters email on login page and clicks "Forgot password?".
+2. **Endpoint**: Frontend sends `POST /api/auth/send-password-reset` with `{ email }`.
+3. **Anti-Enumeration**: Backend generates link via `admin.auth().generatePasswordResetLink(email, { url: '${CLIENT_URL}/auth/action' })` and delivers it via Resend. If the email is not found, it catches the error silently and **always returns the same generic success message**:
+   > *"If an account exists for this email, a password reset link has been sent."*
+4. **Reset**: User clicks the email link to open `/auth/action?mode=resetPassword&oobCode=...`, enters a new password, and calls `confirmPasswordReset(auth, oobCode, newPassword)`.
+
+### 3. Security Rules Enforced
+- **Strictly Server-Side Secrets**: `RESEND_API_KEY` exists **only** in the server environment. It is never exposed in client code, VITE environment variables, or Git.
+- **Identity Verification**: Verification emails derive the recipient's UID and email solely from the cryptographically verified Firebase ID token (`req.firebaseUser`).
+- **Rate Limiting**:
+  - Verification emails: 1 request per 60 seconds per user (`auth-verify-email`).
+  - Password resets: 5 requests per 15 minutes (`auth-password-reset`).
+
+---
 
 ### Trust & safety rules enforced by the API
 

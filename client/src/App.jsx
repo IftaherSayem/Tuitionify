@@ -18,6 +18,7 @@ const EditTuition = lazy(() => import('./pages/EditTuition'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Admin = lazy(() => import('./pages/Admin'));
 const AuthAction = lazy(() => import('./pages/AuthAction'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/complete-profile" element={<CompleteProfile />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/auth/action" element={<AuthAction />} />
 
           <Route path="/tuitions" element={<Tuitions />} />

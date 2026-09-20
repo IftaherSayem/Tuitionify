@@ -18,9 +18,9 @@ export default function Login() {
     setBusy(true);
     try {
       await resetPassword(form.email);
-      toast.success('Password reset link sent. Check your inbox.');
+      toast.success("If an account exists for this email, you'll receive a password reset link shortly.");
     } catch (err) {
-      toast.error(friendly(err));
+      toast.error(err?.response?.data?.message || err?.message || 'Something went wrong');
     } finally {
       setBusy(false);
     }
@@ -35,7 +35,12 @@ export default function Login() {
     e.preventDefault();
     setBusy(true);
     try {
-      await loginEmail(form.email, form.password);
+      const cred = await loginEmail(form.email, form.password);
+      if (!cred.user.emailVerified) {
+        toast('Please verify your email to access your account.', { icon: '✉️' });
+        navigate('/verify-email', { state: { email: form.email }, replace: true });
+        return;
+      }
       toast.success('Welcome back!');
       await routeAfterLogin();
     } catch (err) {

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
-  const { signupEmail, loginGoogle, registerProfile } = useAuth();
+  const { signupEmail, loginGoogle, registerProfile, resendVerification } = useAuth();
   const navigate = useNavigate();
 
   const [role, setRole] = useState('');
@@ -19,8 +19,14 @@ export default function Register() {
     try {
       await signupEmail(form.name, form.email, form.password);
       await registerProfile({ name: form.name, role });
-      toast.success('Account created!');
-      navigate(role === 'tutor' ? '/dashboard?edit=1' : '/dashboard', { replace: true });
+      try {
+        await resendVerification();
+      } catch (emailErr) {
+        // Non-fatal if rate-limited or transient: user can resend from verify page
+        console.warn('Initial verification email notification:', emailErr?.message);
+      }
+      toast.success('Account created! Please verify your email.');
+      navigate('/verify-email', { state: { email: form.email }, replace: true });
     } catch (err) {
       toast.error(friendly(err));
     } finally {

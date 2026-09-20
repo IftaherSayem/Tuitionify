@@ -20,6 +20,12 @@ export default function ProtectedRoute({ children, role, admin }) {
   // registration" explains nothing and leads to a dashboard that only errors.
   if (restricted) return <Restricted />;
 
+  // Unverified email users must confirm their email before accessing protected areas.
+  // Google sign-in accounts are pre-verified by Firebase so they pass through.
+  if (!firebaseUser.emailVerified) {
+    return <Navigate to="/verify-email" state={{ from: location }} replace />;
+  }
+
   // Logged in with Firebase but no Mongo profile yet → finish registration.
   if (!profile) {
     return <Navigate to="/complete-profile" state={{ from: location }} replace />;

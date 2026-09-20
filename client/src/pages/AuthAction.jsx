@@ -1,20 +1,40 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import {
   applyActionCode, verifyPasswordResetCode, confirmPasswordReset,
 } from 'firebase/auth';
-import { CheckCircle2, XCircle, Lock, LogIn, Home } from 'lucide-react';
+import { CheckCircle2, XCircle, Lock, LogIn, Home, ArrowRight } from 'lucide-react';
 import { auth } from '../firebase/config';
+import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
 
 export default function AuthAction() {
   const [params] = useSearchParams();
   const mode = params.get('mode');
   const oobCode = params.get('oobCode');
+  const { firebaseUser } = useAuth();
 
   if (mode === 'resetPassword') return <ResetPassword oobCode={oobCode} />;
   if (mode === 'verifyEmail') return <VerifyEmail oobCode={oobCode} />;
   if (mode === 'recoverEmail') return <RecoverEmail oobCode={oobCode} />;
+
+  // If redirected from Firebase default action handler without params
+  if (firebaseUser?.emailVerified) {
+    return (
+      <Shell>
+        <Success
+          title="Email verified"
+          message="Your email is verified and your account is active."
+          cta={
+            <Link to="/dashboard" className="btn-primary w-full">
+              <Home size={17} /> Go to dashboard
+            </Link>
+          }
+        />
+      </Shell>
+    );
+  }
+
   return (
     <Shell>
       <Fail title="Invalid link" message="This link is missing or malformed. Request a new one." />
@@ -24,19 +44,61 @@ export default function AuthAction() {
 
 function VerifyEmail({ oobCode }) {
   const [status, setStatus] = useState('working');
+  const { firebaseUser, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!oobCode) return setStatus('error');
-    applyActionCode(auth, oobCode).then(() => setStatus('ok')).catch(() => setStatus('error'));
+    applyActionCode(auth, oobCode)
+      .then(async () => {
+        if (auth.currentUser) {
+          await auth.currentUser.reload();
+          await refreshProfile();
+        }
+        setStatus('ok');
+      })
+      .catch((err) => {
+        // If code was already applied or user is already verified
+        if (auth.currentUser?.emailVerified) {
+          setStatus('ok');
+        } else {
+          setStatus('error');
+        }
+      });
   }, [oobCode]);
+
+  const isLoggedIn = Boolean(firebaseUser || auth.currentUser);
 
   return (
     <Shell>
       {status === 'working' && <Working message="Verifying your email…" />}
       {status === 'ok' && (
-        <Success title="Email verified" message="Your email is confirmed. You're all set to sign in and start using Tuitionify."
-          cta={<Link to="/login" className="btn-primary w-full"><LogIn size={17} /> Continue to login</Link>} />
+        <Success
+          title="Email verified"
+          message={
+            isLoggedIn
+              ? "Your email is confirmed! You are signed in and ready to access all Tuitionify features."
+              : "Your email is confirmed! You can now log in to your account and start using Tuitionify."
+          }
+          cta={
+            isLoggedIn ? (
+              <Link to="/dashboard" className="btn-primary w-full">
+                <Home size={17} /> Go to dashboard
+              </Link>
+            ) : (
+              <Link to="/login" className="btn-primary w-full">
+                <LogIn size={17} /> Continue to login
+              </Link>
+            )
+          }
+        />
       )}
-      {status === 'error' && <Fail title="Verification failed" message="This link is invalid or has expired. Log in and request a new verification email." />}
+      {status === 'error' && (
+        <Fail
+          title="Verification failed"
+          message="This link is invalid or has expired. Please log in to request a fresh verification link."
+        />
+      )}
     </Shell>
   );
 }

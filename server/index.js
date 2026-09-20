@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import { connectDB } from './config/db.js';
 import { initFirebase } from './config/firebase.js';
 
+import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import tuitionRoutes from './routes/tuitions.js';
 import applicationRoutes from './routes/applications.js';
@@ -32,12 +33,34 @@ app.use(helmet());
 // user-agent, referrer), 'dev' locally for compact colored output.
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-const clientUrl = (process.env.CLIENT_URL || '').replace(/\/+$/, '');
-if (!clientUrl && process.env.NODE_ENV === 'production') {
-  // Hard-fail in production — a wildcard origin lets any site call the API.
-  throw new Error('CLIENT_URL must be set in production. CORS cannot default to wildcard.');
-}
-app.use(cors({ origin: clientUrl || '*' }));
+const allowedOrigins = [
+  'https://iiuc-tuitionify.vercel.app',
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+]
+  .filter(Boolean)
+  .map((url) => url.replace(/\/+$/, ''));
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/+$/, '');
+      if (
+        allowedOrigins.includes(cleanOrigin) ||
+        process.env.NODE_ENV !== 'production' ||
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  }),
+);
 
 // Base64 photo uploads need a large body, but only on that one route —
 // every other endpoint keeps a small limit so a single request cannot
@@ -67,6 +90,7 @@ app.get('/api/options', (req, res) => {
   res.json({ classLevels: CLASS_LEVELS, subjects: SUBJECTS, areas: AREAS, salaryMin: SALARY_MIN, salaryMax: SALARY_MAX });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tuitions', tuitionRoutes);
 app.use('/api/applications', applicationRoutes);
