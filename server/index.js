@@ -51,12 +51,13 @@ app.use(
       const cleanOrigin = origin.replace(/\/+$/, '');
       if (
         allowedOrigins.includes(cleanOrigin) ||
+        cleanOrigin.endsWith('.vercel.app') ||
         process.env.NODE_ENV !== 'production' ||
         /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)
       ) {
         return callback(null, true);
       }
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
+      return callback(null, false);
     },
     credentials: true,
   }),

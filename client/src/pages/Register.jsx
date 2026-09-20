@@ -21,11 +21,12 @@ export default function Register() {
       await registerProfile({ name: form.name, role });
       try {
         await resendVerification();
+        toast.success('Account created! Please verify your email.');
       } catch (emailErr) {
-        // Non-fatal if rate-limited or transient: user can resend from verify page
-        console.warn('Initial verification email notification:', emailErr?.message);
+        const errorMsg = emailErr?.response?.data?.message || emailErr?.message || 'Verification email could not be sent';
+        console.warn('Initial verification email notification:', errorMsg);
+        toast.error(`Account created, but email failed: ${errorMsg}`);
       }
-      toast.success('Account created! Please verify your email.');
       navigate('/verify-email', { state: { email: form.email }, replace: true });
     } catch (err) {
       toast.error(friendly(err));
