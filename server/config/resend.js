@@ -1,18 +1,29 @@
 import { Resend } from 'resend';
 
-const apiKey = process.env.RESEND_API_KEY;
+function sanitizeKey(rawKey) {
+  if (!rawKey) return '';
+  return String(rawKey)
+    .trim()
+    .replace(/^["'`]+|["'`]+$/g, '')
+    .trim();
+}
 
-if (!apiKey) {
+const rawApiKey = process.env.RESEND_API_KEY;
+
+if (!rawApiKey) {
   console.warn('⚠ Resend API key not configured — set RESEND_API_KEY in server environment to enable custom emails.');
 }
 
 export function getResend() {
-  const key = process.env.RESEND_API_KEY;
+  const key = sanitizeKey(process.env.RESEND_API_KEY);
   if (!key) return null;
   return new Resend(key);
 }
 
-export const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const initialKey = sanitizeKey(process.env.RESEND_API_KEY);
+export const resend = initialKey ? new Resend(initialKey) : null;
 
 export const DEFAULT_SENDER =
-  process.env.RESEND_FROM || 'Tuitionify <noreply@tuitionify.publicvm.com>';
+  (process.env.RESEND_FROM ? sanitizeKey(process.env.RESEND_FROM) : '') ||
+  'Tuitionify <noreply@tuitionify.publicvm.com>';
+
