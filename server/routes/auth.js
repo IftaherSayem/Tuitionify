@@ -44,9 +44,19 @@ router.post(
       }
 
       const clientUrl = getClientUrl();
-      const firebaseLink = await admin.auth().generateEmailVerificationLink(email, {
-        url: `${clientUrl}/auth/action`,
-      });
+      let firebaseLink;
+      try {
+        firebaseLink = await admin.auth().generateEmailVerificationLink(email, {
+          url: `${clientUrl}/auth/action`,
+        });
+      } catch (linkErr) {
+        if (linkErr.code === 'auth/unauthorized-continue-uri') {
+          console.warn('Continue URL not yet in Firebase Console Authorized Domains, using standard link fallback');
+          firebaseLink = await admin.auth().generateEmailVerificationLink(email);
+        } else {
+          throw linkErr;
+        }
+      }
 
       // Point directly to Tuitionify's custom AuthAction page using the secure Firebase action code
       let directActionLink = firebaseLink;
@@ -78,7 +88,9 @@ router.post(
         email: req.firebaseUser?.email,
         error: err.message,
       });
-      next(err);
+      res.status(500).json({
+        message: err.message || 'Failed to send verification email',
+      });
     }
   },
 );

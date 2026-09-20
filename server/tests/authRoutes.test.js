@@ -26,6 +26,11 @@ vi.mock('../config/firebase.js', () => ({
 }));
 
 vi.mock('../config/resend.js', () => ({
+  getResend: () => ({
+    emails: {
+      send: mocks.sendEmail,
+    },
+  }),
   resend: {
     emails: {
       send: mocks.sendEmail,

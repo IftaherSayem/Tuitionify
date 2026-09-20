@@ -1,4 +1,4 @@
-import { resend, DEFAULT_SENDER } from '../config/resend.js';
+import { resend, getResend, DEFAULT_SENDER } from '../config/resend.js';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -227,8 +227,9 @@ function emailLayout({ title, badge = 'ACCOUNT SECURITY', previewText = '', icon
  * Send high-converting, professional email verification link via Resend
  */
 export async function sendVerificationEmail({ to, name, link }) {
-  if (!resend) {
-    throw new Error('Resend is not configured on the server. Please check RESEND_API_KEY.');
+  const client = getResend() || resend;
+  if (!client) {
+    throw new Error('RESEND_API_KEY is not configured in server environment variables');
   }
 
   const safeName = escapeHtml(name || 'there');
@@ -271,7 +272,7 @@ export async function sendVerificationEmail({ to, name, link }) {
     `,
   });
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await client.emails.send({
     from: DEFAULT_SENDER,
     to: [to],
     subject: 'Verify your Tuitionify account',
@@ -289,8 +290,9 @@ export async function sendVerificationEmail({ to, name, link }) {
  * Send clean, professional password reset email via Resend
  */
 export async function sendPasswordResetEmail({ to, name, link }) {
-  if (!resend) {
-    throw new Error('Resend is not configured on the server. Please check RESEND_API_KEY.');
+  const client = getResend() || resend;
+  if (!client) {
+    throw new Error('RESEND_API_KEY is not configured in server environment variables');
   }
 
   const safeName = escapeHtml(name || 'there');
@@ -329,7 +331,7 @@ export async function sendPasswordResetEmail({ to, name, link }) {
     `,
   });
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await client.emails.send({
     from: DEFAULT_SENDER,
     to: [to],
     subject: 'Reset your Tuitionify password',
@@ -347,7 +349,8 @@ export async function sendPasswordResetEmail({ to, name, link }) {
  * Optional welcome email
  */
 export async function sendWelcomeEmail({ to, name }) {
-  if (!resend) return { success: false };
+  const client = getResend() || resend;
+  if (!client) return { success: false };
 
   const safeName = escapeHtml(name || 'there');
 
@@ -367,7 +370,7 @@ export async function sendWelcomeEmail({ to, name }) {
   });
 
   try {
-    const { data } = await resend.emails.send({
+    const { data } = await client.emails.send({
       from: DEFAULT_SENDER,
       to: [to],
       subject: 'Welcome to Tuitionify!',
