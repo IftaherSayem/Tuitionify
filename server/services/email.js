@@ -1,4 +1,53 @@
+import nodemailer from 'nodemailer';
 import { resend, getResend, DEFAULT_SENDER } from '../config/resend.js';
+
+function getGmailTransporter() {
+  const user = (process.env.GMAIL_USER || '').trim().replace(/^["']|["']$/g, '');
+  const pass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '').replace(/^["']|["']$/g, '');
+
+  if (!user || !pass) return null;
+
+  return {
+    transporter: nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass },
+    }),
+    user,
+  };
+}
+
+async function dispatchEmail({ to, subject, html }) {
+  const gmailConfig = getGmailTransporter();
+  if (gmailConfig) {
+    const from = process.env.GMAIL_FROM || `Tuitionify <${gmailConfig.user}>`;
+    const info = await gmailConfig.transporter.sendMail({
+      from,
+      to,
+      subject,
+      html,
+    });
+    return { success: true, id: info.messageId, provider: 'gmail' };
+  }
+
+  // Fallback to Resend
+  const client = getResend() || resend;
+  if (!client) {
+    throw new Error('Email service not configured. Please set GMAIL_USER & GMAIL_APP_PASSWORD, or RESEND_API_KEY in server environment.');
+  }
+
+  const { data, error } = await client.emails.send({
+    from: DEFAULT_SENDER,
+    to: [to],
+    subject,
+    html,
+  });
+
+  if (error) {
+    throw new Error(`Failed to send email via Resend: ${error.message}`);
+  }
+
+  return { success: true, id: data?.id, provider: 'resend' };
+}
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -59,143 +108,142 @@ function emailLayout({ title, badge = 'ACCOUNT SECURITY', previewText = '', icon
     .brand-logo-text {
       font-size: 20px;
       font-weight: 800;
-      letter-spacing: -0.5px;
       color: #0f172a;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
+      letter-spacing: -0.5px;
     }
     .brand-highlight {
-      color: #0f8f62;
+      color: #10b981;
     }
     .brand-tag {
-      display: inline-block;
-      margin-left: 10px;
-      padding: 3px 8px;
-      background-color: #ecfdf5;
-      color: #059669;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      border-radius: 6px;
+      background: #ecfdf5;
+      color: #047857;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
       vertical-align: middle;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .email-body {
-      padding: 32px 36px;
+      padding: 36px;
+      text-align: left;
     }
     .badge-pill {
       display: inline-block;
-      padding: 4px 10px;
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
-      color: #475569;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.8px;
       text-transform: uppercase;
-      margin-bottom: 16px;
+      letter-spacing: 1px;
+      color: #047857;
+      background: #d1fae5;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
     }
     .main-heading {
-      margin: 0 0 14px;
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 800;
       color: #0f172a;
       line-height: 1.3;
-      letter-spacing: -0.3px;
+      margin: 0 0 16px;
+      letter-spacing: -0.5px;
     }
     .lead-text {
-      margin: 0 0 16px;
       font-size: 15px;
-      line-height: 1.65;
       color: #475569;
-    }
-    .cta-wrapper {
-      margin: 32px 0 28px;
-      text-align: left;
-    }
-    .primary-btn {
-      display: inline-block;
-      padding: 14px 34px;
-      background-color: #0f8f62;
-      background-image: linear-gradient(180deg, #10b981 0%, #0f8f62 100%);
-      color: #ffffff !important;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(15, 143, 98, 0.28);
-      text-align: center;
+      line-height: 1.6;
+      margin: 0 0 20px;
     }
     .account-info-box {
-      margin: 24px 0;
-      padding: 16px 20px;
-      background-color: #f8fafc;
+      background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      font-size: 13px;
-      color: #475569;
+      padding: 16px 20px;
+      margin: 24px 0;
     }
     .account-info-row {
       display: flex;
       justify-content: space-between;
-      margin: 4px 0;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 14px;
     }
     .info-label {
       color: #64748b;
+      font-weight: 500;
     }
     .info-val {
-      font-weight: 600;
       color: #0f172a;
+      font-weight: 600;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .cta-wrapper {
+      margin: 32px 0;
+      text-align: center;
+    }
+    .primary-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 36px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      letter-spacing: 0.2px;
     }
     .fallback-box {
-      margin-top: 24px;
-      padding: 16px 18px;
-      background-color: #f8fafc;
+      background: #f8fafc;
       border: 1px dashed #cbd5e1;
-      border-radius: 10px;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 24px 0 16px;
+      word-break: break-all;
       font-size: 12px;
       color: #64748b;
-      line-height: 1.5;
     }
     .fallback-url {
-      color: #0f8f62;
+      color: #059669;
       text-decoration: underline;
-      word-break: break-all;
-      font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 11px;
     }
     .security-notice {
-      margin-top: 28px;
-      padding-top: 20px;
       border-top: 1px solid #f1f5f9;
+      padding-top: 20px;
+      margin-top: 28px;
       font-size: 12px;
       color: #94a3b8;
-      line-height: 1.55;
+      line-height: 1.5;
     }
     .email-footer {
-      padding: 24px 36px 32px;
-      background-color: #f8fafc;
-      border-top: 1px solid #f1f5f9;
-      text-align: left;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      padding: 24px 36px;
+      text-align: center;
     }
     .footer-text {
-      margin: 0;
       font-size: 12px;
       color: #94a3b8;
+      margin: 0;
       line-height: 1.5;
     }
     .footer-links {
-      margin-top: 10px;
-      font-size: 11px;
+      margin-top: 12px;
+      font-size: 12px;
       color: #94a3b8;
+    }
+    .footer-links a {
+      color: #64748b;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   ${previewText ? `<span style="display:none;font-size:1px;color:#f1f5f9;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${escapeHtml(previewText)}</span>` : ''}
-  <table class="email-wrapper" role="presentation" cellpadding="0" cellspacing="0">
+  <table role="presentation" class="email-wrapper" width="100%" cellpadding="0" cellspacing="0">
     <tr>
       <td align="center">
         <div class="email-container">
@@ -224,14 +272,9 @@ function emailLayout({ title, badge = 'ACCOUNT SECURITY', previewText = '', icon
 }
 
 /**
- * Send high-converting, professional email verification link via Resend
+ * Send high-converting, professional email verification link
  */
 export async function sendVerificationEmail({ to, name, link }) {
-  const client = getResend() || resend;
-  if (!client) {
-    throw new Error('RESEND_API_KEY is not configured in server environment variables');
-  }
-
   const safeName = escapeHtml(name || 'there');
   const safeLink = escapeHtml(link);
   const safeTo = escapeHtml(to);
@@ -272,18 +315,11 @@ export async function sendVerificationEmail({ to, name, link }) {
     `,
   });
 
-  const { data, error } = await client.emails.send({
-    from: DEFAULT_SENDER,
-    to: [to],
+  return await dispatchEmail({
+    to,
     subject: 'Verify your Tuitionify account',
     html,
   });
-
-  if (error) {
-    throw new Error(`Failed to send verification email via Resend: ${error.message}`);
-  }
-
-  return { success: true, id: data?.id };
 }
 
 /**
@@ -331,27 +367,17 @@ export async function sendPasswordResetEmail({ to, name, link }) {
     `,
   });
 
-  const { data, error } = await client.emails.send({
-    from: DEFAULT_SENDER,
-    to: [to],
+  return await dispatchEmail({
+    to,
     subject: 'Reset your Tuitionify password',
     html,
   });
-
-  if (error) {
-    throw new Error(`Failed to send password reset email via Resend: ${error.message}`);
-  }
-
-  return { success: true, id: data?.id };
 }
 
 /**
  * Optional welcome email
  */
 export async function sendWelcomeEmail({ to, name }) {
-  const client = getResend() || resend;
-  if (!client) return { success: false };
-
   const safeName = escapeHtml(name || 'there');
 
   const html = emailLayout({
@@ -370,15 +396,14 @@ export async function sendWelcomeEmail({ to, name }) {
   });
 
   try {
-    const { data } = await client.emails.send({
-      from: DEFAULT_SENDER,
-      to: [to],
+    return await dispatchEmail({
+      to,
       subject: 'Welcome to Tuitionify!',
       html,
     });
-    return { success: true, id: data?.id };
   } catch (err) {
     console.warn('Welcome email could not be sent:', err.message);
     return { success: false };
   }
 }
+
